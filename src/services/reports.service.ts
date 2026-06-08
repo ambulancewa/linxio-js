@@ -65,9 +65,7 @@ export class DigitalFormsService extends BaseService {
 
     /** Fetch one digital form. */
     get(formId: LinxioId): Promise<LinxioResult<LinxioDigitalForm>> {
-        return this.result(() =>
-            this.http.get(`/digital-form/form/${formId}`),
-        );
+        return this.result(() => this.http.get(`/digital-form/form/${formId}`));
     }
 
     /** Fetch one digital form answer. */

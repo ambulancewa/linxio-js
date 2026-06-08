@@ -1,5 +1,5 @@
-import { fail, ok, unwrapLinxioPageResult } from "./result";
 import type { LinxioPageResult, LinxioResult } from "./result";
+import { fail, ok, unwrapLinxioPageResult } from "./result";
 import type { ListParams } from "./types/common";
 
 /**
@@ -21,7 +21,7 @@ export async function collectPages<TData, TParams extends ListParams>(
 
         return ok(data);
     } catch (error) {
-        return fail<TData[]>(error);
+        return fail(error);
     }
 }
 

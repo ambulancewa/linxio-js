@@ -1,0 +1,62 @@
+---
+title: Authentication
+description: Login, session hydration, token refresh, and safe credential handling.
+---
+
+## Login
+
+```ts
+const login = await linxio.auth.login({
+  email,
+  password,
+  domain: "optional-domain",
+});
+
+if (login.error) {
+  throw login.error;
+}
+
+console.log(login.data.expireAt);
+```
+
+`auth.login()` updates the client's in-memory session. The HTTP layer adds `Authorization: Bearer <token>` to future requests.
+
+## Hydrate an existing session
+
+```ts
+const linxio = createClient({
+  token: stored.token,
+  refreshToken: stored.refreshToken,
+});
+```
+
+You can also update a client later:
+
+```ts
+linxio.setSession({ token, refreshToken });
+```
+
+## Automatic refresh
+
+When a request receives `401` and a refresh token is available, the SDK calls `/token/refresh`, updates the session, and retries the original request once.
+
+Concurrent refreshes are coalesced. If several requests hit `401` at the same time, only one refresh call is sent.
+
+## OTP
+
+```ts
+const otp = await linxio.auth.verifyOtp({
+  email,
+  code,
+});
+
+if (otp.error) {
+  throw otp.error;
+}
+```
+
+Linxio's public integration notes recommend disabling OTP for integration users.
+
+## Secrets
+
+Do not commit credentials. Prefer environment variables, a secret manager, or your deployment platform's encrypted environment configuration.

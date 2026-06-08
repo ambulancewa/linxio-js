@@ -1,7 +1,7 @@
 import type { HttpClient, LinxioHttpRequestOptions } from "../http";
 import { mergeParams, toPage } from "../params";
-import { pageFail, pageOk, toResult } from "../result";
 import type { LinxioPageResult, LinxioResult } from "../result";
+import { pageFail, pageOk, toResult } from "../result";
 import type {
     FieldSelector,
     LinxioPageEnvelope,
@@ -28,7 +28,7 @@ export abstract class BaseService {
 
             return pageOk(toPage(response));
         } catch (error) {
-            return pageFail<TData>(error);
+            return pageFail(error);
         }
     }
 

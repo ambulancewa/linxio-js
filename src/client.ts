@@ -56,7 +56,15 @@ export type LinxioClientOptions = {
  * const linxio = createClient();
  * await linxio.auth.login({ email, password });
  *
- * const vehicles = await linxio.vehicles.list({ fields: ["id", "regNo"] });
+ * const { data, error } = await linxio.vehicles.list({
+ *   fields: ["id", "regNo"],
+ * });
+ *
+ * if (error) {
+ *   throw error;
+ * }
+ *
+ * console.log(data);
  * ```
  */
 export class LinxioClient {

@@ -11,9 +11,9 @@ export default function HomePage() {
         APIs.
       </h1>
       <p className="mb-8 text-lg text-fd-muted-foreground">
-        Authenticate once, use domain services for common workflows, stream
-        paginated results with async iterators, and drop down to raw requests
-        for tenant-specific endpoints.
+        Authenticate once, use domain services for common workflows, load or
+        stream paginated results, and drop down to raw requests for
+        tenant-specific endpoints.
       </p>
       <p>
         <Link href="/docs" className="font-medium underline">

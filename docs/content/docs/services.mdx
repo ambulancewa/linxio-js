@@ -1,0 +1,82 @@
+---
+title: Services
+description: Domain services exposed by LinxioClient.
+---
+
+## Vehicles
+
+```ts
+const { data: vehicles, error, meta } = await linxio.vehicles.list({
+  fields: ["id", "regNo"],
+  limit: 50,
+});
+
+if (error) {
+  throw error;
+}
+
+console.log(meta.total, vehicles);
+
+const vehicle = await linxio.vehicles.get(304);
+const odometer = await linxio.vehicles.getOdometer(304);
+```
+
+## Routes
+
+```ts
+const routes = await linxio.routes.getVehicleRoutes(304, {
+  dateFrom: "2026-06-01T00:00:00+08:00",
+  dateTo: "2026-06-08T00:00:00+08:00",
+});
+
+if (routes.error) {
+  throw routes.error;
+}
+```
+
+Only request `fields: ["coordinates"]` when you need every coordinate point.
+
+## Geofences
+
+```ts
+const geofences = await linxio.geofences.list({ limit: 100 });
+
+const depot = await linxio.geofences.create({
+  name: "Temporary Test Area",
+  type: "circle",
+  radius: 100,
+  coordinates: [{ lat: -31.95, lng: 115.86 }],
+});
+```
+
+## Devices
+
+```ts
+const devices = await linxio.devices.list({ fields: ["id", "imei", "status"] });
+
+const installed = await linxio.devices.install(deviceId, {
+  vehicleId,
+  installedAt: new Date().toISOString(),
+});
+```
+
+## Drivers
+
+```ts
+await linxio.drivers.assignToVehicle(vehicleId, driverId);
+await linxio.drivers.unassignFromVehicle(vehicleId, driverId);
+```
+
+## Sensors
+
+```ts
+const report = await linxio.sensors.deviceTemperatureHumidityReport({
+  startDate: "2026-06-01T00:00:00+08:00",
+  endDate: "2026-06-08T00:00:00+08:00",
+  limit: 100,
+});
+```
+
+## Fuel and dashboard-derived services
+
+Fuel, scheduled reports, digital forms, cameras, users, clients, and resellers are available as typed service objects. Some of these endpoints were inferred from the dashboard bundles rather than the public API page, so inspect your tenant behavior before using mutations in production.

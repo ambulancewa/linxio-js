@@ -18,10 +18,9 @@ export type LinxioFailure<TError extends LinxioError = LinxioError> = {
 };
 
 /** Standard result returned by SDK service methods. */
-export type LinxioResult<
-    TData,
-    TError extends LinxioError = LinxioError,
-> = LinxioFailure<TError> | LinxioSuccess<TData>;
+export type LinxioResult<TData, TError extends LinxioError = LinxioError> =
+    | LinxioFailure<TError>
+    | LinxioSuccess<TData>;
 
 /** Successful paginated SDK result. */
 export type LinxioPageSuccess<TData> = LinxioPaginationMeta & {
@@ -38,9 +37,7 @@ export type LinxioPageSuccess<TData> = LinxioPaginationMeta & {
 };
 
 /** Failed paginated SDK result. */
-export type LinxioPageFailure<
-    TError extends LinxioError = LinxioError,
-> = {
+export type LinxioPageFailure<TError extends LinxioError = LinxioError> = {
     /** Always `null` when the operation fails. */
     data: null;
     /** Typed SDK error with request context where available. */
@@ -56,10 +53,9 @@ export type LinxioPageFailure<
 };
 
 /** Paginated result returned by SDK list/report methods. */
-export type LinxioPageResult<
-    TData,
-    TError extends LinxioError = LinxioError,
-> = LinxioPageFailure<TError> | LinxioPageSuccess<TData>;
+export type LinxioPageResult<TData, TError extends LinxioError = LinxioError> =
+    | LinxioPageFailure<TError>
+    | LinxioPageSuccess<TData>;
 
 /** Create a successful result object. */
 export function ok<TData>(data: TData): LinxioSuccess<TData> {
@@ -67,9 +63,7 @@ export function ok<TData>(data: TData): LinxioSuccess<TData> {
 }
 
 /** Create a failed result object from an unknown thrown value. */
-export function fail<TData = never>(
-    error: unknown,
-): LinxioFailure<LinxioError> {
+export function fail(error: unknown): LinxioFailure<LinxioError> {
     return { data: null, error: toLinxioError(error) };
 }
 
@@ -80,7 +74,7 @@ export async function toResult<TData>(
     try {
         return ok(await operation());
     } catch (error) {
-        return fail<TData>(error);
+        return fail(error);
     }
 }
 
@@ -92,9 +86,7 @@ export function pageOk<TData>(
 }
 
 /** Create a failed paginated result object from an unknown thrown value. */
-export function pageFail<TData = never>(
-    error: unknown,
-): LinxioPageFailure<LinxioError> {
+export function pageFail(error: unknown): LinxioPageFailure<LinxioError> {
     return {
         data: null,
         error: toLinxioError(error),
@@ -113,9 +105,7 @@ export function isLinxioFailure(
 }
 
 /** Return the data from a result or throw the contained SDK error. */
-export function unwrapLinxioResult<TData>(
-    result: LinxioResult<TData>,
-): TData {
+export function unwrapLinxioResult<TData>(result: LinxioResult<TData>): TData {
     if (result.error) {
         throw result.error;
     }

@@ -1,0 +1,59 @@
+---
+title: Endpoint Catalogue
+description: Public and dashboard-derived Linxio endpoint families exposed by the SDK.
+---
+
+The SDK exposes a runtime `linxioEndpoints` catalogue:
+
+```ts
+import { linxioEndpoints } from "linxio-js";
+
+console.log(linxioEndpoints.vehicles.list);
+```
+
+Each entry contains a method, path, and source marker:
+
+- `public-docs` means the endpoint appears on Linxio's public API page.
+- `dashboard` means the endpoint was inferred from the Linxio dashboard JavaScript bundles.
+
+## Public core
+
+- `POST /login`
+- `GET /vehicles/fields/json`
+- `GET /vehicles/{vehicleId}/routes`
+- `GET /areas`
+- `POST /areas`
+- `DELETE /areas/{areaId}`
+- `GET /vehicles/{vehicleId}/odometer`
+- `POST /vehicles/{vehicleId}/odometer`
+- `POST /devices`
+- `PATCH /devices/{deviceId}`
+- `GET /devices/json`
+- `GET /devices/{deviceId}`
+- `POST /vehicles`
+- `POST /vehicles/{vehicleId}`
+- `GET /vehicles/{vehicleId}`
+- `POST /clients/{clientId}/users`
+- `POST /clients/{clientId}/users/{userId}`
+- `GET /clients/{clientId}/users`
+- `GET /clients/{clientId}/users/{userId}`
+- `POST /devices/{deviceId}/install`
+- `POST /devices/{deviceId}/uninstall`
+- `POST /vehicle/{vehicleId}/set-driver/{driverId}`
+- `POST /vehicle/{vehicleId}/unset-driver/{driverId}`
+- sensor report endpoints
+- client driver user list
+
+## Dashboard-derived families
+
+- fuel cards and fuel reports
+- scheduled reports
+- digital forms
+- camera events
+- users
+- resellers
+- area groups
+- notifications
+- settings
+
+Prefer read-only verification before using dashboard-derived mutations in a live tenant.

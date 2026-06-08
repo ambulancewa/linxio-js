@@ -1,0 +1,94 @@
+---
+title: Getting Started
+description: Install linxio-js and make your first authenticated Linxio request.
+---
+
+## Install
+
+```bash
+pnpm add linxio-js
+```
+
+```bash
+npm install linxio-js
+```
+
+The package ships ESM, CommonJS, and TypeScript declarations.
+
+## Create a client
+
+```ts
+import { createClient } from "linxio-js";
+
+const linxio = createClient({
+  timeoutMs: 30_000,
+  retry: {
+    retries: 3,
+    delayMs: 1_000,
+  },
+});
+```
+
+## Authenticate
+
+```ts
+const login = await linxio.auth.login({
+  email: process.env.LINXIO_EMAIL!,
+  password: process.env.LINXIO_PASSWORD!,
+});
+
+if (login.error) {
+  throw login.error;
+}
+```
+
+The SDK stores tokens in memory. Persist them yourself if your process needs to survive restarts:
+
+```ts
+const session = linxio.session();
+await saveSession(session);
+
+const linxio = createClient(await loadSession());
+```
+
+## Read vehicles
+
+```ts
+const { data: vehicles, error, meta } = await linxio.vehicles.list({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+  page: 1,
+  sort: "regNo",
+});
+
+if (error) {
+  throw error;
+}
+
+console.log(meta.total, vehicles);
+```
+
+## Read all pages
+
+```ts
+const { data: vehicles, error } = await linxio.vehicles.iterate({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+
+for (const vehicle of vehicles) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```
+
+## Stream all pages
+
+```ts
+for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```

@@ -1,0 +1,13 @@
+{
+  "title": "linxio-js",
+  "pages": [
+    "index",
+    "getting-started",
+    "authentication",
+    "services",
+    "realtime",
+    "errors",
+    "live-validation",
+    "endpoint-catalogue"
+  ]
+}

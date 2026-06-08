@@ -1,0 +1,47 @@
+---
+title: Overview
+description: A TypeScript SDK for Linxio fleet, device, driver, geofence, route, sensor, fuel, and realtime APIs.
+---
+
+`linxio-js` is a TypeScript SDK for Linxio's REST and realtime APIs.
+
+The SDK is designed for Node.js projects, operational scripts, and backend services:
+
+- `createClient()` gives you one clear entry point for the SDK.
+- Domain services cover documented Linxio workflows and stable dashboard-derived endpoints.
+- Service methods return `{ data, error }` results for straightforward script control flow.
+- Automatic JWT refresh coalesces concurrent 401 recovery into one refresh call.
+- Idempotent requests retry transient failures with exponential backoff.
+- List endpoints return normalized pages, auto-pagination helpers, and streaming iterators.
+- `client.request()` is available for advanced or tenant-specific endpoints.
+- Realtime helpers wrap Linxio's Socket.IO `coordinates` and `notifications` channels.
+
+```ts
+import { createClient } from "linxio-js";
+
+const linxio = createClient();
+
+await linxio.auth.login({
+  email: process.env.LINXIO_EMAIL!,
+  password: process.env.LINXIO_PASSWORD!,
+});
+
+const { data: vehicles, error } = await linxio.vehicles.iterate({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+
+for (const vehicle of vehicles) {
+  console.log(vehicle.id, vehicle.regNo, vehicle.lastLoggedAt);
+}
+```
+
+## Evidence model
+
+The public API methods are based on Linxio's published API page. Additional service helpers were inferred from JavaScript bundles captured from the Linxio dashboard and are documented as dashboard-derived where appropriate.
+
+When a response schema is only partially known, exported types include the confirmed fields plus an open record shape so production scripts can keep working as Linxio adds fields.

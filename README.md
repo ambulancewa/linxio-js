@@ -12,7 +12,7 @@ await linxio.auth.login({
     password: process.env.LINXIO_PASSWORD!,
 });
 
-const { data, error } = await linxio.vehicles.list({
+const { data, error } = await linxio.vehicles.iterate({
     fields: ["id", "regNo", "lastLoggedAt"],
     limit: 100,
 });

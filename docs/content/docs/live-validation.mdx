@@ -1,0 +1,45 @@
+---
+title: Live Validation
+description: Redacted read-only validation notes from a production Linxio tenant.
+---
+
+The SDK was exercised against a production Linxio tenant on June 8, 2026 using
+read-only operations. No create, update, delete, archive, restore, install, or
+assignment calls were made during this validation run.
+
+The shapes below are intentionally redacted. They do not include real
+registration numbers, IMEIs, coordinates, names, identifiers, tenant totals, or
+route data.
+
+## Read-only smoke test
+
+```bash
+LINXIO_EMAIL="..." LINXIO_PASSWORD="..." pnpm live:smoke
+```
+
+The smoke script imports the compiled package from `dist`, authenticates with
+`auth.login()`, then samples list/stream endpoints through the public SDK.
+
+## Observed shapes
+
+| SDK call | Result |
+| --- | --- |
+| `vehicles.list({ fields: ["id", "regNo", "lastLoggedAt"], limit: 3 })` | `data` array with `id: number`, `regNo: string` in the sampled record. Requested fields may be omitted by Linxio when a value is not present. |
+| `vehicles.stream({ fields: ["id", "regNo", "lastLoggedAt"], limit: 3 })` | Streamed vehicle records with the same redacted shape as the list sample. |
+| `devices.list({ fields: ["id", "imei", "status"], limit: 3 })` | `data` array with `id: number`, `imei: string`, `status: string` in the sampled record. |
+| `geofences.list({ limit: 3 })` | `data` array with `coordinates: array`, `createdAt: string`, `groups: array`, `id: number`, `name: string`, `polygon: string`, `readOnly: boolean`, `status: string`, `team: object`, `type: string`, `updatedAt: string` in the sampled record. |
+
+All sampled list responses returned normalized pagination metadata through
+`page`, `limit`, `total`, and `meta`. The docs omit the actual values because
+tenant inventory counts are operational data.
+
+## Repeating the check
+
+```bash
+pnpm build
+LINXIO_EMAIL="..." LINXIO_PASSWORD="..." pnpm live:smoke
+```
+
+Set `LINXIO_LIVE_FULL_PAGINATION=1` only when you deliberately want to exercise
+`vehicles.iterate()` against every vehicle page. The default smoke test avoids
+full-pagination traversal to keep production-tenant load low.

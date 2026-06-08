@@ -1,0 +1,44 @@
+---
+title: Errors
+description: Handle typed SDK, network, timeout, API, validation, and realtime errors.
+---
+
+All SDK-defined errors extend `LinxioError`. Domain service methods return
+`{ data, error }` results, while low-level `client.request()` calls throw typed
+errors directly.
+
+```ts
+import { LinxioApiError } from "linxio-js";
+
+const { data, error } = await linxio.vehicles.create({});
+
+if (error instanceof LinxioApiError) {
+  console.error(error.status, error.path, error.body);
+}
+
+if (data) {
+  console.log(data.id);
+}
+```
+
+## Error classes
+
+| Class | When it is thrown |
+| --- | --- |
+| `LinxioConfigurationError` | Required runtime configuration is missing. |
+| `LinxioNetworkError` | Fetch failed before Linxio returned a response. |
+| `LinxioTimeoutError` | A request exceeded its timeout. |
+| `LinxioApiError` | Linxio returned a non-2xx response. |
+| `LinxioAuthenticationError` | SDK-side authentication state is invalid. |
+| `LinxioValidationError` | SDK-side validation fails. |
+| `LinxioRealtimeError` | Realtime Socket.IO setup fails. |
+
+`LinxioApiError` includes:
+
+- `status`
+- `statusText`
+- `body`
+- `headers`
+- `requestId`
+- `method`
+- `path`
