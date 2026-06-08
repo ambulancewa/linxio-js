@@ -1,11 +1,11 @@
 ---
 title: API Reference
 description: HTTP endpoints, parameters, response envelopes, and copy-ready request examples.
-full: true
 ---
 
 The default REST base URL is `https://api.linxio.com/api`. Authenticated
-requests use `Authorization: Bearer <token>`.
+requests require an `Authorization: Bearer <token>` header, obtained from the
+[login endpoint](#create-a-session).
 
 ## Response Envelope
 
@@ -19,6 +19,8 @@ Most list endpoints return a pagination envelope:
   "data": []
 }
 ```
+
+## Create a session
 
 <ReferenceGrid>
   <div>
@@ -99,6 +101,8 @@ curl -X POST https://api.linxio.com/api/login \
   </CodeRail>
 </ReferenceGrid>
 
+## List vehicles
+
 <ReferenceGrid>
   <div>
     <ReferenceHeader
@@ -163,6 +167,8 @@ curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo
   </CodeRail>
 </ReferenceGrid>
 
+## Get vehicle routes
+
 <ReferenceGrid>
   <div>
     <ReferenceHeader
@@ -220,6 +226,8 @@ if (routes.error) {
 
   </CodeRail>
 </ReferenceGrid>
+
+## Create a geofence
 
 <ReferenceGrid>
   <div>

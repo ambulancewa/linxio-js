@@ -1,8 +1,8 @@
 ---
 title: Authentication
 description: Login, session hydration, token refresh, OTP, and safe credential handling.
-full: true
 ---
+
 
 <ReferenceGrid>
   <div>
@@ -117,7 +117,8 @@ curl -X POST https://api.linxio.com/api/login \
   <div>
     <ReferenceHeader title="Hydrate a client" sdk="createClient(options)">
       Use this when you persist sessions yourself and want a new process to
-      resume without calling `auth.login()` again.
+      resume without calling `auth.login()` again. Pass previously stored
+      tokens directly into `createClient`.
     </ReferenceHeader>
 
     <FieldTable
@@ -131,7 +132,7 @@ curl -X POST https://api.linxio.com/api/login \
         {
           name: "refreshToken",
           type: "string",
-          description: "Refresh token used for automatic token recovery.",
+          description: "Refresh token used for automatic token recovery on 401 responses.",
         },
         {
           name: "timeoutMs",
@@ -158,11 +159,13 @@ const linxio = createClient({
   refreshToken: stored.refreshToken,
 });
 
+// Update session tokens at runtime
 linxio.setSession({
   token: nextToken,
   refreshToken: nextRefreshToken,
 });
 
+// Read the current session
 const current = linxio.session();
 ```
 
@@ -173,7 +176,7 @@ const current = linxio.session();
 
 When a request receives `401` and a refresh token is available, the SDK calls
 `/token/refresh`, updates the in-memory session, and retries the original
-request once. Concurrent refreshes are coalesced, so several simultaneous `401`
+request once. Concurrent refreshes are coalesced — several simultaneous `401`
 responses only trigger one refresh request.
 
 ## OTP
@@ -187,8 +190,8 @@ responses only trigger one refresh request.
       sdk="linxio.auth.verifyOtp(payload)"
     >
       Completes an OTP challenge for accounts where Linxio requires a one-time
-      code. Linxio's public integration notes recommend disabling OTP for
-      integration users.
+      code after the initial login. Linxio's integration notes recommend
+      disabling OTP for machine users to avoid this step.
     </ReferenceHeader>
 
     <FieldTable
@@ -204,7 +207,7 @@ responses only trigger one refresh request.
           name: "code",
           type: "string",
           required: true,
-          description: "One-time code provided by Linxio's OTP flow.",
+          description: "One-time code delivered by Linxio to the user's registered device.",
         },
       ]}
     />
@@ -213,13 +216,20 @@ responses only trigger one refresh request.
   <CodeRail>
 
 ```ts title="Verify an OTP challenge" lineNumbers
-const otp = await linxio.auth.verifyOtp({
+const login = await linxio.auth.login({
   email: process.env.LINXIO_EMAIL!,
-  code,
+  password: process.env.LINXIO_PASSWORD!,
 });
 
-if (otp.error) {
-  throw otp.error;
+if (login.data?.otpRequired) {
+  const otp = await linxio.auth.verifyOtp({
+    email: process.env.LINXIO_EMAIL!,
+    code, // delivered out of band
+  });
+
+  if (otp.error) {
+    throw otp.error;
+  }
 }
 ```
 
@@ -230,3 +240,12 @@ if (otp.error) {
 
 Do not commit credentials. Prefer environment variables, a secret manager, or
 your deployment platform's encrypted environment configuration.
+
+```ts title="Recommended credential pattern"
+const linxio = createClient();
+
+await linxio.auth.login({
+  email: process.env.LINXIO_EMAIL!,    // from env, not source
+  password: process.env.LINXIO_PASSWORD!, // from env, not source
+});
+```

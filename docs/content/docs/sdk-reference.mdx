@@ -1,8 +1,9 @@
 ---
 title: SDK Reference
 description: TypeScript client options, result contracts, service methods, parameters, and return shapes.
-full: true
 ---
+
+## Create a client
 
 <ReferenceGrid>
   <div>
@@ -39,7 +40,7 @@ full: true
         {
           name: "retry",
           type: "RetryOptions",
-          description: "Retry configuration for idempotent requests.",
+          description: "Retry configuration for idempotent requests that fail with transient network or 5xx errors.",
         },
         {
           name: "fetch",
@@ -120,7 +121,7 @@ wrapping every call in `try/catch`.
   ]}
 />
 
-## Shared List Parameters
+## Shared list parameters
 
 <FieldTable
   fields={[
@@ -153,6 +154,8 @@ wrapping every call in `try/catch`.
   ]}
 />
 
+## Vehicle methods
+
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Vehicle methods" sdk="linxio.vehicles">
@@ -166,21 +169,25 @@ wrapping every call in `try/catch`.
           name: "list(params)",
           parameters: "LinxioVehicleListParams",
           returns: "LinxioPageResult<LinxioVehicle>",
+          description: "Paginated vehicle list with optional field projection.",
         },
         {
           name: "iterate(params)",
           parameters: "LinxioVehicleListParams",
           returns: "LinxioResult<LinxioVehicle[]>",
+          description: "Auto-paginate all pages and return a flat array.",
         },
         {
           name: "stream(params)",
           parameters: "LinxioVehicleListParams",
           returns: "AsyncGenerator<LinxioVehicle>",
+          description: "Lazy async generator — yield one vehicle at a time across pages.",
         },
         {
           name: "get(vehicleId)",
           parameters: "LinxioId",
           returns: "LinxioResult<LinxioVehicle>",
+          description: "Fetch a single vehicle by its Linxio ID.",
         },
         {
           name: "create(payload)",
@@ -196,6 +203,7 @@ wrapping every call in `try/catch`.
           name: "archive(vehicleId)",
           parameters: "LinxioId",
           returns: "LinxioResult<void>",
+          description: "Soft-delete a vehicle. Reversible with restore().",
         },
         {
           name: "restore(vehicleId)",
@@ -206,11 +214,13 @@ wrapping every call in `try/catch`.
           name: "count(params)",
           parameters: "LinxioVehicleCountParams",
           returns: "LinxioResult<LinxioCount>",
+          description: "Efficient vehicle count without fetching records.",
         },
         {
           name: "types(params)",
           parameters: "LinxioVehicleTypeParams",
           returns: "LinxioResult<LinxioVehicleType[]>",
+          description: "Available vehicle type categories.",
         },
       ]}
     />
@@ -233,10 +243,16 @@ for (const vehicle of vehicles) {
 }
 ```
 
+```ts title="Stream lazily" lineNumbers
+for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```
+
   </CodeRail>
 </ReferenceGrid>
 
-## Core Services
+## Core services
 
 <ServiceTable
   rows={[
@@ -279,6 +295,8 @@ for (const vehicle of vehicles) {
   ]}
 />
 
+## Advanced requests
+
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Advanced requests" sdk="linxio.request(method, path, options)">
@@ -305,7 +323,7 @@ for (const vehicle of vehicles) {
         {
           name: "options.params",
           type: "QueryParams",
-          description: "Query parameters.",
+          description: "Query parameters to append to the request URL.",
         },
         {
           name: "options.body",
@@ -321,6 +339,15 @@ for (const vehicle of vehicles) {
 ```ts title="Raw request" lineNumbers
 const result = await linxio.request("GET", "/country/list");
 console.log(result);
+```
+
+```ts title="POST with body" lineNumbers
+const result = await linxio.request("POST", "/vehicles", {
+  body: {
+    regNo: "ABC-123",
+    type: "car",
+  },
+});
 ```
 
   </CodeRail>

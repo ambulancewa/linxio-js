@@ -1,277 +1,310 @@
-import defaultMdxComponents from "fumadocs-ui/mdx";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 type ReferenceField = {
-  allowedValues?: string[];
-  defaultValue?: string;
-  description: ReactNode;
-  name: string;
-  required?: boolean;
-  type: string;
+    allowedValues?: string[];
+    defaultValue?: string;
+    description: ReactNode;
+    name: string;
+    required?: boolean;
+    type: string;
 };
 
 type MethodRow = {
-  description?: ReactNode;
-  name: string;
-  parameters: string;
-  returns: string;
+    description?: ReactNode;
+    name: string;
+    parameters: string;
+    returns: string;
 };
 
 type ServiceRow = {
-  methods: string;
-  service: string;
+    methods: string;
+    service: string;
 };
 
+function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
 function MethodBadge({ method }: { method: string }) {
-  const normalized = method.toUpperCase();
+    const normalized = method.toUpperCase();
 
-  return (
-    <span
-      className={cn(
-        "inline-flex h-5 items-center rounded-sm border px-1.5 font-mono text-[10px] font-semibold uppercase tracking-normal",
-        normalized === "GET" &&
-          "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300",
-        normalized === "POST" &&
-          "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-300",
-        normalized === "PATCH" &&
-          "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300",
-        normalized === "DELETE" &&
-          "border-red-200 bg-red-50 text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300",
-      )}
-    >
-      {normalized}
-    </span>
-  );
+    return (
+        <span
+            className={cn(
+                "inline-flex h-[26px] shrink-0 items-center rounded px-[7px] font-bold font-mono text-sm uppercase leading-none tracking-wide",
+                normalized === "GET" &&
+                    "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80 ring-inset dark:bg-emerald-950/30 dark:text-emerald-400 dark:ring-emerald-800/60",
+                normalized === "POST" &&
+                    "bg-blue-50 text-blue-700 ring-1 ring-blue-200/80 ring-inset dark:bg-blue-950/30 dark:text-blue-400 dark:ring-blue-800/60",
+                normalized === "PATCH" &&
+                    "bg-amber-50 text-amber-700 ring-1 ring-amber-200/80 ring-inset dark:bg-amber-950/30 dark:text-amber-400 dark:ring-amber-800/60",
+                normalized === "PUT" &&
+                    "bg-violet-50 text-violet-700 ring-1 ring-violet-200/80 ring-inset dark:bg-violet-950/30 dark:text-violet-400 dark:ring-violet-800/60",
+                normalized === "DELETE" &&
+                    "bg-red-50 text-red-700 ring-1 ring-red-200/80 ring-inset dark:bg-red-950/30 dark:text-red-400 dark:ring-red-800/60",
+            )}
+        >
+            {normalized}
+        </span>
+    );
 }
 
-/**
- * Compact method header for API and SDK reference pages.
- */
 export function ReferenceHeader({
-  children,
-  method,
-  path,
-  sdk,
-  title,
+    children,
+    method,
+    path,
+    sdk,
+    title,
+    hideTitle = false,
 }: {
-  children?: ReactNode;
-  method?: string;
-  path?: string;
-  sdk?: string;
-  title: string;
+    children?: ReactNode;
+    method?: string;
+    path?: string;
+    sdk?: string;
+    title: string;
+    hideTitle?: boolean;
 }) {
-  return (
-    <section className="not-prose my-12 border-b pb-8">
-      <div>
-        <div className="flex flex-wrap items-center gap-2.5">
-          {method ? <MethodBadge method={method} /> : null}
-          <h2 className="m-0 text-2xl font-semibold tracking-normal">
-            {title}
-          </h2>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {path ? (
-            <code className="rounded-md border bg-fd-muted/50 px-2.5 py-1.5 text-sm">
-              {path}
-            </code>
-          ) : null}
-          {sdk ? (
-            <code className="rounded-md border bg-fd-muted/50 px-2.5 py-1.5 text-sm">
-              {sdk}
-            </code>
-          ) : null}
-        </div>
-      </div>
-      {children ? (
-        <div className="mt-5 max-w-3xl space-y-4 text-base leading-7 text-fd-muted-foreground">
-          {children}
-        </div>
-      ) : null}
-    </section>
-  );
-}
+    const id = slugify(title);
 
-/**
- * Responsive two-column layout for reference copy and runnable examples.
- */
-export function ReferenceGrid({ children }: { children: ReactNode }) {
-  return (
-    <div className="not-prose mx-auto my-16 grid w-full max-w-[1240px] gap-10 xl:grid-cols-[minmax(0,620px)_minmax(460px,520px)] xl:items-start xl:gap-20">
-      {children}
-    </div>
-  );
-}
-
-/**
- * Right-hand example rail for highlighted, copyable MDX code fences.
- */
-export function CodeRail({ children }: { children: ReactNode }) {
-  return (
-    <aside className="linxio-code-rail not-prose space-y-5 xl:sticky xl:top-20 xl:self-start [&_figure]:my-0 [&_pre]:max-h-[min(72vh,760px)] [&_pre]:text-[13px]">
-      {children}
-    </aside>
-  );
-}
-
-/**
- * Parameter or response-field table for reference pages.
- */
-export function FieldTable({
-  fields,
-  title = "Parameters",
-}: {
-  fields: ReferenceField[];
-  title?: string;
-}) {
-  return (
-    <section className="not-prose my-10">
-      <h2 className="mb-4 text-xl font-semibold tracking-normal">{title}</h2>
-      <div className="border-t">
-        {fields.map((field) => (
-          <div
-            className="grid gap-4 border-b py-5 md:grid-cols-[minmax(220px,0.32fr)_1fr]"
-            key={field.name}
-          >
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <code className="text-[15px] font-semibold">{field.name}</code>
-                {field.required ? (
-                  <span className="rounded-sm border border-red-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-600 dark:border-red-900/70 dark:text-red-300">
-                    Required
-                  </span>
-                ) : (
-                  <span className="rounded-sm border px-1.5 py-0.5 text-[10px] font-semibold uppercase text-fd-muted-foreground">
-                    Optional
-                  </span>
+    return (
+        <section
+            id={id}
+            className={cn(
+                "not-prose mb-7 scroll-mt-24",
+                hideTitle && "-mt-12 [&>aside+*]:-mt-12",
+            )}
+            {...(hideTitle && { "data-hide-title": true })}
+        >
+            <div className="mb-3 flex flex-wrap items-center gap-2.5">
+                {method ? <MethodBadge method={method} /> : null}
+                {hideTitle ? null : (
+                    <h2 className="m-0 font-bold text-2xl text-fd-foreground leading-snug tracking-tight">
+                        {title}
+                    </h2>
                 )}
-              </div>
-              <div className="mt-2 font-mono text-[13px] text-fd-muted-foreground">
-                {field.type}
-              </div>
             </div>
-            <div className="space-y-2 text-[15px] leading-7 text-fd-muted-foreground">
-              <div>{field.description}</div>
-              {field.defaultValue ? (
-                <div>
-                  Default: <code>{field.defaultValue}</code>
+
+            {(path ?? sdk) ? (
+                <div className="mb-4 flex flex-wrap gap-2">
+                    {path ? (
+                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-[7px] font-mono text-[12.5px] text-fd-muted-foreground leading-none">
+                            {path}
+                        </code>
+                    ) : null}
+                    {sdk ? (
+                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-[7px] font-mono text-[12.5px] text-fd-muted-foreground leading-none">
+                            {sdk}
+                        </code>
+                    ) : null}
                 </div>
-              ) : null}
-              {field.allowedValues?.length ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {field.allowedValues.map((value) => (
-                    <code
-                      className="rounded border bg-fd-muted px-1.5 py-0.5 text-xs"
-                      key={value}
-                    >
-                      {value}
-                    </code>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+            ) : null}
+
+            {children ? (
+                <p className="m-0 max-w-[600px] text-[15px] text-fd-muted-foreground leading-[1.75]">
+                    {children}
+                </p>
+            ) : null}
+        </section>
+    );
 }
 
-/**
- * Method signature table for SDK service reference sections.
- */
-export function MethodTable({
-  rows,
-  title = "Methods",
+export function ReferenceGrid({ children }: { children: ReactNode }) {
+    return (
+        <div className="not-prose mx-auto my-12 grid w-full gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-12 xl:[&:has(section[data-hide-title=true])>aside]:-mt-12 [&>*]:min-w-0">
+            {children}
+        </div>
+    );
+}
+
+export function CodeRail({ children }: { children: ReactNode }) {
+    return (
+        <aside className="peer/code-rail linxio-code-rail not-prose space-y-4 xl:sticky xl:top-20 xl:self-start [&_figure]:my-0 [&_pre]:max-h-[min(72vh,720px)] [&_pre]:text-[13px]">
+            {children}
+        </aside>
+    );
+}
+
+export function FieldTable({
+    fields,
+    title = "Parameters",
 }: {
-  rows: MethodRow[];
-  title?: string;
+    fields: ReferenceField[];
+    title?: string;
 }) {
-  return (
-    <section className="not-prose my-10">
-      <h2 className="mb-4 text-xl font-semibold tracking-normal">{title}</h2>
-      <div className="border-t">
-        {rows.map((row) => (
-          <div
-            className="grid gap-4 border-b py-5 xl:grid-cols-[minmax(210px,0.34fr)_minmax(180px,0.28fr)_minmax(220px,0.38fr)]"
-            key={row.name}
-          >
-            <div>
-              <code className="text-[15px] font-semibold">{row.name}</code>
-              {row.description ? (
-                <div className="mt-2 text-fd-muted-foreground text-sm leading-6">
-                  {row.description}
-                </div>
-              ) : null}
+    return (
+        <section className="not-prose my-8">
+            {title ? <h3 className="mb-3 font-bold text-lg">{title}</h3> : null}
+            <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
+                {fields.map((field) => (
+                    <div
+                        key={field.name}
+                        className="grid gap-x-8 gap-y-1 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40"
+                    >
+                        <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
+                                    {field.name}
+                                </code>
+
+                                <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
+                                    {field.type}
+                                </div>
+
+                                {field.required ? (
+                                    <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-[3px] font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+                                        required
+                                    </span>
+                                ) : (
+                                    <span className="rounded border border-fd-border px-1.5 py-[3px] font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
+                                        optional
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="text-[14px] text-fd-muted-foreground leading-relaxed">
+                            <div>{field.description}</div>
+
+                            {field.defaultValue ? (
+                                <div className="mt-0.5 text-[13px]">
+                                    <span className="text-fd-muted-foreground/70">
+                                        Default:
+                                    </span>{" "}
+                                    <code className="rounded bg-fd-muted px-1.5 py-[3px] font-mono text-[12px]">
+                                        {field.defaultValue}
+                                    </code>
+                                </div>
+                            ) : null}
+
+                            {field.allowedValues?.length ? (
+                                <div className="mt-0.5 flex flex-wrap gap-1.5">
+                                    {field.allowedValues.map((v) => (
+                                        <code
+                                            key={v}
+                                            className="rounded-md border border-fd-border bg-fd-muted/60 px-2 py-1 font-mono text-[11.5px]"
+                                        >
+                                            {v}
+                                        </code>
+                                    ))}
+                                </div>
+                            ) : null}
+                        </div>
+                    </div>
+                ))}
             </div>
-            <code className="overflow-x-auto text-fd-muted-foreground text-xs">
-              {row.parameters}
-            </code>
-            <code className="overflow-x-auto text-fd-muted-foreground text-xs">
-              {row.returns}
-            </code>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+        </section>
+    );
 }
 
-/**
- * Compact service surface-area table for the SDK overview reference.
- */
-export function ServiceTable({ rows }: { rows: ServiceRow[] }) {
-  return (
-    <section className="not-prose my-10">
-      <h2 className="mb-4 text-xl font-semibold tracking-normal">
-        Service Surface
-      </h2>
-      <div className="border-t">
-        {rows.map((row) => (
-          <div
-            className="grid gap-4 border-b py-5 md:grid-cols-[minmax(190px,0.28fr)_1fr]"
-            key={row.service}
-          >
-            <code className="text-[15px] font-semibold">{row.service}</code>
-            <div className="flex flex-wrap gap-1.5">
-              {row.methods.split(",").map((method) => (
-                <code
-                  className="rounded border bg-fd-muted px-1.5 py-0.5 text-xs"
-                  key={`${row.service}-${method.trim()}`}
-                >
-                  {method.trim()}
-                </code>
-              ))}
+export function MethodTable({
+    rows,
+    title = "Methods",
+}: {
+    rows: MethodRow[];
+    title?: string;
+}) {
+    return (
+        <section className="not-prose my-8">
+            {title ? (
+                <div className="mb-3">
+                    <span className="font-semibold text-[11px] text-fd-muted-foreground uppercase tracking-widest">
+                        {title}
+                    </span>
+                </div>
+            ) : null}
+            <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
+                {rows.map((row) => (
+                    <div
+                        key={row.name}
+                        className="px-4 py-3.5 transition-colors duration-100 hover:bg-fd-muted/40"
+                    >
+                        <div className="flex flex-wrap items-start gap-x-5 gap-y-1.5">
+                            <code className="shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
+                                {row.name}
+                            </code>
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] text-fd-muted-foreground/80">
+                                <span className="truncate">
+                                    {row.parameters}
+                                </span>
+                                <span className="select-none text-fd-muted-foreground/40">
+                                    →
+                                </span>
+                                <span className="truncate">{row.returns}</span>
+                            </div>
+                        </div>
+                        {row.description ? (
+                            <p className="mt-1.5 text-[13px] text-fd-muted-foreground leading-relaxed">
+                                {row.description}
+                            </p>
+                        ) : null}
+                    </div>
+                ))}
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+        </section>
+    );
+}
+
+export function ServiceTable({ rows }: { rows: ServiceRow[] }) {
+    return (
+        <section className="not-prose my-8">
+            <div className="mb-3">
+                <span className="font-semibold text-[11px] text-fd-muted-foreground uppercase tracking-widest">
+                    Service Surface
+                </span>
+            </div>
+            <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
+                {rows.map((row) => (
+                    <div
+                        key={row.service}
+                        className="flex flex-wrap items-start gap-x-6 gap-y-3 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40"
+                    >
+                        <code className="min-w-[160px] shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
+                            {row.service}
+                        </code>
+                        <div className="flex flex-wrap gap-1.5">
+                            {row.methods.split(",").map((m) => (
+                                <code
+                                    key={`${row.service}-${m.trim()}`}
+                                    className="rounded-md border border-fd-border bg-fd-muted/60 px-2 py-1 font-mono text-[11.5px] text-fd-muted-foreground"
+                                >
+                                    {m.trim()}
+                                </code>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
 }
 
 export function getMDXComponents(components?: MDXComponents) {
-  return {
-    ...defaultMdxComponents,
-    CodeRail,
-    FieldTable,
-    MethodTable,
-    ReferenceGrid,
-    ReferenceHeader,
-    ServiceTable,
-    pre: ({ ref: _ref, ...props }: ComponentProps<"pre">) => (
-      <CodeBlock {...props}>
-        <Pre>{props.children}</Pre>
-      </CodeBlock>
-    ),
-    ...components,
-  } satisfies MDXComponents;
+    return {
+        ...defaultMdxComponents,
+        CodeRail,
+        FieldTable,
+        MethodTable,
+        ReferenceGrid,
+        ReferenceHeader,
+        ServiceTable,
+        pre: ({ ref: _ref, ...props }: ComponentProps<"pre">) => (
+            <CodeBlock {...props}>
+                <Pre>{props.children}</Pre>
+            </CodeBlock>
+        ),
+        ...components,
+    } satisfies MDXComponents;
 }
 
 export const useMDXComponents = getMDXComponents;
 
 declare global {
-  type MDXProvidedComponents = ReturnType<typeof getMDXComponents>;
+    type MDXProvidedComponents = ReturnType<typeof getMDXComponents>;
 }

@@ -5,23 +5,56 @@ description: Install linxio-js and make your first authenticated Linxio request.
 
 ## Install
 
-```bash
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Install" hideTitle={true}>
+      The package ships ESM, CommonJS, and TypeScript declarations. No
+      configuration needed — import and go.
+    </ReferenceHeader>
+  </div>
+
+  <CodeRail>
+
+```bash title="pnpm"
 pnpm add linxio-js
 ```
 
-```bash
+```bash title="npm"
 npm install linxio-js
 ```
 
-The package ships ESM, CommonJS, and TypeScript declarations.
-
-Need the exact method parameters or response shape? Keep the
-[SDK Reference](./sdk-reference.mdx) and [API Reference](./api-reference.mdx)
-open beside this guide.
+  </CodeRail>
+</ReferenceGrid>
 
 ## Create a client
 
-```ts
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a client" sdk="createClient(options)" hideTitle={true}>
+      Instantiate a client once per process. Pass optional configuration for
+      timeout, retry behaviour, and a custom fetch implementation.
+    </ReferenceHeader>
+
+    <FieldTable
+      fields={[
+        {
+          name: "timeoutMs",
+          type: "number",
+          description: "Per-request timeout. Throws LinxioTimeoutError when exceeded.",
+          defaultValue: "30000",
+        },
+        {
+          name: "retry",
+          type: "{ retries?: number; delayMs?: number }",
+          description: "Retry policy for transient failures on idempotent requests.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Client setup"
 import { createClient } from "linxio-js";
 
 const linxio = createClient({
@@ -33,9 +66,23 @@ const linxio = createClient({
 });
 ```
 
+  </CodeRail>
+</ReferenceGrid>
+
 ## Authenticate
 
-```ts
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Authenticate" method="POST" path="/login" sdk="linxio.auth.login(payload)">
+      Login stores the session in memory. Subsequent service calls include the
+      bearer token automatically. Store the session yourself if your process
+      needs to survive restarts.
+    </ReferenceHeader>
+  </div>
+
+  <CodeRail>
+
+```ts title="Login"
 const login = await linxio.auth.login({
   email: process.env.LINXIO_EMAIL!,
   password: process.env.LINXIO_PASSWORD!,
@@ -44,20 +91,31 @@ const login = await linxio.auth.login({
 if (login.error) {
   throw login.error;
 }
-```
 
-The SDK stores tokens in memory. Persist them yourself if your process needs to survive restarts:
-
-```ts
+// Persist tokens across restarts
 const session = linxio.session();
 await saveSession(session);
 
-const linxio = createClient(await loadSession());
+// Restore on next startup
+const linxio2 = createClient(await loadSession());
 ```
+
+  </CodeRail>
+</ReferenceGrid>
 
 ## Read vehicles
 
-```ts
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Read vehicles" sdk="linxio.vehicles.list(params)">
+      Paginated list with field projection. Use `iterate()` to auto-page
+      everything into one array, or `stream()` for lazy async iteration.
+    </ReferenceHeader>
+  </div>
+
+  <CodeRail>
+
+```ts title="Single page"
 const { data: vehicles, error, meta } = await linxio.vehicles.list({
   fields: ["id", "regNo", "lastLoggedAt"],
   limit: 100,
@@ -65,34 +123,30 @@ const { data: vehicles, error, meta } = await linxio.vehicles.list({
   sort: "regNo",
 });
 
-if (error) {
-  throw error;
-}
-
+if (error) throw error;
 console.log(meta.total, vehicles);
 ```
 
-## Read all pages
-
-```ts
-const { data: vehicles, error } = await linxio.vehicles.iterate({
+```ts title="All pages at once"
+const { data: all, error } = await linxio.vehicles.iterate({
   fields: ["id", "regNo", "lastLoggedAt"],
   limit: 100,
 });
 
-if (error) {
-  throw error;
-}
-
-for (const vehicle of vehicles) {
-  console.log(vehicle.id, vehicle.regNo);
-}
+if (error) throw error;
+for (const v of all) console.log(v.id, v.regNo);
 ```
 
-## Stream all pages
-
-```ts
+```ts title="Lazy stream"
 for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
   console.log(vehicle.id, vehicle.regNo);
 }
 ```
+
+  </CodeRail>
+</ReferenceGrid>
+
+---
+
+Need full method signatures and return shapes? See the
+[SDK Reference](./sdk-reference.mdx) and [API Reference](./api-reference.mdx).
