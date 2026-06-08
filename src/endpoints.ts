@@ -18,6 +18,18 @@ export const linxioEndpoints = {
         },
         verifyOtp: { method: "POST", path: "/login/otp", source: "dashboard" },
     },
+    cameras: {
+        eventTypes: {
+            method: "GET",
+            path: "/devices/cameras/events/types",
+            source: "dashboard",
+        },
+        events: {
+            method: "GET",
+            path: "/devices/cameras/events",
+            source: "dashboard",
+        },
+    },
     clients: {
         get: {
             method: "GET",
@@ -54,6 +66,11 @@ export const linxioEndpoints = {
             path: "/devices/{deviceId}/archive",
             source: "dashboard",
         },
+        coordinates: {
+            method: "GET",
+            path: "/devices/{deviceId}/coordinates",
+            source: "dashboard",
+        },
         create: { method: "POST", path: "/devices", source: "public-docs" },
         get: {
             method: "GET",
@@ -66,6 +83,11 @@ export const linxioEndpoints = {
             source: "public-docs",
         },
         list: { method: "GET", path: "/devices/json", source: "public-docs" },
+        history: {
+            method: "GET",
+            path: "/devices/{deviceId}/history",
+            source: "dashboard",
+        },
         sensors: {
             list: {
                 method: "GET",
@@ -160,6 +182,11 @@ export const linxioEndpoints = {
         digitalFormAnswer: {
             method: "GET",
             path: "/digital-form/answer/{answerId}",
+            source: "dashboard",
+        },
+        digitalFormAnswerPdf: {
+            method: "GET",
+            path: "/digital-form/answer/{answerId}/pdf",
             source: "dashboard",
         },
         scheduledReport: {

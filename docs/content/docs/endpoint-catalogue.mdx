@@ -16,6 +16,9 @@ Each entry contains a method, path, and source marker:
 - `public-docs` means the endpoint appears on Linxio's public API page.
 - `dashboard` means the endpoint was inferred from the Linxio dashboard JavaScript bundles.
 
+Run `pnpm analyze:sources` to compare this catalogue with endpoint candidates
+extracted from the dashboard bundles in `sources/`.
+
 ## Public core
 
 - `POST /login`
@@ -50,6 +53,7 @@ Each entry contains a method, path, and source marker:
 - scheduled reports
 - digital forms
 - camera events
+- device coordinates and device history
 - users
 - resellers
 - area groups

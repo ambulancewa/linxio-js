@@ -4,6 +4,7 @@ import {
     type FetchLike,
     LinxioApiError,
     type LinxioClient,
+    linxioEndpoints,
 } from "./index";
 
 type CapturedRequest = {
@@ -108,6 +109,29 @@ describe("LinxioClient", () => {
 
         expect("from" in client).toBe(false);
         expect(typeof client.request).toBe("function");
+    });
+
+    it("catalogues dashboard-derived endpoints exposed by SDK services", () => {
+        expect(linxioEndpoints.cameras.events).toEqual({
+            method: "GET",
+            path: "/devices/cameras/events",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.cameras.eventTypes).toEqual({
+            method: "GET",
+            path: "/devices/cameras/events/types",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.devices.coordinates).toEqual({
+            method: "GET",
+            path: "/devices/{deviceId}/coordinates",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.reports.digitalFormAnswerPdf).toEqual({
+            method: "GET",
+            path: "/digital-form/answer/{answerId}/pdf",
+            source: "dashboard",
+        });
     });
 
     it("coalesces concurrent token refreshes and retries authorised requests with the new token", async () => {

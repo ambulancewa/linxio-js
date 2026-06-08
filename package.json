@@ -25,6 +25,7 @@
         "docs:build": "pnpm --dir docs build",
         "docs:check": "pnpm --dir docs types:check",
         "docs:dev": "pnpm --dir docs dev",
+        "analyze:sources": "pnpm build && node scripts/analyze-dashboard-sources.mjs",
         "format": "pnpm format:sdk && pnpm --dir docs format",
         "format:biome": "pnpm format:sdk",
         "format:sdk": "biome check src scripts package.json tsconfig.json tsup.config.ts pnpm-workspace.yaml --write --config-path ./biome.json",

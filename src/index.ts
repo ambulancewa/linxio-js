@@ -1,5 +1,6 @@
 export type { LinxioClientOptions } from "./client";
 export { createClient, LinxioClient } from "./client";
+export * from "./endpoint-discovery";
 export * from "./endpoints";
 export * from "./errors";
 export * from "./http";

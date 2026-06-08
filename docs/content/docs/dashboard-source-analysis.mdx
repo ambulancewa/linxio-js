@@ -1,0 +1,76 @@
+---
+title: Dashboard Source Analysis
+description: Repeatable endpoint extraction from the Linxio dashboard JavaScript bundles.
+---
+
+The SDK includes maintainer tooling for analysing the Linxio dashboard bundles
+kept in `sources/`. The extractor scans JavaScript string and template literals,
+keeps path-like values used near HTTP method calls, normalizes dynamic template
+segments to `{param}`, and records the source bundle filenames where each
+candidate appeared.
+
+```bash
+pnpm analyze:sources
+```
+
+For machine-readable output:
+
+```bash
+pnpm analyze:sources -- --json
+```
+
+## Current summary
+
+The latest analysis run covered the ten JavaScript files currently checked into
+`sources/`.
+
+| Metric | Count |
+| --- | ---: |
+| Source files analysed | 10 |
+| Dashboard endpoint candidates extracted | 169 |
+| SDK endpoint catalogue definitions | 54 |
+| Dashboard candidates covered by the SDK catalogue | 27 |
+| Dashboard candidates not yet represented in the SDK catalogue | 142 |
+| SDK catalogue entries not observed in these dashboard bundles | 20 |
+
+## What the counts mean
+
+`dashboard candidates covered by the SDK catalogue` means the same HTTP method
+and normalized path shape appears in both the extracted dashboard evidence and
+`linxioEndpoints`.
+
+`dashboard candidates not yet represented` is not automatically a to-do list.
+Some candidates are admin-only, internal dashboard configuration, password/phone
+flows, chat/notification features, bulk import helpers, integrations, notes, or
+tenant-specific operational tools. They should be wrapped only after validating
+the payload shape and safety model.
+
+`SDK catalogue entries not observed` can include public API endpoints, realtime
+channels, or endpoints documented elsewhere that are not directly present in
+the captured dashboard bundles.
+
+## High-signal dashboard-only candidates
+
+These candidates are useful for future wrapper work because they are related to
+existing SDK domains and came directly from the captured dashboard bundles:
+
+| Methods | Path | Source bundle |
+| --- | --- | --- |
+| POST | `/area-groups` | `9243.ede4bc3645220992.js` |
+| DELETE, GET, PATCH | `/area-groups/{param}` | `9243.ede4bc3645220992.js` |
+| PATCH | `/area-groups/{param}/archive` | `9243.ede4bc3645220992.js` |
+| PATCH | `/area-groups/{param}/restore` | `9243.ede4bc3645220992.js` |
+| GET | `/devices/installation` | `4167.49eae6a246b4574d.js` |
+| GET | `/devices/vendors` | `4167.49eae6a246b4574d.js` |
+| GET | `/devices/{param}/cameras` | `4167.49eae6a246b4574d.js` |
+| POST | `/devices/{param}/notes` | `4167.49eae6a246b4574d.js` |
+| POST | `/fuel-cards/upload` | `5049.278d2bc7e646d60c.js` |
+| GET | `/scheduled-report/template` | `9159.35e4f8cd04333dbb.js` |
+| DELETE, GET, PATCH | `/scheduled-report/{param}` | `9159.35e4f8cd04333dbb.js` |
+| GET | `/vehicles/count` | `main.91cbbc5b3b642d22.js` |
+| GET | `/vehicles/types?limit=1000&sort=order` | `main.91cbbc5b3b642d22.js` |
+| GET | `/vehicles/{param}/engine-hours/current` | `main.91cbbc5b3b642d22.js` |
+
+Use read-only validation first when turning any dashboard-only candidate into a
+public SDK method. Mutation wrappers should be added only when the payload,
+side effects, and rollback story are understood.
