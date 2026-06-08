@@ -71,7 +71,7 @@
         "@semantic-release/npm": "^13.1.5",
         "@semantic-release/release-notes-generator": "^14.1.1",
         "@total-typescript/ts-reset": "^0.6.1",
-        "@types/node": "^25.9.1",
+        "@types/node": "^25.9.2",
         "prettier": "^3.8.3",
         "prettier-plugin-tailwindcss": "^0.8.0",
         "prettier-plugin-tailwindcss-canonical-classes": "^0.1.5",
@@ -82,7 +82,7 @@
         "typed-query-selector": "^2.12.2",
         "typescript": "^6.0.3",
         "ultracite": "^7.8.1",
-        "vitest": "^4.1.6"
+        "vitest": "^4.1.8"
     },
     "sideEffects": false
 }
