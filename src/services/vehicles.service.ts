@@ -2,13 +2,17 @@ import { collectPages, streamPages } from "../pagination";
 import type { LinxioPageResult, LinxioResult } from "../result";
 import type { LinxioId } from "../types/common";
 import type {
+    LinxioCount,
     LinxioEngineHours,
     LinxioOdometer,
     LinxioOdometerParams,
     LinxioOdometerRecalibration,
     LinxioVehicle,
+    LinxioVehicleCountParams,
     LinxioVehicleListParams,
     LinxioVehiclePayload,
+    LinxioVehicleType,
+    LinxioVehicleTypeParams,
 } from "../types/vehicles";
 import { BaseService } from "./base.service";
 
@@ -67,7 +71,7 @@ export class VehiclesService extends BaseService {
     /** Restore a previously archived vehicle when the dashboard endpoint is available. */
     restore(vehicleId: LinxioId): Promise<LinxioResult<void>> {
         return this.result(() =>
-            this.http.patch(`/vehicles/${vehicleId}/restore`, {}),
+            this.http.post(`/vehicles/${vehicleId}/restore`, {}),
         );
     }
 
@@ -97,6 +101,28 @@ export class VehiclesService extends BaseService {
     ): Promise<LinxioResult<LinxioEngineHours>> {
         return this.result(() =>
             this.http.get(`/vehicles/${vehicleId}/engine-hours/current`),
+        );
+    }
+
+    /** Count vehicles using the dashboard-derived count endpoint. */
+    count(
+        params: LinxioVehicleCountParams = {},
+    ): Promise<LinxioResult<LinxioCount>> {
+        return this.result(() => this.http.get("/vehicles/count", { params }));
+    }
+
+    /** List vehicle types using the dashboard-derived vehicle type endpoint. */
+    types(
+        params: LinxioVehicleTypeParams = {},
+    ): Promise<LinxioResult<LinxioVehicleType[]>> {
+        return this.result(() =>
+            this.http.get("/vehicles/types", {
+                params: {
+                    limit: 1000,
+                    sort: "order",
+                    ...params,
+                },
+            }),
         );
     }
 }

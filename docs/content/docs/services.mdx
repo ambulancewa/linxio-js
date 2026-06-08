@@ -19,6 +19,8 @@ console.log(meta.total, vehicles);
 
 const vehicle = await linxio.vehicles.get(304);
 const odometer = await linxio.vehicles.getOdometer(304);
+const vehicleCount = await linxio.vehicles.count({ status: "active" });
+const vehicleTypes = await linxio.vehicles.types();
 ```
 
 ## Routes
@@ -47,6 +49,11 @@ const depot = await linxio.geofences.create({
   radius: 100,
   coordinates: [{ lat: -31.95, lng: 115.86 }],
 });
+
+const group = await linxio.geofences.createGroup({ name: "Temporary Group" });
+if (!group.error) {
+  await linxio.geofences.archiveGroup(group.data.id);
+}
 ```
 
 ## Devices
@@ -58,6 +65,10 @@ const installed = await linxio.devices.install(deviceId, {
   vehicleId,
   installedAt: new Date().toISOString(),
 });
+
+const vendors = await linxio.devices.vendors();
+const installations = await linxio.devices.installations({ limit: 100 });
+const cameras = await linxio.devices.cameras(deviceId);
 ```
 
 ## Drivers

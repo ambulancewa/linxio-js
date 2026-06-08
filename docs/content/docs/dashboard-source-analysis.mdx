@@ -28,10 +28,10 @@ The latest analysis run covered the ten JavaScript files currently checked into
 | --- | ---: |
 | Source files analysed | 10 |
 | Dashboard endpoint candidates extracted | 169 |
-| SDK endpoint catalogue definitions | 54 |
-| Dashboard candidates covered by the SDK catalogue | 27 |
-| Dashboard candidates not yet represented in the SDK catalogue | 142 |
-| SDK catalogue entries not observed in these dashboard bundles | 20 |
+| SDK endpoint catalogue definitions | 71 |
+| Dashboard candidates covered by the SDK catalogue | 41 |
+| Dashboard candidates not yet represented in the SDK catalogue | 128 |
+| SDK catalogue entries not observed in these dashboard bundles | 19 |
 
 ## What the counts mean
 
@@ -49,6 +49,13 @@ the payload shape and safety model.
 channels, or endpoints documented elsewhere that are not directly present in
 the captured dashboard bundles.
 
+## Recently promoted wrappers
+
+The current SDK catalogue includes dashboard-derived wrappers for area group
+lifecycle actions, device vendors, device installation rows, attached device
+cameras, vehicle counts, vehicle types, scheduled-report templates, scheduled
+report restore, and the dashboard-observed vehicle restore method.
+
 ## High-signal dashboard-only candidates
 
 These candidates are useful for future wrapper work because they are related to
@@ -56,20 +63,8 @@ existing SDK domains and came directly from the captured dashboard bundles:
 
 | Methods | Path | Source bundle |
 | --- | --- | --- |
-| POST | `/area-groups` | `9243.ede4bc3645220992.js` |
-| DELETE, GET, PATCH | `/area-groups/{param}` | `9243.ede4bc3645220992.js` |
-| PATCH | `/area-groups/{param}/archive` | `9243.ede4bc3645220992.js` |
-| PATCH | `/area-groups/{param}/restore` | `9243.ede4bc3645220992.js` |
-| GET | `/devices/installation` | `4167.49eae6a246b4574d.js` |
-| GET | `/devices/vendors` | `4167.49eae6a246b4574d.js` |
-| GET | `/devices/{param}/cameras` | `4167.49eae6a246b4574d.js` |
 | POST | `/devices/{param}/notes` | `4167.49eae6a246b4574d.js` |
 | POST | `/fuel-cards/upload` | `5049.278d2bc7e646d60c.js` |
-| GET | `/scheduled-report/template` | `9159.35e4f8cd04333dbb.js` |
-| DELETE, GET, PATCH | `/scheduled-report/{param}` | `9159.35e4f8cd04333dbb.js` |
-| GET | `/vehicles/count` | `main.91cbbc5b3b642d22.js` |
-| GET | `/vehicles/types?limit=1000&sort=order` | `main.91cbbc5b3b642d22.js` |
-| GET | `/vehicles/{param}/engine-hours/current` | `main.91cbbc5b3b642d22.js` |
 
 Use read-only validation first when turning any dashboard-only candidate into a
 public SDK method. Mutation wrappers should be added only when the payload,

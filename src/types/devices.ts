@@ -61,3 +61,26 @@ export type LinxioDeviceCoordinate = LinxioRecord &
         id?: LinxioId;
         ts?: ISODateString;
     };
+
+/** Device vendor record from the dashboard-derived vendor endpoint. */
+export type LinxioDeviceVendor = LinxioRecord & {
+    id?: LinxioId;
+    name?: string;
+};
+
+/** Device installation row from the dashboard-derived installation endpoint. */
+export type LinxioDeviceInstallation = LinxioRecord & {
+    deviceId?: LinxioId;
+    id?: LinxioId;
+    installedAt?: ISODateString | null;
+    uninstalledAt?: ISODateString | null;
+    vehicleId?: LinxioId;
+};
+
+/** Camera record associated with a device. */
+export type LinxioDeviceCamera = LinxioRecord & {
+    deviceId?: LinxioId;
+    id?: LinxioId;
+    name?: string;
+    status?: string;
+};

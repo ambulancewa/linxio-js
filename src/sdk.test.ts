@@ -132,6 +132,51 @@ describe("LinxioClient", () => {
             path: "/digital-form/answer/{answerId}/pdf",
             source: "dashboard",
         });
+        expect(linxioEndpoints.geofences.groups.create).toEqual({
+            method: "POST",
+            path: "/area-groups",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.geofences.groups.get).toEqual({
+            method: "GET",
+            path: "/area-groups/{groupId}",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.devices.vendors).toEqual({
+            method: "GET",
+            path: "/devices/vendors",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.vehicles.count).toEqual({
+            method: "GET",
+            path: "/vehicles/count",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.vehicles.engineHours).toEqual({
+            method: "GET",
+            path: "/vehicles/{vehicleId}/engine-hours/current",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.reports.scheduledTemplate).toEqual({
+            method: "GET",
+            path: "/scheduled-report/template",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.reports.getScheduledReport).toEqual({
+            method: "GET",
+            path: "/scheduled-report/{reportId}",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.reports.updateScheduledReport).toEqual({
+            method: "PATCH",
+            path: "/scheduled-report/{reportId}",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.reports.deleteScheduledReport).toEqual({
+            method: "DELETE",
+            path: "/scheduled-report/{reportId}",
+            source: "dashboard",
+        });
     });
 
     it("coalesces concurrent token refreshes and retries authorised requests with the new token", async () => {
@@ -387,6 +432,61 @@ describe("LinxioClient", () => {
                 },
             ],
             ["POST", "/api/vehicle/304/set-driver/42", {}, {}],
+        ]);
+    });
+
+    it("maps high-signal dashboard-derived service methods to paths and payloads", async () => {
+        const fetcher = captureFetch((request) => {
+            if (request.url.pathname === "/api/vehicles/count") {
+                return jsonResponse({ count: 14 });
+            }
+
+            return jsonResponse({ id: 1 });
+        });
+        const client = createTestClient(fetcher);
+
+        await client.geofences.createGroup({ name: "Metro" });
+        await client.geofences.getGroup(7);
+        await client.geofences.updateGroup(7, { name: "Regional" });
+        await client.geofences.archiveGroup(7);
+        await client.geofences.restoreGroup(7);
+        await client.geofences.deleteGroup(7);
+        await client.devices.vendors();
+        await client.devices.installations({ limit: 25 });
+        await client.devices.cameras(545);
+        await client.vehicles.count({ status: "active" });
+        await client.vehicles.types();
+        await client.vehicles.restore(304);
+        await client.reports.scheduledTemplate();
+        await client.reports.restoreScheduled(91);
+
+        expect(
+            fetcher.calls.map((request) => [
+                request.method,
+                request.url.pathname,
+                Object.fromEntries(request.url.searchParams),
+                request.body,
+            ]),
+        ).toEqual([
+            ["POST", "/api/area-groups", {}, { name: "Metro" }],
+            ["GET", "/api/area-groups/7", {}, undefined],
+            ["PATCH", "/api/area-groups/7", {}, { name: "Regional" }],
+            ["PATCH", "/api/area-groups/7/archive", {}, {}],
+            ["PATCH", "/api/area-groups/7/restore", {}, {}],
+            ["DELETE", "/api/area-groups/7", {}, undefined],
+            ["GET", "/api/devices/vendors", {}, undefined],
+            ["GET", "/api/devices/installation", { limit: "25" }, undefined],
+            ["GET", "/api/devices/545/cameras", {}, undefined],
+            ["GET", "/api/vehicles/count", { status: "active" }, undefined],
+            [
+                "GET",
+                "/api/vehicles/types",
+                { limit: "1000", sort: "order" },
+                undefined,
+            ],
+            ["POST", "/api/vehicles/304/restore", {}, {}],
+            ["GET", "/api/scheduled-report/template", {}, undefined],
+            ["PATCH", "/api/scheduled-report/91/restore", {}, {}],
         ]);
     });
 

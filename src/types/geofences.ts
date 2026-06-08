@@ -35,3 +35,8 @@ export type LinxioAreaGroup = LinxioRecord & {
     id: LinxioId;
     name: string;
 };
+
+/** Payload accepted by dashboard-derived area group endpoints. */
+export type LinxioAreaGroupPayload = LinxioRecord & {
+    name: string;
+};

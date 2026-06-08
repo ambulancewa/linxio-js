@@ -54,6 +54,13 @@ export class ReportsService extends BaseService {
             this.http.delete(`/scheduled-report/${reportId}`),
         );
     }
+
+    /** Restore a scheduled report from the dashboard-derived endpoint. */
+    restoreScheduled(reportId: LinxioId): Promise<LinxioResult<void>> {
+        return this.result(() =>
+            this.http.patch(`/scheduled-report/${reportId}/restore`, {}),
+        );
+    }
 }
 
 /** Digital form endpoints discovered from the dashboard bundle. */

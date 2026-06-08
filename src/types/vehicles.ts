@@ -4,6 +4,7 @@ import type {
     LinxioId,
     LinxioRecord,
     ListParams,
+    QueryParams,
 } from "./common";
 
 /** Common field names for Linxio vehicle list responses. */
@@ -85,4 +86,26 @@ export type LinxioEngineHours = LinxioRecord & {
     engineHours: number;
     occurredAt?: ISODateString | null;
     vehicleId: LinxioId;
+};
+
+/** Count response returned by dashboard-derived count endpoints. */
+export type LinxioCount = LinxioRecord & {
+    count?: number;
+    total?: number;
+};
+
+/** Vehicle type record returned by the dashboard-derived vehicle types endpoint. */
+export type LinxioVehicleType = LinxioRecord & {
+    id: LinxioId;
+    name?: string;
+    order?: number;
+};
+
+/** Optional filters accepted by `client.vehicles.count()`. */
+export type LinxioVehicleCountParams = QueryParams;
+
+/** Parameters for `client.vehicles.types()`. */
+export type LinxioVehicleTypeParams = QueryParams & {
+    limit?: number;
+    sort?: string;
 };

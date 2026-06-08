@@ -3,6 +3,7 @@ import type { LinxioPageResult, LinxioResult } from "../result";
 import type { LinxioId } from "../types/common";
 import type {
     LinxioAreaGroup,
+    LinxioAreaGroupPayload,
     LinxioGeofence,
     LinxioGeofenceListParams,
     LinxioGeofencePayload,
@@ -74,5 +75,46 @@ export class GeofencesService extends BaseService {
     /** List area groups from the dashboard-derived endpoint. */
     listGroups(): Promise<LinxioResult<LinxioAreaGroup[]>> {
         return this.result(() => this.http.get("/area-groups"));
+    }
+
+    /** Fetch one area group from the dashboard-derived endpoint. */
+    getGroup(groupId: LinxioId): Promise<LinxioResult<LinxioAreaGroup>> {
+        return this.result(() => this.http.get(`/area-groups/${groupId}`));
+    }
+
+    /** Create an area group from the dashboard-derived endpoint. */
+    createGroup(
+        payload: LinxioAreaGroupPayload,
+    ): Promise<LinxioResult<LinxioAreaGroup>> {
+        return this.result(() => this.http.post("/area-groups", payload));
+    }
+
+    /** Update an area group from the dashboard-derived endpoint. */
+    updateGroup(
+        groupId: LinxioId,
+        payload: Partial<LinxioAreaGroupPayload>,
+    ): Promise<LinxioResult<LinxioAreaGroup>> {
+        return this.result(() =>
+            this.http.patch(`/area-groups/${groupId}`, payload),
+        );
+    }
+
+    /** Delete an area group. Prefer archive/restore when reversibility matters. */
+    deleteGroup(groupId: LinxioId): Promise<LinxioResult<void>> {
+        return this.result(() => this.http.delete(`/area-groups/${groupId}`));
+    }
+
+    /** Soft-archive an area group from the dashboard-derived endpoint. */
+    archiveGroup(groupId: LinxioId): Promise<LinxioResult<void>> {
+        return this.result(() =>
+            this.http.patch(`/area-groups/${groupId}/archive`, {}),
+        );
+    }
+
+    /** Restore an archived area group from the dashboard-derived endpoint. */
+    restoreGroup(groupId: LinxioId): Promise<LinxioResult<void>> {
+        return this.result(() =>
+            this.http.patch(`/area-groups/${groupId}/restore`, {}),
+        );
     }
 }

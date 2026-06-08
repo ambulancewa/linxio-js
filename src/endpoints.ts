@@ -71,6 +71,11 @@ export const linxioEndpoints = {
             path: "/devices/{deviceId}/coordinates",
             source: "dashboard",
         },
+        cameras: {
+            method: "GET",
+            path: "/devices/{deviceId}/cameras",
+            source: "dashboard",
+        },
         create: { method: "POST", path: "/devices", source: "public-docs" },
         get: {
             method: "GET",
@@ -86,6 +91,11 @@ export const linxioEndpoints = {
         history: {
             method: "GET",
             path: "/devices/{deviceId}/history",
+            source: "dashboard",
+        },
+        installations: {
+            method: "GET",
+            path: "/devices/installation",
             source: "dashboard",
         },
         sensors: {
@@ -104,6 +114,11 @@ export const linxioEndpoints = {
             method: "PATCH",
             path: "/devices/{deviceId}",
             source: "public-docs",
+        },
+        vendors: {
+            method: "GET",
+            path: "/devices/vendors",
+            source: "dashboard",
         },
     },
     drivers: {
@@ -165,6 +180,43 @@ export const linxioEndpoints = {
             path: "/areas/{areaId}/restore",
             source: "dashboard",
         },
+        groups: {
+            archive: {
+                method: "PATCH",
+                path: "/area-groups/{groupId}/archive",
+                source: "dashboard",
+            },
+            create: {
+                method: "POST",
+                path: "/area-groups",
+                source: "dashboard",
+            },
+            delete: {
+                method: "DELETE",
+                path: "/area-groups/{groupId}",
+                source: "dashboard",
+            },
+            get: {
+                method: "GET",
+                path: "/area-groups/{groupId}",
+                source: "dashboard",
+            },
+            list: {
+                method: "GET",
+                path: "/area-groups",
+                source: "dashboard",
+            },
+            restore: {
+                method: "PATCH",
+                path: "/area-groups/{groupId}/restore",
+                source: "dashboard",
+            },
+            update: {
+                method: "PATCH",
+                path: "/area-groups/{groupId}",
+                source: "dashboard",
+            },
+        },
     },
     realtime: {
         coordinates: {
@@ -189,9 +241,34 @@ export const linxioEndpoints = {
             path: "/digital-form/answer/{answerId}/pdf",
             source: "dashboard",
         },
+        deleteScheduledReport: {
+            method: "DELETE",
+            path: "/scheduled-report/{reportId}",
+            source: "dashboard",
+        },
+        getScheduledReport: {
+            method: "GET",
+            path: "/scheduled-report/{reportId}",
+            source: "dashboard",
+        },
         scheduledReport: {
             method: "GET",
             path: "/scheduled-report",
+            source: "dashboard",
+        },
+        restoreScheduledReport: {
+            method: "PATCH",
+            path: "/scheduled-report/{reportId}/restore",
+            source: "dashboard",
+        },
+        scheduledTemplate: {
+            method: "GET",
+            path: "/scheduled-report/template",
+            source: "dashboard",
+        },
+        updateScheduledReport: {
+            method: "PATCH",
+            path: "/scheduled-report/{reportId}",
             source: "dashboard",
         },
     },
@@ -214,9 +291,14 @@ export const linxioEndpoints = {
             source: "dashboard",
         },
         create: { method: "POST", path: "/vehicles", source: "public-docs" },
+        count: {
+            method: "GET",
+            path: "/vehicles/count",
+            source: "dashboard",
+        },
         engineHours: {
             method: "GET",
-            path: "/vehicles/{vehicleId}/engine-hours",
+            path: "/vehicles/{vehicleId}/engine-hours/current",
             source: "dashboard",
         },
         get: {
@@ -240,7 +322,7 @@ export const linxioEndpoints = {
             source: "public-docs",
         },
         restore: {
-            method: "PATCH",
+            method: "POST",
             path: "/vehicles/{vehicleId}/restore",
             source: "dashboard",
         },
@@ -253,6 +335,11 @@ export const linxioEndpoints = {
             method: "POST",
             path: "/vehicles/{vehicleId}",
             source: "public-docs",
+        },
+        types: {
+            method: "GET",
+            path: "/vehicles/types?limit=1000&sort=order",
+            source: "dashboard",
         },
     },
 } as const satisfies Record<string, unknown>;

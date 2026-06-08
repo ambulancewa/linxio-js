@@ -3,11 +3,14 @@ import type { LinxioPageResult, LinxioResult } from "../result";
 import type { LinxioId, LinxioRecord } from "../types/common";
 import type {
     LinxioDevice,
+    LinxioDeviceCamera,
     LinxioDeviceCoordinate,
+    LinxioDeviceInstallation,
     LinxioDeviceInstallationPayload,
     LinxioDeviceListParams,
     LinxioDevicePayload,
     LinxioDeviceUninstallPayload,
+    LinxioDeviceVendor,
 } from "../types/devices";
 import type { LinxioSensor } from "../types/sensors";
 import { BaseService } from "./base.service";
@@ -106,5 +109,22 @@ export class DevicesService extends BaseService {
     /** Fetch device history entries from the dashboard-derived endpoint. */
     history(deviceId: LinxioId): Promise<LinxioResult<LinxioRecord[]>> {
         return this.result(() => this.http.get(`/devices/${deviceId}/history`));
+    }
+
+    /** List device vendors from the dashboard-derived endpoint. */
+    vendors(): Promise<LinxioResult<LinxioDeviceVendor[]>> {
+        return this.result(() => this.http.get("/devices/vendors"));
+    }
+
+    /** List device installation rows from the dashboard-derived endpoint. */
+    installations(
+        params: LinxioDeviceListParams = {},
+    ): Promise<LinxioPageResult<LinxioDeviceInstallation>> {
+        return this.getPage("/devices/installation", params);
+    }
+
+    /** List cameras attached to a device from the dashboard-derived endpoint. */
+    cameras(deviceId: LinxioId): Promise<LinxioResult<LinxioDeviceCamera[]>> {
+        return this.result(() => this.http.get(`/devices/${deviceId}/cameras`));
     }
 }
