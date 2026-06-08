@@ -6,6 +6,7 @@ export * from "./devices.service";
 export * from "./drivers.service";
 export * from "./fuel.service";
 export * from "./geofences.service";
+export * from "./metadata.service";
 export * from "./reports.service";
 export * from "./routes.service";
 export * from "./sensors.service";

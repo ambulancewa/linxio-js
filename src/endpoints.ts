@@ -160,6 +160,11 @@ export const linxioEndpoints = {
             path: "/fuel-summary-report",
             source: "dashboard",
         },
+        fuelTypes: {
+            method: "GET",
+            path: "/fuel-types",
+            source: "dashboard",
+        },
     },
     geofences: {
         archive: {
@@ -216,6 +221,78 @@ export const linxioEndpoints = {
                 path: "/area-groups/{groupId}",
                 source: "dashboard",
             },
+        },
+    },
+    metadata: {
+        countries: {
+            method: "GET",
+            path: "/country/list",
+            source: "dashboard",
+        },
+        currentPlan: {
+            method: "GET",
+            path: "/permissions/current-plan",
+            source: "dashboard",
+        },
+        digitalFormSettings: {
+            method: "GET",
+            path: "/settings/digitalForm",
+            source: "dashboard",
+        },
+        ecoSpeedSettings: {
+            method: "GET",
+            path: "/settings/ecoSpeed",
+            source: "dashboard",
+        },
+        excessiveIdlingSettings: {
+            method: "GET",
+            path: "/settings/excessiveIdling",
+            source: "dashboard",
+        },
+        languages: {
+            method: "GET",
+            path: "/settings/language/list",
+            source: "dashboard",
+        },
+        mapApiOptions: {
+            method: "GET",
+            path: "/settings/mapApiOptions",
+            source: "dashboard",
+        },
+        myTheme: {
+            method: "GET",
+            path: "/themes/my",
+            source: "dashboard",
+        },
+        platformDomain: {
+            method: "GET",
+            path: "/platform-settings/domain",
+            source: "dashboard",
+        },
+        plans: {
+            method: "GET",
+            path: "/plans",
+            source: "dashboard",
+        },
+        providers: {
+            method: "GET",
+            path: "/settings/provider",
+            source: "dashboard",
+        },
+        roles: {
+            method: "GET",
+            path: "/roles",
+            source: "dashboard",
+        },
+        themes: {
+            method: "GET",
+            path: "/themes",
+            source: "dashboard",
+        },
+        timezones: {
+            method: "GET",
+            path: "/timezones",
+            source: "dashboard",
         },
     },
     realtime: {

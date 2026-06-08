@@ -8,6 +8,7 @@ import { DevicesService } from "./services/devices.service";
 import { DriversService } from "./services/drivers.service";
 import { FuelService } from "./services/fuel.service";
 import { GeofencesService } from "./services/geofences.service";
+import { MetadataService } from "./services/metadata.service";
 import {
     DigitalFormsService,
     ReportsService,
@@ -86,6 +87,8 @@ export class LinxioClient {
     readonly geofences: GeofencesService;
     /** Low-level HTTP client for advanced integrations. */
     readonly http: HttpClient;
+    /** Read-only reference data and tenant settings discovered from the dashboard bundle. */
+    readonly metadata: MetadataService;
     /** Socket.IO live tracking and notification client. */
     readonly realtime: RealtimeClient;
     /** Scheduled report helpers discovered from the dashboard bundle. */
@@ -133,6 +136,7 @@ export class LinxioClient {
         this.drivers = new DriversService(this.http);
         this.fuel = new FuelService(this.http);
         this.geofences = new GeofencesService(this.http);
+        this.metadata = new MetadataService(this.http);
         this.reports = new ReportsService(this.http);
         this.resellers = new ResellersService(this.http);
         this.routes = new RoutesService(this.http);

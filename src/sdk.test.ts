@@ -177,6 +177,31 @@ describe("LinxioClient", () => {
             path: "/scheduled-report/{reportId}",
             source: "dashboard",
         });
+        expect(linxioEndpoints.fuel.fuelTypes).toEqual({
+            method: "GET",
+            path: "/fuel-types",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.metadata.countries).toEqual({
+            method: "GET",
+            path: "/country/list",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.metadata.timezones).toEqual({
+            method: "GET",
+            path: "/timezones",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.metadata.currentPlan).toEqual({
+            method: "GET",
+            path: "/permissions/current-plan",
+            source: "dashboard",
+        });
+        expect(linxioEndpoints.metadata.mapApiOptions).toEqual({
+            method: "GET",
+            path: "/settings/mapApiOptions",
+            source: "dashboard",
+        });
     });
 
     it("coalesces concurrent token refreshes and retries authorised requests with the new token", async () => {
@@ -487,6 +512,50 @@ describe("LinxioClient", () => {
             ["POST", "/api/vehicles/304/restore", {}, {}],
             ["GET", "/api/scheduled-report/template", {}, undefined],
             ["PATCH", "/api/scheduled-report/91/restore", {}, {}],
+        ]);
+    });
+
+    it("maps read-only dashboard metadata helpers to their API paths", async () => {
+        const fetcher = captureFetch(() => jsonResponse({ data: [] }));
+        const client = createTestClient(fetcher);
+
+        await client.metadata.countries();
+        await client.metadata.roles();
+        await client.metadata.plans();
+        await client.metadata.timezones();
+        await client.metadata.themes();
+        await client.metadata.myTheme();
+        await client.metadata.currentPlan();
+        await client.metadata.platformDomain();
+        await client.metadata.languages();
+        await client.metadata.mapApiOptions();
+        await client.metadata.providers();
+        await client.metadata.digitalFormSettings();
+        await client.metadata.ecoSpeedSettings();
+        await client.metadata.excessiveIdlingSettings();
+
+        expect(
+            fetcher.calls.map((request) => [
+                request.method,
+                request.url.pathname,
+                Object.fromEntries(request.url.searchParams),
+                request.body,
+            ]),
+        ).toEqual([
+            ["GET", "/api/country/list", {}, undefined],
+            ["GET", "/api/roles", {}, undefined],
+            ["GET", "/api/plans", {}, undefined],
+            ["GET", "/api/timezones", {}, undefined],
+            ["GET", "/api/themes", {}, undefined],
+            ["GET", "/api/themes/my", {}, undefined],
+            ["GET", "/api/permissions/current-plan", {}, undefined],
+            ["GET", "/api/platform-settings/domain", {}, undefined],
+            ["GET", "/api/settings/language/list", {}, undefined],
+            ["GET", "/api/settings/mapApiOptions", {}, undefined],
+            ["GET", "/api/settings/provider", {}, undefined],
+            ["GET", "/api/settings/digitalForm", {}, undefined],
+            ["GET", "/api/settings/ecoSpeed", {}, undefined],
+            ["GET", "/api/settings/excessiveIdling", {}, undefined],
         ]);
     });
 
