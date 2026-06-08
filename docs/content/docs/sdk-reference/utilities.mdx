@@ -1,0 +1,580 @@
+---
+title: Utilities
+description: Result helpers, pagination helpers, endpoint catalogue exports, and dashboard endpoint analysis helpers.
+---
+
+Most projects can stay inside the domain services. These helpers are exported
+for scripts, tests, custom endpoint wrappers, and endpoint-discovery tooling.
+
+## Check whether a result failed
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Check whether a result failed" sdk="isLinxioFailure(result)">
+      Narrows a `LinxioResult<T>` or `LinxioPageResult<T>` to its failure
+      branch.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "result",
+          type: "LinxioResult<unknown> | LinxioPageResult<unknown>",
+          required: true,
+          description: "SDK result object returned by a domain service.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "boolean",
+          description: "True when result.error is not null.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Failure narrowing" lineNumbers
+import { isLinxioFailure } from "linxio-js";
+
+const result = await linxio.vehicles.list({ limit: 100 });
+
+if (isLinxioFailure(result)) {
+  console.error(result.error.name, result.error.message);
+  process.exitCode = 1;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Unwrap a result
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Unwrap a result" sdk="unwrapLinxioResult(result)">
+      Returns `data` from a successful result or throws the contained SDK error.
+      Use this when your script prefers normal throwing control flow.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "result",
+          type: "LinxioResult<TData>",
+          required: true,
+          description: "Non-paginated SDK result object.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "TData",
+          description: "Successful result data.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "The contained SDK error when result.error is present.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Unwrap result" lineNumbers
+import { unwrapLinxioResult } from "linxio-js";
+
+const vehicle = unwrapLinxioResult(await linxio.vehicles.get(vehicleId));
+console.log(vehicle.regNo);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Unwrap a page result
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Unwrap a page result" sdk="unwrapLinxioPageResult(result)">
+      Returns a successful page result or throws the contained SDK error.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "result",
+          type: "LinxioPageResult<TData>",
+          required: true,
+          description: "Paginated SDK result object.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioPageSuccess<TData>",
+          description: "Successful page result with data, meta, page, limit, and total.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "The contained SDK error when result.error is present.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Unwrap page" lineNumbers
+import { unwrapLinxioPageResult } from "linxio-js";
+
+const page = unwrapLinxioPageResult(
+  await linxio.vehicles.list({ limit: 100 }),
+);
+
+console.log(page.meta.total);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Convert unknown errors
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Convert unknown errors" sdk="toLinxioError(error)">
+      Converts arbitrary thrown values into the SDK base error type.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "error",
+          type: "unknown",
+          required: true,
+          description: "Unknown thrown value from user code or a custom integration.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioError",
+          description: "Existing LinxioError values are returned as-is; other values are wrapped.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Normalize errors" lineNumbers
+import { toLinxioError } from "linxio-js";
+
+try {
+  await runCustomEndpoint();
+} catch (error) {
+  const linxioError = toLinxioError(error);
+  console.error(linxioError.message);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Create result objects
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create result objects" sdk="ok(data); fail(error); pageOk(page); pageFail(error)">
+      Builds SDK-shaped result objects for custom services or tests.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Helpers"
+      fields={[
+        {
+          name: "ok(data)",
+          type: "LinxioSuccess<TData>",
+          description: "Creates a successful non-paginated result.",
+        },
+        {
+          name: "fail(error)",
+          type: "LinxioFailure<LinxioError>",
+          description: "Creates a failed non-paginated result from an unknown error.",
+        },
+        {
+          name: "pageOk(page)",
+          type: "LinxioPageSuccess<TData>",
+          description: "Creates a successful paginated result from a normalized page.",
+        },
+        {
+          name: "pageFail(error)",
+          type: "LinxioPageFailure<LinxioError>",
+          description: "Creates a failed paginated result from an unknown error.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Custom result" lineNumbers
+import { fail, ok } from "linxio-js";
+
+async function readCustomThing() {
+  try {
+    return ok(await linxio.request("GET", "/custom-thing"));
+  } catch (error) {
+    return fail(error);
+  }
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Collect pages
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Collect pages" sdk="collectPages(loadPage, params)">
+      Loads every page from a paginated endpoint into a single result object.
+      Domain services already wrap this for common list methods.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "loadPage",
+          type: "(params: TParams) => Promise<LinxioPageResult<TData>>",
+          required: true,
+          description: "Function that loads one page.",
+        },
+        {
+          name: "params",
+          type: "TParams",
+          description: "Initial list parameters. limit controls page size.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioResult<TData[]>",
+          description: "All records from all pages, or a typed SDK error.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Collect custom endpoint pages" lineNumbers
+import { collectPages } from "linxio-js";
+
+const result = await collectPages(
+  (params) => linxio.devices.installations(params),
+  { limit: 100 },
+);
+
+if (result.error) {
+  throw result.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Stream pages
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream pages" sdk="streamPages(loadPage, params)">
+      Streams a paginated endpoint one item at a time. This helper throws if a
+      page fails.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "loadPage",
+          type: "(params: TParams) => Promise<LinxioPageResult<TData>>",
+          required: true,
+          description: "Function that loads one page.",
+        },
+        {
+          name: "params",
+          type: "TParams",
+          description: "Initial list parameters. limit controls page size.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "TData",
+          description: "One item at a time across all pages.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown when any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream custom endpoint pages" lineNumbers
+import { streamPages } from "linxio-js";
+
+for await (const installation of streamPages(
+  (params) => linxio.devices.installations(params),
+  { limit: 100 },
+)) {
+  console.log(installation.deviceId, installation.vehicleId);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Use the endpoint catalogue
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Use the endpoint catalogue" sdk="linxioEndpoints">
+      Runtime catalogue of public and dashboard-derived endpoints represented by
+      the SDK.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Endpoint definition"
+      fields={[
+        {
+          name: "method",
+          type: "GET | POST | PATCH | PUT | DELETE",
+          description: "HTTP method.",
+        },
+        {
+          name: "path",
+          type: "string",
+          description: "Endpoint path. Dynamic segments use {name} placeholders.",
+        },
+        {
+          name: "source",
+          type: "public-docs | dashboard",
+          description: "Whether the endpoint is from Linxio's public API docs or inferred from dashboard JavaScript.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Endpoint catalogue" lineNumbers
+import { linxioEndpoints } from "linxio-js";
+
+console.log(linxioEndpoints.vehicles.list);
+// { method: "GET", path: "/vehicles/fields/json", source: "public-docs" }
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Flatten endpoint definitions
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Flatten endpoint definitions" sdk="flattenEndpointDefinitions(catalogue)">
+      Converts the nested endpoint catalogue into a sorted array of endpoint
+      definitions.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "catalogue",
+          type: "unknown",
+          required: true,
+          description: "Nested endpoint catalogue, usually linxioEndpoints.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioEndpointDefinition[]",
+          description: "Sorted endpoint definitions.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Flatten endpoints" lineNumbers
+import { flattenEndpointDefinitions, linxioEndpoints } from "linxio-js";
+
+const endpoints = flattenEndpointDefinitions(linxioEndpoints);
+console.table(endpoints.slice(0, 5));
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Extract dashboard endpoints
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Extract dashboard endpoints" sdk="extractDashboardEndpoints(sources)">
+      Extracts endpoint evidence from captured Linxio dashboard JavaScript
+      bundles.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "sources",
+          type: "DashboardSourceFile[]",
+          required: true,
+          description: "Source filename and JavaScript content pairs.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "DashboardEndpointEvidence[]",
+          description: "Endpoint candidates with methods, files, occurrence counts, and normalized paths.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Extract dashboard endpoint evidence" lineNumbers
+import { extractDashboardEndpoints } from "linxio-js";
+
+const endpoints = extractDashboardEndpoints([
+  {
+    filename: "main.js",
+    content: dashboardBundle,
+  },
+]);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Compare endpoint coverage
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Compare endpoint coverage" sdk="compareDashboardEndpointCoverage(input)">
+      Compares dashboard-extracted endpoint evidence with SDK endpoint
+      definitions.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "dashboardEndpoints",
+          type: "DashboardEndpointEvidence[]",
+          required: true,
+          description: "Endpoint evidence from extractDashboardEndpoints().",
+        },
+        {
+          name: "sdkEndpoints",
+          type: "LinxioEndpointDefinition[]",
+          required: true,
+          description: "Flattened SDK endpoint definitions.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "dashboardCovered",
+          type: "DashboardEndpointEvidence[]",
+          description: "Dashboard-observed endpoints represented in the SDK catalogue.",
+        },
+        {
+          name: "dashboardOnly",
+          type: "DashboardEndpointEvidence[]",
+          description: "Dashboard-observed endpoints not represented in the SDK catalogue.",
+        },
+        {
+          name: "sdkOnly",
+          type: "LinxioEndpointDefinition[]",
+          description: "SDK catalogue endpoints not observed in the analysed dashboard bundle set.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Compare coverage" lineNumbers
+import {
+  compareDashboardEndpointCoverage,
+  extractDashboardEndpoints,
+  flattenEndpointDefinitions,
+  linxioEndpoints,
+} from "linxio-js";
+
+const coverage = compareDashboardEndpointCoverage({
+  dashboardEndpoints: extractDashboardEndpoints(sources),
+  sdkEndpoints: flattenEndpointDefinitions(linxioEndpoints),
+});
+
+console.log(coverage.dashboardOnly);
+```
+
+  </CodeRail>
+</ReferenceGrid>

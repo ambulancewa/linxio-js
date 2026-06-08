@@ -12,6 +12,7 @@
     "routes-sensors-cameras",
     "metadata",
     "realtime",
-    "http"
+    "http",
+    "utilities"
   ]
 }
