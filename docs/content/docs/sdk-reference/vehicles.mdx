@@ -1,0 +1,795 @@
+---
+title: Vehicles
+description: Vehicle inventory, pagination, lifecycle, odometer, engine-hours, counts, and type helpers.
+---
+
+The vehicle service is the main entry point for fleet inventory. Use field
+projection aggressively on list and iterate calls to keep large fleets fast.
+
+## vehicles.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List vehicles" method="GET" path="/vehicles/fields/json" sdk="linxio.vehicles.list(params)">
+      Loads one page of vehicles.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of vehicles to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "VehicleField[]",
+          description: "Vehicle fields to include, such as id, regNo, status, lastLoggedAt, lastCoordinates, or todayData.",
+        },
+        {
+          name: "params.sort",
+          type: "string",
+          description: "Sort expression accepted by Linxio.",
+        },
+        {
+          name: "params.[filter]",
+          type: "QueryValue",
+          description: "Additional filters are forwarded as query parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicle[] | null",
+          description: "Vehicles for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "{ page: number; limit: number; total: number } | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails to load.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List vehicles" lineNumbers
+const page = await linxio.vehicles.list({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+  page: 1,
+});
+
+if (page.error) {
+  throw page.error;
+}
+
+console.log(page.meta.total, page.data);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.iterate()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all vehicles" method="GET" path="/vehicles/fields/json" sdk="linxio.vehicles.iterate(params)">
+      Auto-paginates all vehicle pages and returns a single result object.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioVehicleListParams",
+          description: "Same parameters as vehicles.list(). limit controls the page size used while collecting all pages.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicle[] | null",
+          description: "Flat array containing all loaded vehicles.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate vehicles" lineNumbers
+const { data: vehicles, error } = await linxio.vehicles.iterate({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+
+for (const vehicle of vehicles) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.stream()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream vehicles" method="GET" path="/vehicles/fields/json" sdk="linxio.vehicles.stream(params)">
+      Streams vehicles lazily across pages. Use this for large tenants or
+      scheduled jobs where memory use matters.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioVehicleListParams",
+          description: "Same parameters as vehicles.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioVehicle",
+          description: "One vehicle at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "The generator throws if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream vehicles" lineNumbers
+for await (const vehicle of linxio.vehicles.stream({
+  fields: ["id", "regNo"],
+  limit: 100,
+})) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a vehicle" method="GET" path="/vehicles/{vehicleId}" sdk="linxio.vehicles.get(vehicleId)">
+      Fetches one vehicle by internal Linxio vehicle ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicle | null",
+          description: "The vehicle record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the vehicle cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get a vehicle" lineNumbers
+const vehicle = await linxio.vehicles.get(vehicleId);
+
+if (vehicle.error) {
+  throw vehicle.error;
+}
+
+console.log(vehicle.data.regNo);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.create()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a vehicle" method="POST" path="/vehicles" sdk="linxio.vehicles.create(payload)">
+      Creates a vehicle. Tenant validation rules can vary, so send only fields
+      you know are valid for your Linxio account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "payload.regNo",
+          type: "string",
+          description: "Registration number or fleet identifier.",
+        },
+        {
+          name: "payload.defaultLabel",
+          type: "string",
+          description: "Default display label.",
+        },
+        {
+          name: "payload.model",
+          type: "string",
+          description: "Vehicle model text.",
+        },
+        {
+          name: "payload.typeId",
+          type: "LinxioId",
+          description: "Vehicle type ID from vehicles.types().",
+        },
+        {
+          name: "payload.depotId",
+          type: "LinxioId | null",
+          description: "Depot identifier when the tenant uses depots.",
+        },
+        {
+          name: "payload.groupIds",
+          type: "LinxioId[]",
+          description: "Vehicle group IDs.",
+        },
+        {
+          name: "payload.vin",
+          type: "string",
+          description: "Vehicle identification number.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicle | null",
+          description: "Created vehicle.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when creation fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Create a vehicle" lineNumbers
+const created = await linxio.vehicles.create({
+  regNo: "TEST-001",
+  defaultLabel: "Temporary SDK Test Vehicle",
+  typeId: vehicleTypeId,
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.update()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a vehicle" method="POST" path="/vehicles/{vehicleId}" sdk="linxio.vehicles.update(vehicleId, payload)">
+      Updates vehicle fields using Linxio's POST update endpoint.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+        {
+          name: "payload",
+          type: "LinxioVehiclePayload",
+          required: true,
+          description: "Partial vehicle payload containing fields to change.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicle | null",
+          description: "Updated vehicle.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when update fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Update a vehicle" lineNumbers
+const updated = await linxio.vehicles.update(vehicleId, {
+  defaultLabel: "Updated display label",
+});
+
+if (updated.error) {
+  throw updated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.archive()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a vehicle" method="PATCH" path="/vehicles/{vehicleId}/archive" sdk="linxio.vehicles.archive(vehicleId)">
+      Soft-archives a vehicle. Prefer this over destructive actions when you
+      need reversibility.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when archive fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Archive a vehicle" lineNumbers
+const archived = await linxio.vehicles.archive(vehicleId);
+
+if (archived.error) {
+  throw archived.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.restore()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a vehicle" method="POST" path="/vehicles/{vehicleId}/restore" sdk="linxio.vehicles.restore(vehicleId)">
+      Restores a previously archived vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Archived vehicle identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when restore fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Restore a vehicle" lineNumbers
+const restored = await linxio.vehicles.restore(vehicleId);
+
+if (restored.error) {
+  throw restored.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.getOdometer()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get vehicle odometer" method="GET" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.getOdometer(vehicleId, params)">
+      Reads the current odometer value, or the value at a supplied occurrence
+      time when Linxio supports it for the tenant.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+        {
+          name: "params.occurredAt",
+          type: "ISODateString",
+          description: "Optional occurrence timestamp.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data.odometer",
+          type: "number",
+          description: "Odometer reading.",
+        },
+        {
+          name: "data.vehicleId",
+          type: "LinxioId",
+          description: "Vehicle the reading belongs to.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the reading cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Read odometer" lineNumbers
+const odometer = await linxio.vehicles.getOdometer(vehicleId);
+
+if (odometer.error) {
+  throw odometer.error;
+}
+
+console.log(odometer.data.odometer);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.recalibrateOdometer()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Recalibrate vehicle odometer" method="POST" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.recalibrateOdometer(vehicleId, payload)">
+      Recalibrates a vehicle odometer. Treat this as an operational change and
+      only call it with confirmed values.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+        {
+          name: "payload.occurredAt",
+          type: "ISODateString",
+          required: true,
+          description: "When the recalibrated reading applies.",
+        },
+        {
+          name: "payload.odometer",
+          type: "number",
+          required: true,
+          description: "New odometer value.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioOdometer | null",
+          description: "Updated odometer reading.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when recalibration fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Recalibrate odometer" lineNumbers
+const recalibrated = await linxio.vehicles.recalibrateOdometer(vehicleId, {
+  occurredAt: new Date().toISOString(),
+  odometer: 123456,
+});
+
+if (recalibrated.error) {
+  throw recalibrated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.getEngineHours()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get vehicle engine hours" method="GET" path="/vehicles/{vehicleId}/engine-hours/current" sdk="linxio.vehicles.getEngineHours(vehicleId)">
+      Reads the current engine-hours value for a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data.engineHours",
+          type: "number",
+          description: "Current engine-hours reading.",
+        },
+        {
+          name: "data.occurredAt",
+          type: "ISODateString | null",
+          description: "Timestamp associated with the reading when supplied.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the reading cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Read engine hours" lineNumbers
+const engineHours = await linxio.vehicles.getEngineHours(vehicleId);
+
+if (engineHours.error) {
+  throw engineHours.error;
+}
+
+console.log(engineHours.data.engineHours);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.count()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Count vehicles" method="GET" path="/vehicles/count" sdk="linxio.vehicles.count(params)">
+      Returns a count without fetching vehicle records.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioVehicleCountParams",
+          description: "Optional dashboard-derived filters forwarded as query parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data.count",
+          type: "number",
+          description: "Vehicle count when Linxio returns count.",
+        },
+        {
+          name: "data.total",
+          type: "number",
+          description: "Vehicle count when Linxio returns total.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when count fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Count vehicles" lineNumbers
+const count = await linxio.vehicles.count({ status: "active" });
+
+if (count.error) {
+  throw count.error;
+}
+
+console.log(count.data.count ?? count.data.total ?? 0);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## vehicles.types()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List vehicle types" method="GET" path="/vehicles/types" sdk="linxio.vehicles.types(params)">
+      Lists vehicle type categories visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Maximum number of type records.",
+          defaultValue: "1000",
+        },
+        {
+          name: "params.sort",
+          type: "string",
+          description: "Sort expression.",
+          defaultValue: "order",
+        },
+        {
+          name: "params.[filter]",
+          type: "QueryValue",
+          description: "Additional filters forwarded as query parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioVehicleType[] | null",
+          description: "Vehicle type records, usually including id, name, and order.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when type loading fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Vehicle types" lineNumbers
+const types = await linxio.vehicles.types();
+
+if (types.error) {
+  throw types.error;
+}
+
+const lightVehicle = types.data.find((type) => type.name === "Light Vehicle");
+```
+
+  </CodeRail>
+</ReferenceGrid>

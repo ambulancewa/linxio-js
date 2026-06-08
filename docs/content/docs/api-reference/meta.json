@@ -1,0 +1,15 @@
+{
+  "title": "API Reference",
+  "pages": [
+    "index",
+    "auth",
+    "vehicles-routes",
+    "devices-sensors-cameras",
+    "accounts-users-drivers",
+    "geofences",
+    "fuel",
+    "reports-forms",
+    "metadata",
+    "realtime"
+  ]
+}

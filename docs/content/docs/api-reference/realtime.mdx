@@ -1,0 +1,95 @@
+---
+title: Realtime
+description: Socket.IO realtime coordinate and notification namespaces.
+---
+
+Realtime uses `https://track.linxio.com` and the Socket.IO path `/socket.io`.
+The SDK handles token query parameters and reconnect behaviour.
+
+## /coordinates namespace
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Connect to live coordinates" path="https://track.linxio.com/coordinates" sdk="linxio.realtime.onPosition(vehicleIds, handler)">
+      Receives live vehicle coordinate payloads after subscribing to vehicle IDs.
+    </ReferenceHeader>
+
+    <FieldTable title="Connection parameters" fields={[
+      { name: "token", type: "string", required: true, description: "JWT token passed as a Socket.IO query parameter." },
+      { name: "path", type: "/socket.io", description: "Socket.IO path." },
+      { name: "subscribe.vehicleIds", type: "number[]", required: true, description: "Vehicle IDs sent with the subscribe event." },
+    ]} />
+    <FieldTable title="Payload fields" fields={[
+      { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
+      { name: "lat / lng", type: "number", description: "Current coordinate." },
+      { name: "speed", type: "number", description: "Speed when supplied." },
+      { name: "heading", type: "number", description: "Heading when supplied." },
+      { name: "ts", type: "ISODateString", description: "Timestamp when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```ts title="SDK subscription" lineNumbers
+const unsubscribe = linxio.realtime.onPosition([vehicleId], (position) => {
+  console.log(position.vehicleId, position.lat, position.lng);
+});
+```
+
+```js title="Socket.IO shape" lineNumbers
+const socket = io("https://track.linxio.com/coordinates", {
+  path: "/socket.io",
+  query: { token },
+  transports: ["websocket"],
+});
+
+socket.emit("subscribe", { vehicleIds: [304] });
+socket.on("coordinates", (position) => console.log(position));
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## /notifications namespace
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Connect to notifications" path="https://track.linxio.com/notifications" sdk="linxio.realtime.onNotification(handler)">
+      Receives Linxio notification payloads for notifications configured in the
+      dashboard for the authenticated user.
+    </ReferenceHeader>
+
+    <FieldTable title="Connection parameters" fields={[
+      { name: "token", type: "string", required: true, description: "JWT token passed as a Socket.IO query parameter." },
+      { name: "path", type: "/socket.io", description: "Socket.IO path." },
+    ]} />
+    <FieldTable title="Payload fields" fields={[
+      { name: "id", type: "LinxioId", description: "Notification identifier when supplied." },
+      { name: "type", type: "string", description: "Notification type when supplied." },
+      { name: "message", type: "string", description: "Notification message when supplied." },
+      { name: "vehicleId", type: "LinxioId | null", description: "Related vehicle when supplied." },
+      { name: "occurredAt", type: "ISODateString", description: "Timestamp when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```ts title="SDK subscription" lineNumbers
+const unsubscribe = linxio.realtime.onNotification((notification) => {
+  console.log(notification.type, notification.message);
+});
+```
+
+```js title="Socket.IO shape" lineNumbers
+const socket = io("https://track.linxio.com/notifications", {
+  path: "/socket.io",
+  query: { token },
+  transports: ["websocket"],
+});
+
+socket.on("notification", (notification) => console.log(notification));
+socket.on("notifications", (notification) => console.log(notification));
+```
+
+  </CodeRail>
+</ReferenceGrid>

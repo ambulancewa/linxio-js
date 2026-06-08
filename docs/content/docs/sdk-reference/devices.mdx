@@ -1,0 +1,898 @@
+---
+title: Devices
+description: Device inventory, install/uninstall workflows, coordinates, sensors, vendors, installations, and cameras.
+---
+
+Device methods cover hardware inventory and the relationship between trackers,
+vehicles, sensors, and cameras.
+
+## devices.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List devices" method="GET" path="/devices/json" sdk="linxio.devices.list(params)">
+      Loads one page of devices.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of devices to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "DeviceField[]",
+          description: "Optional fields such as id, imei, serial, status, vehicle, usage, or vendor.",
+        },
+        {
+          name: "params.sort",
+          type: "string",
+          description: "Sort expression accepted by Linxio.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice[] | null",
+          description: "Devices for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List devices" lineNumbers
+const devices = await linxio.devices.list({
+  fields: ["id", "imei", "serial", "vehicle"],
+  limit: 100,
+});
+
+if (devices.error) {
+  throw devices.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.iterate()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all devices" method="GET" path="/devices/json" sdk="linxio.devices.iterate(params)">
+      Auto-paginates device inventory and returns one result object.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioDeviceListParams",
+          description: "Same filters and field projection as devices.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice[] | null",
+          description: "Flat array containing every loaded device.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate devices" lineNumbers
+const { data: devices, error } = await linxio.devices.iterate({
+  fields: ["id", "imei", "status"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.stream()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream devices" method="GET" path="/devices/json" sdk="linxio.devices.stream(params)">
+      Streams devices lazily across pages.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioDeviceListParams",
+          description: "Same filters and field projection as devices.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioDevice",
+          description: "One device record at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown if a page request fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream devices" lineNumbers
+for await (const device of linxio.devices.stream({ limit: 100 })) {
+  console.log(device.id, device.imei);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a device" method="GET" path="/devices/{deviceId}" sdk="linxio.devices.get(deviceId)">
+      Fetches one device by internal Linxio device ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice | null",
+          description: "Device record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the device cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get a device" lineNumbers
+const device = await linxio.devices.get(deviceId);
+
+if (device.error) {
+  throw device.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.create()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a device" method="POST" path="/devices" sdk="linxio.devices.create(payload)">
+      Creates a device record.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "payload.imei",
+          type: "string",
+          description: "IMEI or unique hardware identifier.",
+        },
+        {
+          name: "payload.serial",
+          type: "string",
+          description: "Device serial number.",
+        },
+        {
+          name: "payload.typeId",
+          type: "LinxioId",
+          description: "Device type identifier.",
+        },
+        {
+          name: "payload.usage",
+          type: "string",
+          description: "Usage classification accepted by the tenant.",
+        },
+        {
+          name: "payload.vendorId",
+          type: "LinxioId",
+          description: "Vendor identifier from devices.vendors().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice | null",
+          description: "Created device.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when creation fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Create a device" lineNumbers
+const created = await linxio.devices.create({
+  imei: "123456789012345",
+  serial: "SDK-TEST-001",
+  vendorId,
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.update()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a device" method="PATCH" path="/devices/{deviceId}" sdk="linxio.devices.update(deviceId, payload)">
+      Updates a device record.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+        {
+          name: "payload",
+          type: "LinxioDevicePayload",
+          required: true,
+          description: "Partial device payload containing fields to change.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice | null",
+          description: "Updated device.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when update fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Update a device" lineNumbers
+const updated = await linxio.devices.update(deviceId, {
+  serial: "SDK-TEST-001-UPDATED",
+});
+
+if (updated.error) {
+  throw updated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.install()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Install a device" method="POST" path="/devices/{deviceId}/install" sdk="linxio.devices.install(deviceId, payload)">
+      Installs a device into a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+        {
+          name: "payload.vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle receiving the device.",
+        },
+        {
+          name: "payload.installedAt",
+          type: "ISODateString",
+          description: "Installation timestamp.",
+        },
+        {
+          name: "payload.odometer",
+          type: "number",
+          description: "Vehicle odometer at installation time.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice | null",
+          description: "Updated device record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when install fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Install a device" lineNumbers
+const installed = await linxio.devices.install(deviceId, {
+  vehicleId,
+  installedAt: new Date().toISOString(),
+  odometer: 123456,
+});
+
+if (installed.error) {
+  throw installed.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.uninstall()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Uninstall a device" method="POST" path="/devices/{deviceId}/uninstall" sdk="linxio.devices.uninstall(deviceId, payload)">
+      Removes a device from its currently installed vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+        {
+          name: "payload.uninstalledAt",
+          type: "ISODateString",
+          description: "Uninstall timestamp.",
+        },
+        {
+          name: "payload.odometer",
+          type: "number",
+          description: "Vehicle odometer at uninstall time.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDevice | null",
+          description: "Updated device record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when uninstall fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Uninstall a device" lineNumbers
+const uninstalled = await linxio.devices.uninstall(deviceId, {
+  uninstalledAt: new Date().toISOString(),
+});
+
+if (uninstalled.error) {
+  throw uninstalled.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.archive()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a device" method="PATCH" path="/devices/{deviceId}/archive" sdk="linxio.devices.archive(deviceId)">
+      Soft-archives a device.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when archive fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Archive a device" lineNumbers
+const archived = await linxio.devices.archive(deviceId);
+
+if (archived.error) {
+  throw archived.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.restore()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a device" method="PATCH" path="/devices/{deviceId}/restore" sdk="linxio.devices.restore(deviceId)">
+      Restores a previously archived device.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Archived device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when restore fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Restore a device" lineNumbers
+const restored = await linxio.devices.restore(deviceId);
+
+if (restored.error) {
+  throw restored.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.coordinates()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId)">
+      Fetches recent coordinates for a device.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDeviceCoordinate[] | null",
+          description: "Coordinate rows including lat, lng, and ts when supplied.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when coordinates cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Device coordinates" lineNumbers
+const coordinates = await linxio.devices.coordinates(deviceId);
+
+if (coordinates.error) {
+  throw coordinates.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.sensors()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device sensors" method="GET" path="/devices/{deviceId}/sensors" sdk="linxio.devices.sensors(deviceId)">
+      Lists sensors paired with a device.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioSensor[] | null",
+          description: "Sensors associated with the device.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when sensors cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Device sensors" lineNumbers
+const sensors = await linxio.devices.sensors(deviceId);
+
+if (sensors.error) {
+  throw sensors.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.history()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device history" method="GET" path="/devices/{deviceId}/history" sdk="linxio.devices.history(deviceId)">
+      Fetches dashboard-derived device history entries.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioRecord[] | null",
+          description: "History entries. The exact shape can vary by tenant and device type.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when history cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Device history" lineNumbers
+const history = await linxio.devices.history(deviceId);
+
+if (history.error) {
+  throw history.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.vendors()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors" sdk="linxio.devices.vendors()">
+      Lists device vendors available to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "vendors() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDeviceVendor[] | null",
+          description: "Vendor records, usually including id and name.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when vendors cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Device vendors" lineNumbers
+const vendors = await linxio.devices.vendors();
+
+if (vendors.error) {
+  throw vendors.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.installations()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device installations" method="GET" path="/devices/installation" sdk="linxio.devices.installations(params)">
+      Lists device installation rows.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioDeviceListParams",
+          description: "Pagination, sorting, fields, and dashboard-derived filters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDeviceInstallation[] | null",
+          description: "Installation rows with deviceId, vehicleId, installedAt, and uninstalledAt when supplied.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when installations cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Installation rows" lineNumbers
+const installations = await linxio.devices.installations({
+  limit: 100,
+  page: 1,
+});
+
+if (installations.error) {
+  throw installations.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## devices.cameras()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List device cameras" method="GET" path="/devices/{deviceId}/cameras" sdk="linxio.devices.cameras(deviceId)">
+      Lists cameras attached to a device.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "deviceId",
+          type: "LinxioId",
+          required: true,
+          description: "Device identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDeviceCamera[] | null",
+          description: "Camera records with id, deviceId, name, and status when supplied.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when cameras cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Device cameras" lineNumbers
+const cameras = await linxio.devices.cameras(deviceId);
+
+if (cameras.error) {
+  throw cameras.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>

@@ -1,0 +1,105 @@
+---
+title: API Reference
+description: HTTP base URL, auth headers, response envelopes, and endpoint-family pages.
+---
+
+The default REST base URL is `https://api.linxio.com/api`. Authenticated
+requests require an `Authorization: Bearer <token>` header from the login
+endpoint.
+
+The API reference is split by endpoint family. Publicly documented endpoints
+are included together with dashboard-derived endpoints represented in the SDK.
+
+## Endpoint families
+
+<ServiceTable
+  rows={[
+    {
+      service: "Authentication",
+      methods: "POST /login, POST /login/otp, POST /token/refresh, GET /me, POST /logout",
+    },
+    {
+      service: "Vehicles and routes",
+      methods: "vehicle inventory, odometer, engine-hours, counts, types, route history",
+    },
+    {
+      service: "Devices, sensors, and cameras",
+      methods: "device inventory, install/uninstall, sensor reports, camera events",
+    },
+    {
+      service: "Accounts, users, and drivers",
+      methods: "clients, client users, users, drivers, reseller accounts",
+    },
+    {
+      service: "Geofences",
+      methods: "areas and area groups",
+    },
+    {
+      service: "Fuel",
+      methods: "fuel transactions, summaries, cards, fuel types",
+    },
+    {
+      service: "Reports and forms",
+      methods: "scheduled reports and digital form answers",
+    },
+    {
+      service: "Metadata",
+      methods: "countries, roles, plans, settings, themes, languages",
+    },
+    {
+      service: "Realtime",
+      methods: "coordinates and notification Socket.IO namespaces",
+    },
+  ]}
+/>
+
+## Request conventions
+
+<FieldTable
+  fields={[
+    {
+      name: "Authorization",
+      type: "Bearer token",
+      required: true,
+      description: "Send the JWT token returned by /login or /token/refresh for every authenticated endpoint.",
+    },
+    {
+      name: "Content-Type",
+      type: "application/json",
+      description: "Send for JSON request bodies.",
+    },
+    {
+      name: "fields[]",
+      type: "string[]",
+      description: "Several list endpoints accept repeated fields[] parameters to reduce response size.",
+    },
+    {
+      name: "limit",
+      type: "number",
+      description: "Maximum records per page for paginated endpoints.",
+    },
+    {
+      name: "page",
+      type: "number",
+      description: "Page number for paginated endpoints.",
+      defaultValue: "1",
+    },
+  ]}
+/>
+
+## Response envelope
+
+Most list endpoints return a pagination envelope:
+
+```json title="Paginated response" lineNumbers
+{
+  "page": 1,
+  "limit": 100,
+  "total": 123,
+  "data": [],
+  "aggregations": null
+}
+```
+
+Most entity endpoints return the entity directly. Endpoints returning `204 No
+Content` are represented by `LinxioResult<void>` in the SDK.

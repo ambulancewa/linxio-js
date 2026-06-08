@@ -1,0 +1,1317 @@
+---
+title: Users, Clients, Drivers, and Resellers
+description: User management, client account users, driver assignment, and reseller account helpers.
+---
+
+These services are related but not interchangeable. `linxio.users` works at the
+account user endpoint, `linxio.clients` works with client accounts and their
+users, `linxio.drivers` focuses on driver workflows, and `linxio.resellers`
+exposes reseller account lookup.
+
+## users.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List users" method="GET" path="/users" sdk="linxio.users.list(params)">
+      Loads one page of users visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of users to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "UserField[]",
+          description: "Optional fields such as id, email, fullName, role, or status.",
+        },
+        {
+          name: "params.role",
+          type: "string",
+          description: "Optional role filter.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser[] | null",
+          description: "Users for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List users" lineNumbers
+const users = await linxio.users.list({
+  fields: ["id", "email", "fullName", "role"],
+  limit: 100,
+});
+
+if (users.error) {
+  throw users.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.iterate()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all users" method="GET" path="/users" sdk="linxio.users.iterate(params)">
+      Auto-paginates all user pages and returns a single result object.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioUserListParams",
+          description: "Same filters and field projection as users.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser[] | null",
+          description: "Flat array containing every loaded user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate users" lineNumbers
+const { data: users, error } = await linxio.users.iterate({
+  fields: ["id", "email", "status"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.stream()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream users" method="GET" path="/users" sdk="linxio.users.stream(params)">
+      Streams users lazily across pages.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioUserListParams",
+          description: "Same filters and field projection as users.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioUser",
+          description: "One user at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown if a page request fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream users" lineNumbers
+for await (const user of linxio.users.stream({ limit: 100 })) {
+  console.log(user.id, user.email);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a user" method="GET" path="/users/{userId}" sdk="linxio.users.get(userId)">
+      Fetches one user by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "User identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "User record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the user cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get user" lineNumbers
+const user = await linxio.users.get(userId);
+
+if (user.error) {
+  throw user.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.create()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a user" method="POST" path="/users" sdk="linxio.users.create(payload)">
+      Creates a user. Role and permission validation depends on the authenticated
+      account and tenant configuration.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "payload.email",
+          type: "string",
+          description: "User email address.",
+        },
+        {
+          name: "payload.firstName",
+          type: "string",
+          description: "Given name.",
+        },
+        {
+          name: "payload.lastName",
+          type: "string",
+          description: "Family name.",
+        },
+        {
+          name: "payload.fullName",
+          type: "string",
+          description: "Full display name.",
+        },
+        {
+          name: "payload.phone",
+          type: "string",
+          description: "Phone number.",
+        },
+        {
+          name: "payload.roleId",
+          type: "LinxioId",
+          description: "Role identifier from metadata.roles().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "Created user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when creation fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Create user" lineNumbers
+const created = await linxio.users.create({
+  email: "new-user@example.com",
+  firstName: "New",
+  lastName: "User",
+  roleId,
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.update()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a user" method="PATCH" path="/users/{userId}" sdk="linxio.users.update(userId, payload)">
+      Updates a user.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "User identifier.",
+        },
+        {
+          name: "payload",
+          type: "LinxioUserPayload",
+          required: true,
+          description: "Partial user payload containing fields to change.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "Updated user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when update fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Update user" lineNumbers
+const updated = await linxio.users.update(userId, {
+  phone: "+61 400 000 000",
+});
+
+if (updated.error) {
+  throw updated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.archive()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a user" method="PATCH" path="/users/{userId}/archive" sdk="linxio.users.archive(userId)">
+      Soft-archives a user.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "User identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when archive fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Archive user" lineNumbers
+const archived = await linxio.users.archive(userId);
+
+if (archived.error) {
+  throw archived.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## users.restore()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a user" method="PATCH" path="/users/{userId}/restore" sdk="linxio.users.restore(userId)">
+      Restores a previously archived user.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "Archived user identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when restore fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Restore user" lineNumbers
+const restored = await linxio.users.restore(userId);
+
+if (restored.error) {
+  throw restored.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List client accounts" method="GET" path="/clients/json" sdk="linxio.clients.list(params)">
+      Loads one page of client accounts visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioClientUserListParams",
+          description: "Pagination, field projection, sorting, role, and dashboard-derived filters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioClientAccount[] | null",
+          description: "Client account records.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List clients" lineNumbers
+const clients = await linxio.clients.list({ limit: 100 });
+
+if (clients.error) {
+  throw clients.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a client account" method="GET" path="/clients/{clientId}" sdk="linxio.clients.get(clientId)">
+      Fetches one client account by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioClientAccount | null",
+          description: "Client account record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the client cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get client" lineNumbers
+const client = await linxio.clients.get(clientId);
+
+if (client.error) {
+  throw client.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.listUsers()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List client users" method="GET" path="/clients/{clientId}/users" sdk="linxio.clients.listUsers(clientId, params)">
+      Loads one page of users for a client account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "params.role",
+          type: "string",
+          description: "Optional role filter, such as driver.",
+        },
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of users to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser[] | null",
+          description: "Client users for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List client users" lineNumbers
+const users = await linxio.clients.listUsers(clientId, {
+  role: "driver",
+  limit: 100,
+});
+
+if (users.error) {
+  throw users.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.iterateUsers()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all client users" method="GET" path="/clients/{clientId}/users" sdk="linxio.clients.iterateUsers(clientId, params)">
+      Auto-paginates users for one client account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "params",
+          type: "LinxioClientUserListParams",
+          description: "Same filters as clients.listUsers().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser[] | null",
+          description: "Flat array containing every loaded client user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate client users" lineNumbers
+const { data: users, error } = await linxio.clients.iterateUsers(clientId, {
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.streamUsers()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream client users" method="GET" path="/clients/{clientId}/users" sdk="linxio.clients.streamUsers(clientId, params)">
+      Streams client users lazily across pages.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "params",
+          type: "LinxioClientUserListParams",
+          description: "Same filters as clients.listUsers().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioUser",
+          description: "One client user at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown if a page request fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream client users" lineNumbers
+for await (const user of linxio.clients.streamUsers(clientId, { limit: 100 })) {
+  console.log(user.id, user.email);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.getUser()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a client user" method="GET" path="/clients/{clientId}/users/{userId}" sdk="linxio.clients.getUser(clientId, userId)">
+      Fetches one user within a client account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "User identifier within that client account.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "Client user record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the user cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get client user" lineNumbers
+const user = await linxio.clients.getUser(clientId, userId);
+
+if (user.error) {
+  throw user.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.createUser()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a client user" method="POST" path="/clients/{clientId}/users" sdk="linxio.clients.createUser(clientId, payload)">
+      Creates a user inside a client account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "payload",
+          type: "LinxioUserPayload",
+          required: true,
+          description: "User fields such as email, name, phone, and roleId.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "Created client user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when creation fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Create client user" lineNumbers
+const created = await linxio.clients.createUser(clientId, {
+  email: "driver@example.com",
+  firstName: "Driver",
+  lastName: "Example",
+  roleId,
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## clients.updateUser()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a client user" method="POST" path="/clients/{clientId}/users/{userId}" sdk="linxio.clients.updateUser(clientId, userId, payload)">
+      Updates a user inside a client account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "clientId",
+          type: "LinxioId",
+          required: true,
+          description: "Client account identifier.",
+        },
+        {
+          name: "userId",
+          type: "LinxioId",
+          required: true,
+          description: "User identifier.",
+        },
+        {
+          name: "payload",
+          type: "LinxioUserPayload",
+          required: true,
+          description: "Partial user payload containing fields to change.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioUser | null",
+          description: "Updated client user.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when update fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Update client user" lineNumbers
+const updated = await linxio.clients.updateUser(clientId, userId, {
+  phone: "+61 400 000 000",
+});
+
+if (updated.error) {
+  throw updated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## drivers.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List drivers" method="GET" path="/drivers or /clients/{clientId}/users?role=driver" sdk="linxio.drivers.list(params)">
+      Lists drivers. Pass `clientId` to use the documented client-users driver
+      endpoint; omit it to use the dashboard-derived `/drivers` endpoint.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.clientId",
+          type: "LinxioId",
+          description: "Client account identifier. When supplied, role=driver is sent automatically.",
+        },
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of drivers to request.",
+        },
+        {
+          name: "params.fields",
+          type: "DriverField[]",
+          description: "Optional fields such as id, fullName, email, phone, or role.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDriver[] | null",
+          description: "Drivers for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List drivers for a client" lineNumbers
+const drivers = await linxio.drivers.list({
+  clientId,
+  fields: ["id", "fullName", "email"],
+  limit: 100,
+});
+
+if (drivers.error) {
+  throw drivers.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## drivers.iterate()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all drivers" method="GET" path="/drivers or /clients/{clientId}/users?role=driver" sdk="linxio.drivers.iterate(params)">
+      Auto-paginates driver pages into one result object.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioDriverListParams",
+          description: "Same parameters as drivers.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDriver[] | null",
+          description: "Flat array containing every loaded driver.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate drivers" lineNumbers
+const { data: drivers, error } = await linxio.drivers.iterate({
+  clientId,
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## drivers.stream()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream drivers" method="GET" path="/drivers or /clients/{clientId}/users?role=driver" sdk="linxio.drivers.stream(params)">
+      Streams drivers lazily across pages.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioDriverListParams",
+          description: "Same parameters as drivers.list().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioDriver",
+          description: "One driver at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown if a page request fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream drivers" lineNumbers
+for await (const driver of linxio.drivers.stream({ clientId, limit: 100 })) {
+  console.log(driver.id, driver.fullName);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## drivers.assignToVehicle()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Assign driver to vehicle" method="POST" path="/vehicle/{vehicleId}/set-driver/{driverId}" sdk="linxio.drivers.assignToVehicle(vehicleId, driverId)">
+      Assigns a driver to a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle receiving the driver assignment.",
+        },
+        {
+          name: "driverId",
+          type: "LinxioId",
+          required: true,
+          description: "Driver user identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when assignment fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Assign driver" lineNumbers
+const assigned = await linxio.drivers.assignToVehicle(vehicleId, driverId);
+
+if (assigned.error) {
+  throw assigned.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## drivers.unassignFromVehicle()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Unassign driver from vehicle" method="POST" path="/vehicle/{vehicleId}/unset-driver/{driverId}" sdk="linxio.drivers.unassignFromVehicle(vehicleId, driverId)">
+      Removes a driver assignment from a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier.",
+        },
+        {
+          name: "driverId",
+          type: "LinxioId",
+          required: true,
+          description: "Driver user identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when unassignment fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Unassign driver" lineNumbers
+const unassigned = await linxio.drivers.unassignFromVehicle(vehicleId, driverId);
+
+if (unassigned.error) {
+  throw unassigned.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## resellers.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List reseller accounts" method="GET" path="/reseller" sdk="linxio.resellers.list()">
+      Lists reseller accounts visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "list() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioReseller[] | null",
+          description: "Reseller account records.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when resellers cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List resellers" lineNumbers
+const resellers = await linxio.resellers.list();
+
+if (resellers.error) {
+  throw resellers.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## resellers.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a reseller account" method="GET" path="/reseller/{resellerId}" sdk="linxio.resellers.get(resellerId)">
+      Fetches one reseller account by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "resellerId",
+          type: "LinxioId",
+          required: true,
+          description: "Reseller identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioReseller | null",
+          description: "Reseller account record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the reseller cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get reseller" lineNumbers
+const reseller = await linxio.resellers.get(resellerId);
+
+if (reseller.error) {
+  throw reseller.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>

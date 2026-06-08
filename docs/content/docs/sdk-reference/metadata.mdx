@@ -1,0 +1,458 @@
+---
+title: Metadata
+description: Read-only tenant settings, reference data, plans, roles, themes, languages, and feature settings.
+---
+
+Metadata methods are read-only helpers for dropdowns, tenant configuration, and
+feature detection. Most records include a stable `id` or machine-readable value
+when Linxio supplies one, plus tenant-specific fields.
+
+## metadata.countries()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List countries" method="GET" path="/country/list" sdk="linxio.metadata.countries()">
+      Lists country options used by Linxio address and tenant forms.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "countries() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioCountry[] | null", description: "Country records, usually including code and name." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when countries cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Countries" lineNumbers
+const countries = await linxio.metadata.countries();
+
+if (countries.error) {
+  throw countries.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.roles()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List user roles" method="GET" path="/roles" sdk="linxio.metadata.roles()">
+      Lists user roles available to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "roles() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioRole[] | null", description: "Role records, usually including id, name, and type when supplied." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when roles cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Roles" lineNumbers
+const roles = await linxio.metadata.roles();
+
+if (roles.error) {
+  throw roles.error;
+}
+
+const driverRole = roles.data.find((role) => role.name === "Driver");
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.plans()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List plans" method="GET" path="/plans" sdk="linxio.metadata.plans()">
+      Lists plan definitions visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "plans() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioPlan[] | null", description: "Plan records." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when plans cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Plans" lineNumbers
+const plans = await linxio.metadata.plans();
+
+if (plans.error) {
+  throw plans.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.timezones()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List timezones" method="GET" path="/timezones" sdk="linxio.metadata.timezones()">
+      Lists timezone options used by Linxio tenant and user settings.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "timezones() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioTimezone[] | null", description: "Timezone records, usually including name and offset when supplied." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when timezones cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Timezones" lineNumbers
+const timezones = await linxio.metadata.timezones();
+
+if (timezones.error) {
+  throw timezones.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.themes()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List dashboard themes" method="GET" path="/themes" sdk="linxio.metadata.themes()">
+      Lists dashboard theme definitions.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "themes() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioTheme[] | null", description: "Theme records." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when themes cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Themes" lineNumbers
+const themes = await linxio.metadata.themes();
+
+if (themes.error) {
+  throw themes.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.myTheme()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get current dashboard theme" method="GET" path="/themes/my" sdk="linxio.metadata.myTheme()">
+      Fetches the current user's active dashboard theme.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "myTheme() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioTheme | null", description: "Current theme record." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when the current theme cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Current theme" lineNumbers
+const theme = await linxio.metadata.myTheme();
+
+if (theme.error) {
+  throw theme.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.currentPlan()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get current plan permissions" method="GET" path="/permissions/current-plan" sdk="linxio.metadata.currentPlan()">
+      Fetches current-plan permission and feature information.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "currentPlan() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioCurrentPlan | null", description: "Current plan details, enabled features, and permission flags when supplied." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when current plan data cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Current plan" lineNumbers
+const plan = await linxio.metadata.currentPlan();
+
+if (plan.error) {
+  throw plan.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.platformDomain()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get platform domain settings" method="GET" path="/platform-settings/domain" sdk="linxio.metadata.platformDomain()">
+      Fetches hosted-domain settings for the current platform.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "platformDomain() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioPlatformDomain | null", description: "Platform domain settings." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when platform domain settings cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Platform domain" lineNumbers
+const domain = await linxio.metadata.platformDomain();
+
+if (domain.error) {
+  throw domain.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.languages()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List languages" method="GET" path="/settings/language/list" sdk="linxio.metadata.languages()">
+      Lists language options used by Linxio settings screens.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "languages() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioLanguage[] | null", description: "Language records, usually including code and name." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when languages cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Languages" lineNumbers
+const languages = await linxio.metadata.languages();
+
+if (languages.error) {
+  throw languages.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.mapApiOptions()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List map API options" method="GET" path="/settings/mapApiOptions" sdk="linxio.metadata.mapApiOptions()">
+      Lists map API provider options available to the current tenant.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "mapApiOptions() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioMapApiOption[] | null", description: "Map API option records." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when map options cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Map API options" lineNumbers
+const options = await linxio.metadata.mapApiOptions();
+
+if (options.error) {
+  throw options.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.providers()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get provider settings" method="GET" path="/settings/provider" sdk="linxio.metadata.providers()">
+      Fetches dashboard provider settings visible to the current account.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "providers() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioProviderSetting[] | null", description: "Provider setting records." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when provider settings cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Provider settings" lineNumbers
+const providers = await linxio.metadata.providers();
+
+if (providers.error) {
+  throw providers.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.digitalFormSettings()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get digital form settings" method="GET" path="/settings/digitalForm" sdk="linxio.metadata.digitalFormSettings()">
+      Fetches tenant-level digital-form settings.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "digitalFormSettings() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioDigitalFormSettings | null", description: "Digital-form feature settings. Shape can vary by tenant." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Digital form settings" lineNumbers
+const settings = await linxio.metadata.digitalFormSettings();
+
+if (settings.error) {
+  throw settings.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.ecoSpeedSettings()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get eco-speed settings" method="GET" path="/settings/ecoSpeed" sdk="linxio.metadata.ecoSpeedSettings()">
+      Fetches tenant-level eco-speed settings.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "ecoSpeedSettings() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioEcoSpeedSettings | null", description: "Eco-speed settings. Shape can vary by tenant." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Eco-speed settings" lineNumbers
+const settings = await linxio.metadata.ecoSpeedSettings();
+
+if (settings.error) {
+  throw settings.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## metadata.excessiveIdlingSettings()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get excessive-idling settings" method="GET" path="/settings/excessiveIdling" sdk="linxio.metadata.excessiveIdlingSettings()">
+      Fetches tenant-level excessive-idling settings.
+    </ReferenceHeader>
+
+    <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "excessiveIdlingSettings() does not take parameters." }]} />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "LinxioExcessiveIdlingSettings | null", description: "Excessive-idling settings. Shape can vary by tenant." },
+        { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Excessive-idling settings" lineNumbers
+const settings = await linxio.metadata.excessiveIdlingSettings();
+
+if (settings.error) {
+  throw settings.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>

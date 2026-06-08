@@ -1,0 +1,384 @@
+---
+title: Raw HTTP
+description: Low-level request helpers, HTTP client options, retry policy, and response parsing.
+---
+
+Use raw HTTP when you need a tenant-specific or newly discovered endpoint that
+is not represented by a domain service yet. Raw requests use the same auth,
+timeout, retry, and token-refresh behavior as service methods.
+
+## client.request()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a raw API request" sdk="linxio.request(method, path, options)">
+      Sends a raw request through the client's HTTP layer.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "method",
+          type: "GET | POST | PATCH | PUT | DELETE | HEAD | OPTIONS",
+          required: true,
+          description: "HTTP method to send.",
+        },
+        {
+          name: "path",
+          type: "string",
+          required: true,
+          description: "API path relative to the configured base URL, or an absolute URL.",
+        },
+        {
+          name: "options.params",
+          type: "QueryParams",
+          description: "Query parameters appended to the URL.",
+        },
+        {
+          name: "options.body",
+          type: "unknown",
+          description: "JSON body, FormData, URLSearchParams, string, ArrayBuffer, or Blob.",
+        },
+        {
+          name: "options.responseType",
+          type: "json | text | blob | arrayBuffer | raw",
+          description: "Response parser override.",
+          defaultValue: "json",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response. Raw request methods throw typed SDK errors instead of returning LinxioResult." },
+        { name: "throws", type: "LinxioApiError | LinxioNetworkError | LinxioTimeoutError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Raw GET" lineNumbers
+const countries = await linxio.request("GET", "/country/list");
+console.log(countries);
+```
+
+```ts title="Raw POST" lineNumbers
+const vehicle = await linxio.request("POST", "/vehicles", {
+  body: {
+    regNo: "TEST-001",
+    defaultLabel: "Temporary SDK Test Vehicle",
+  },
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a GET request" sdk="linxio.http.get(path, options)">
+      Sends a low-level GET request and returns the parsed response.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "options.params", type: "QueryParams", description: "Query parameters appended to the URL." },
+        { name: "options.responseType", type: "ResponseType", description: "Parser override." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response body." },
+        { name: "throws", type: "LinxioError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="HTTP GET" lineNumbers
+const me = await linxio.http.get("/me", {
+  params: { "fields[]": ["id", "email"] },
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.post()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a POST request" sdk="linxio.http.post(path, body, options)">
+      Sends a low-level POST request. JSON-compatible objects are encoded
+      automatically.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "body", type: "unknown", description: "Request body." },
+        { name: "options.idempotencyKey", type: "string", description: "Optional caller-managed idempotency key for retry-safe operations." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response body." },
+        { name: "throws", type: "LinxioError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="HTTP POST" lineNumbers
+const created = await linxio.http.post("/vehicles", {
+  regNo: "TEST-001",
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.patch()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a PATCH request" sdk="linxio.http.patch(path, body, options)">
+      Sends a low-level PATCH request.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "body", type: "unknown", description: "Request body." },
+        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response body." },
+        { name: "throws", type: "LinxioError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="HTTP PATCH" lineNumbers
+await linxio.http.patch(`/devices/${deviceId}`, {
+  serial: "UPDATED-SERIAL",
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.put()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a PUT request" sdk="linxio.http.put(path, body, options)">
+      Sends a low-level PUT request.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "body", type: "unknown", description: "Request body." },
+        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response body." },
+        { name: "throws", type: "LinxioError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="HTTP PUT" lineNumbers
+const updated = await linxio.http.put("/custom-endpoint", payload);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.delete()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Send a DELETE request" sdk="linxio.http.delete(path, options)">
+      Sends a low-level DELETE request.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<TResponse>", description: "Parsed response body or undefined for 204 responses." },
+        { name: "throws", type: "LinxioError", description: "Typed SDK error when the request fails." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="HTTP DELETE" lineNumbers
+await linxio.http.delete(`/areas/${areaId}`);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## http.buildUrl()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Build an API URL" sdk="linxio.http.buildUrl(path, params)">
+      Builds the final request URL, including query parameters. This is useful
+      in tests and debugging output.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
+        { name: "params", type: "QueryParams", description: "Query parameters to append." },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "URL", description: "Final URL object." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Build URL" lineNumbers
+const url = linxio.http.buildUrl("/vehicles/fields/json", {
+  "fields[]": ["id", "regNo"],
+  limit: 100,
+});
+
+console.log(url.toString());
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Request options
+
+<FieldTable
+  title="LinxioHttpRequestOptions"
+  fields={[
+    {
+      name: "body",
+      type: "unknown",
+      description: "Request body for mutation methods. Plain objects are JSON encoded.",
+    },
+    {
+      name: "headers",
+      type: "HeadersInit",
+      description: "Additional request headers.",
+    },
+    {
+      name: "idempotencyKey",
+      type: "string",
+      description: "Optional caller-managed idempotency key for retry safety.",
+    },
+    {
+      name: "params",
+      type: "QueryParams",
+      description: "Query parameters appended to the URL.",
+    },
+    {
+      name: "responseType",
+      type: "json | text | blob | arrayBuffer | raw",
+      description: "Response parser override.",
+      defaultValue: "json",
+    },
+    {
+      name: "signal",
+      type: "AbortSignal",
+      description: "Abort signal for caller-managed cancellation.",
+    },
+    {
+      name: "skipAuth",
+      type: "boolean",
+      description: "Skip the bearer token for this request.",
+    },
+    {
+      name: "skipAuthRefresh",
+      type: "boolean",
+      description: "Skip automatic refresh handling for this request.",
+    },
+    {
+      name: "timeoutMs",
+      type: "number",
+      description: "Override the client timeout for this request.",
+    },
+  ]}
+/>
+
+## Retry policy
+
+<FieldTable
+  title="RetryOptions"
+  fields={[
+    {
+      name: "retries",
+      type: "number",
+      description: "Number of retries after the first attempt.",
+      defaultValue: "3",
+    },
+    {
+      name: "delayMs",
+      type: "number",
+      description: "Initial exponential backoff delay in milliseconds.",
+      defaultValue: "1000",
+    },
+    {
+      name: "maxDelayMs",
+      type: "number",
+      description: "Maximum exponential backoff delay in milliseconds.",
+      defaultValue: "8000",
+    },
+    {
+      name: "retryUnsafeMethods",
+      type: "boolean",
+      description: "Retry POST, PATCH, PUT, and DELETE requests. Keep false unless the operation is idempotent or protected by your own idempotency key.",
+      defaultValue: "false",
+    },
+  ]}
+/>

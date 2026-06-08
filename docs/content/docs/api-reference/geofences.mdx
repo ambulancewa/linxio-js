@@ -1,0 +1,375 @@
+---
+title: Geofences
+description: Geofence area and area-group HTTP endpoints.
+---
+
+The REST API names geofences as `areas`. Use archive endpoints for reversible
+operations and delete endpoints only when you intend to remove records
+permanently.
+
+## GET /areas
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List geofences" method="GET" path="/areas" sdk="linxio.geofences.list(params)">
+      Returns a paginated list of geofence areas.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+      { name: "sort", type: "string", description: "Sort expression accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "data", type: "LinxioGeofence[]", description: "Geofence records for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/areas?limit=100&page=1" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/areas/{areaId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a geofence" method="GET" path="/areas/{areaId}" sdk="linxio.geofences.get(areaId)">
+      Returns one geofence area by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Geofence area identifier." },
+      { name: "name", type: "string", description: "Geofence display name." },
+      { name: "type", type: "circle | polygon | polyline | rectangle", description: "Geometry type." },
+      { name: "coordinates", type: "LatLng[]", description: "Geometry coordinates when supplied." },
+      { name: "radius", type: "number", description: "Circle radius in metres when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/areas/21" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /areas
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a geofence" method="POST" path="/areas" sdk="linxio.geofences.create(payload)">
+      Creates a geofence area.
+    </ReferenceHeader>
+
+    <FieldTable title="Body parameters" fields={[
+      { name: "name", type: "string", required: true, description: "Display name." },
+      { name: "type", type: "circle | polygon | polyline | rectangle", required: true, description: "Geometry type." },
+      { name: "coordinates", type: "LatLng[]", description: "Geometry coordinates. Circles typically use one centre point." },
+      { name: "radius", type: "number", description: "Circle radius in metres." },
+      { name: "color", type: "string", description: "Display colour accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created geofence area ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/areas \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Temporary SDK Test Area",
+    "type": "circle",
+    "radius": 150,
+    "coordinates": [{ "lat": -31.9505, "lng": 115.8605 }]
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/areas/{areaId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a geofence" method="PATCH" path="/areas/{areaId}" sdk="linxio.geofences.update(areaId, payload)">
+      Updates a geofence area.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." },
+      { name: "body", type: "Partial<LinxioGeofencePayload>", required: true, description: "Fields to update." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated geofence area ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/areas/21 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Updated SDK Test Area"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/areas/{areaId}/archive`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a geofence" method="PATCH" path="/areas/{areaId}/archive" sdk="linxio.geofences.archive(areaId)">
+      Soft-archives a geofence area.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/areas/21/archive \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/areas/{areaId}/restore`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a geofence" method="PATCH" path="/areas/{areaId}/restore" sdk="linxio.geofences.restore(areaId)">
+      Restores a previously archived geofence area.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Archived geofence area identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/areas/21/restore \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## DELETE `/areas/{areaId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Delete a geofence" method="DELETE" path="/areas/{areaId}" sdk="linxio.geofences.delete(areaId)">
+      Permanently deletes a geofence area.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X DELETE https://api.linxio.com/api/areas/21 \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /area-groups
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List geofence groups" method="GET" path="/area-groups" sdk="linxio.geofences.listGroups()">
+      Lists area groups.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Area group identifier." },
+      { name: "name", type: "string", description: "Area group display name." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/area-groups" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/area-groups/{groupId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a geofence group" method="GET" path="/area-groups/{groupId}" sdk="linxio.geofences.getGroup(groupId)">
+      Returns one area group by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Area group identifier." },
+      { name: "name", type: "string", description: "Area group display name." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/area-groups/5" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /area-groups
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a geofence group" method="POST" path="/area-groups" sdk="linxio.geofences.createGroup(payload)">
+      Creates an area group.
+    </ReferenceHeader>
+
+    <FieldTable title="Body parameters" fields={[{ name: "name", type: "string", required: true, description: "Area group display name." }]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created area group ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/area-groups \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Temporary SDK Group"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/area-groups/{groupId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a geofence group" method="PATCH" path="/area-groups/{groupId}" sdk="linxio.geofences.updateGroup(groupId, payload)">
+      Updates an area group.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." },
+      { name: "name", type: "string", description: "Updated group name." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated area group ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/area-groups/5 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Updated SDK Group"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/area-groups/{groupId}/archive`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a geofence group" method="PATCH" path="/area-groups/{groupId}/archive" sdk="linxio.geofences.archiveGroup(groupId)">
+      Soft-archives an area group.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/area-groups/5/archive \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/area-groups/{groupId}/restore`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a geofence group" method="PATCH" path="/area-groups/{groupId}/restore" sdk="linxio.geofences.restoreGroup(groupId)">
+      Restores a previously archived area group.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Archived area group identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/area-groups/5/restore \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## DELETE `/area-groups/{groupId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Delete a geofence group" method="DELETE" path="/area-groups/{groupId}" sdk="linxio.geofences.deleteGroup(groupId)">
+      Permanently deletes an area group.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X DELETE https://api.linxio.com/api/area-groups/5 \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>

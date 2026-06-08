@@ -1,0 +1,284 @@
+---
+title: Realtime
+description: Socket.IO connections for live vehicle positions and Linxio notifications.
+---
+
+Realtime methods use the `https://track.linxio.com` Socket.IO host by default.
+Authenticate first or hydrate the client with an existing token before opening a
+socket.
+
+## realtime.connect()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Connect to a realtime namespace" sdk="linxio.realtime.connect(namespace, token)">
+      Opens or reuses a Socket.IO connection for the `coordinates` or
+      `notifications` namespace.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "namespace",
+          type: "coordinates | notifications",
+          required: true,
+          description: "Realtime namespace to connect to.",
+        },
+        {
+          name: "token",
+          type: "string",
+          description: "Optional JWT token. Defaults to the token stored on the parent client.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Socket", description: "Socket.IO client instance for the namespace." },
+        { name: "throws", type: "LinxioRealtimeError", description: "Thrown when no token is available." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Connect to coordinates" lineNumbers
+await linxio.auth.login({ email, password });
+
+const socket = linxio.realtime.connect("coordinates");
+socket.on("connect", () => {
+  console.log("connected");
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## realtime.subscribe()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Subscribe to realtime vehicles" sdk="linxio.realtime.subscribe(vehicleIds, namespace)">
+      Emits Linxio's realtime `subscribe` event for one or more vehicle IDs.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleIds",
+          type: "readonly LinxioId[]",
+          required: true,
+          description: "Vehicles to subscribe to. Values are converted to numbers before sending.",
+        },
+        {
+          name: "namespace",
+          type: "coordinates | notifications",
+          description: "Namespace to subscribe through.",
+          defaultValue: "coordinates",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "Promise<LinxioRealtimeSubscribeAck>", description: "Acknowledgement from Linxio's subscribe event." },
+        { name: "throws", type: "LinxioRealtimeError", description: "Thrown when no token is available." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Subscribe" lineNumbers
+const ack = await linxio.realtime.subscribe([vehicleId]);
+
+if (ack.error) {
+  console.error(ack.error);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## realtime.onPosition()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Listen for live vehicle positions" sdk="linxio.realtime.onPosition(vehicleIds, handler)">
+      Subscribes to live coordinate events and returns an unsubscribe function.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "vehicleIds",
+          type: "readonly LinxioId[]",
+          required: true,
+          description: "Vehicles to subscribe to.",
+        },
+        {
+          name: "handler",
+          type: "(position: LinxioTrackingPosition) => void",
+          required: true,
+          description: "Function called for each coordinate payload.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "RealtimeUnsubscribe", description: "Function that removes listeners for this subscription." },
+        { name: "payload.vehicleId", type: "LinxioId", description: "Vehicle identifier in each position payload." },
+        { name: "payload.lat / payload.lng", type: "number", description: "Current coordinates." },
+        { name: "payload.speed", type: "number | null", description: "Speed when supplied by Linxio." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Live positions" lineNumbers
+const unsubscribe = linxio.realtime.onPosition([vehicleId], (position) => {
+  console.log(position.vehicleId, position.lat, position.lng);
+});
+
+process.on("SIGINT", () => {
+  unsubscribe();
+  linxio.realtime.disconnect("coordinates");
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## realtime.onNotification()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Listen for notifications" sdk="linxio.realtime.onNotification(handler)">
+      Listens for notification events emitted by Linxio.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "handler",
+          type: "(notification: LinxioNotification) => void",
+          required: true,
+          description: "Function called for each notification payload.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "RealtimeUnsubscribe", description: "Function that removes notification listeners." },
+        { name: "payload.type", type: "string", description: "Notification type when supplied." },
+        { name: "payload.message", type: "string", description: "Notification message when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Notifications" lineNumbers
+const unsubscribe = linxio.realtime.onNotification((notification) => {
+  console.log(notification.type, notification.message);
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## realtime.onNotificationType()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Listen for a notification type" sdk="linxio.realtime.onNotificationType(type, handler)">
+      Listens for a custom notification event type emitted by Linxio.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "type",
+          type: "string",
+          required: true,
+          description: "Socket event name to listen for.",
+        },
+        {
+          name: "handler",
+          type: "(payload: TPayload) => void",
+          required: true,
+          description: "Function called for each matching event payload.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "RealtimeUnsubscribe", description: "Function that removes the custom event listener." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Typed notification event" lineNumbers
+const unsubscribe = linxio.realtime.onNotificationType(
+  "vehicle-alert",
+  (payload) => {
+    console.log(payload);
+  },
+);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## realtime.disconnect()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Disconnect realtime sockets" sdk="linxio.realtime.disconnect(namespace)">
+      Disconnects one namespace or every active realtime socket.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "namespace",
+          type: "coordinates | notifications",
+          description: "Namespace to disconnect. Omit to disconnect all active sockets.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        { name: "data", type: "void", description: "disconnect() does not return a value." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Disconnect" lineNumbers
+linxio.realtime.disconnect("coordinates");
+linxio.realtime.disconnect();
+```
+
+  </CodeRail>
+</ReferenceGrid>

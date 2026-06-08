@@ -1,0 +1,616 @@
+---
+title: Reports and Digital Forms
+description: Scheduled report lifecycle methods and digital form answer retrieval.
+---
+
+Reports and digital form endpoints are dashboard-derived. Use the typed payloads
+for common fields and preserve any tenant-specific fields returned by Linxio.
+
+## reports.scheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List scheduled reports" method="GET" path="/scheduled-report" sdk="linxio.reports.scheduled(params)">
+      Loads one page of scheduled reports.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of reports to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.format",
+          type: "csv | pdf | xlsx",
+          description: "Optional file format filter when Linxio accepts it.",
+        },
+        {
+          name: "params.startDate / params.endDate",
+          type: "ISODateString",
+          description: "Optional date range filters when supported by the report endpoint.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioScheduledReport[] | null",
+          description: "Scheduled reports for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when reports cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List scheduled reports" lineNumbers
+const reports = await linxio.reports.scheduled({
+  limit: 50,
+  page: 1,
+});
+
+if (reports.error) {
+  throw reports.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.scheduledTemplate()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get scheduled report template" method="GET" path="/scheduled-report/template" sdk="linxio.reports.scheduledTemplate()">
+      Fetches the scheduled-report template used by the dashboard.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "scheduledTemplate() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioRecord | null",
+          description: "Dashboard template metadata. Shape can vary by tenant and enabled report types.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the template cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Scheduled report template" lineNumbers
+const template = await linxio.reports.scheduledTemplate();
+
+if (template.error) {
+  throw template.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.getScheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a scheduled report" method="GET" path="/scheduled-report/{reportId}" sdk="linxio.reports.getScheduled(reportId)">
+      Fetches one scheduled report by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "reportId",
+          type: "LinxioId",
+          required: true,
+          description: "Scheduled report identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioScheduledReport | null",
+          description: "Scheduled report record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the report cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get scheduled report" lineNumbers
+const report = await linxio.reports.getScheduled(reportId);
+
+if (report.error) {
+  throw report.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.createScheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a scheduled report" method="POST" path="/scheduled-report" sdk="linxio.reports.createScheduled(payload)">
+      Creates a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "payload.name",
+          type: "string",
+          required: true,
+          description: "Scheduled report display name.",
+        },
+        {
+          name: "payload.type",
+          type: "string",
+          required: true,
+          description: "Report type accepted by Linxio.",
+        },
+        {
+          name: "payload.format",
+          type: "csv | pdf | xlsx",
+          required: true,
+          description: "Output format.",
+        },
+        {
+          name: "payload.params",
+          type: "Record<string, unknown>",
+          description: "Report-specific parameters such as recipients, schedule, date range, vehicle IDs, or filters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioScheduledReport | null",
+          description: "Created scheduled report.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when creation fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Create scheduled report" lineNumbers
+const created = await linxio.reports.createScheduled({
+  name: "Weekly Fleet Summary",
+  type: "fleet-summary",
+  format: "pdf",
+  params: {
+    timezone: "Australia/Perth",
+  },
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.updateScheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a scheduled report" method="PATCH" path="/scheduled-report/{reportId}" sdk="linxio.reports.updateScheduled(reportId, payload)">
+      Updates a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "reportId",
+          type: "LinxioId",
+          required: true,
+          description: "Scheduled report identifier.",
+        },
+        {
+          name: "payload",
+          type: "Partial<LinxioScheduledReportPayload>",
+          required: true,
+          description: "Partial scheduled-report payload containing fields to change.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioScheduledReport | null",
+          description: "Updated scheduled report.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when update fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Update scheduled report" lineNumbers
+const updated = await linxio.reports.updateScheduled(reportId, {
+  name: "Updated Weekly Fleet Summary",
+});
+
+if (updated.error) {
+  throw updated.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.deleteScheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Delete a scheduled report" method="DELETE" path="/scheduled-report/{reportId}" sdk="linxio.reports.deleteScheduled(reportId)">
+      Deletes a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "reportId",
+          type: "LinxioId",
+          required: true,
+          description: "Scheduled report identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when delete fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Delete scheduled report" lineNumbers
+const deleted = await linxio.reports.deleteScheduled(reportId);
+
+if (deleted.error) {
+  throw deleted.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## reports.restoreScheduled()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a scheduled report" method="PATCH" path="/scheduled-report/{reportId}/restore" sdk="linxio.reports.restoreScheduled(reportId)">
+      Restores a scheduled report when the dashboard-derived restore endpoint is
+      available.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "reportId",
+          type: "LinxioId",
+          required: true,
+          description: "Scheduled report identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined on success.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when restore fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Restore scheduled report" lineNumbers
+const restored = await linxio.reports.restoreScheduled(reportId);
+
+if (restored.error) {
+  throw restored.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## digitalForms.list()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List digital forms" method="GET" path="/digital-form/form" sdk="linxio.digitalForms.list()">
+      Lists digital forms visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "list() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDigitalForm[] | null",
+          description: "Digital form records.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when forms cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List digital forms" lineNumbers
+const forms = await linxio.digitalForms.list();
+
+if (forms.error) {
+  throw forms.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## digitalForms.get()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a digital form" method="GET" path="/digital-form/form/{formId}" sdk="linxio.digitalForms.get(formId)">
+      Fetches one digital form by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "formId",
+          type: "LinxioId",
+          required: true,
+          description: "Digital form identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioDigitalForm | null",
+          description: "Digital form record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the form cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get digital form" lineNumbers
+const form = await linxio.digitalForms.get(formId);
+
+if (form.error) {
+  throw form.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## digitalForms.answer()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a form answer" method="GET" path="/digital-form/answer/{answerId}" sdk="linxio.digitalForms.answer(answerId)">
+      Fetches a digital form answer record.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "answerId",
+          type: "LinxioId",
+          required: true,
+          description: "Digital form answer identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioRecord | null",
+          description: "Digital form answer payload. Shape varies by form schema.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the answer cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Get form answer" lineNumbers
+const answer = await linxio.digitalForms.answer(answerId);
+
+if (answer.error) {
+  throw answer.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## digitalForms.answerPdf()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Download a form answer PDF" method="GET" path="/digital-form/answer/{answerId}/pdf" sdk="linxio.digitalForms.answerPdf(answerId)">
+      Downloads a digital form answer as a PDF Blob.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "answerId",
+          type: "LinxioId",
+          required: true,
+          description: "Digital form answer identifier.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "Blob | null",
+          description: "PDF binary data.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the PDF cannot be downloaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Download answer PDF" lineNumbers
+import { writeFile } from "node:fs/promises";
+
+const pdf = await linxio.digitalForms.answerPdf(answerId);
+
+if (pdf.error) {
+  throw pdf.error;
+}
+
+const bytes = new Uint8Array(await pdf.data.arrayBuffer());
+await writeFile("answer.pdf", bytes);
+```
+
+  </CodeRail>
+</ReferenceGrid>

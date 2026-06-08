@@ -1,0 +1,454 @@
+---
+title: Fuel
+description: Fuel transaction records, summaries, vehicle fuel rows, cards, fuel types, and transaction assignment.
+---
+
+Fuel endpoints are dashboard-derived and can include tenant-specific columns.
+The SDK keeps the common fields typed and leaves additional columns available on
+the returned record.
+
+## fuel.records()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel transactions" method="GET" path="/fuel-cards/json" sdk="linxio.fuel.records(params)">
+      Loads one page of fuel transaction records.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of records to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "FuelRecordField[]",
+          description: "Optional fields such as transactionDate, vehicleIds, driverId, refueled, total, fuelPrice, or petrolStation.",
+        },
+        {
+          name: "params.[filter]",
+          type: "QueryValue",
+          description: "Additional fuel report filters forwarded as query parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelRecord[] | null",
+          description: "Fuel transaction records for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when records cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="List fuel records" lineNumbers
+const records = await linxio.fuel.records({
+  fields: ["transactionDate", "vehicleIds", "total"],
+  limit: 100,
+});
+
+if (records.error) {
+  throw records.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.iterateRecords()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Load all fuel transactions" method="GET" path="/fuel-cards/json" sdk="linxio.fuel.iterateRecords(params)">
+      Auto-paginates fuel transaction records into one result object.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioFuelListParams",
+          description: "Same filters and field projection as fuel.records().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelRecord[] | null",
+          description: "Flat array containing every loaded fuel record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error if any page fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Iterate fuel records" lineNumbers
+const { data: records, error } = await linxio.fuel.iterateRecords({
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.streamRecords()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Stream fuel transactions" method="GET" path="/fuel-cards/json" sdk="linxio.fuel.streamRecords(params)">
+      Streams fuel records lazily across pages.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioFuelListParams",
+          description: "Same filters and field projection as fuel.records().",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "yield",
+          type: "LinxioFuelRecord",
+          description: "One fuel record at a time.",
+        },
+        {
+          name: "throws",
+          type: "LinxioError",
+          description: "Thrown if a page request fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Stream fuel records" lineNumbers
+for await (const record of linxio.fuel.streamRecords({ limit: 100 })) {
+  console.log(record.transactionDate, record.total);
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.summary()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel summary rows" method="GET" path="/fuel-summary-report" sdk="linxio.fuel.summary(params)">
+      Loads one page of fuel summary report rows.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioFuelListParams",
+          description: "Pagination, field projection, and report filters such as date range or vehicle filters when supported.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelSummaryRecord[] | null",
+          description: "Summary rows with depot, groups, mileage, refueled, regNo, and total when supplied.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when summary rows cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Fuel summary" lineNumbers
+const summary = await linxio.fuel.summary({
+  limit: 100,
+  startDate: "2026-06-01T00:00:00+08:00",
+  endDate: "2026-06-08T00:00:00+08:00",
+});
+
+if (summary.error) {
+  throw summary.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.recordsByVehicle()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel records by vehicle" method="GET" path="/fuel-cards-by-vehicle/json" sdk="linxio.fuel.recordsByVehicle(params)">
+      Loads fuel transaction rows grouped or filtered by vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioFuelListParams",
+          description: "Pagination, field projection, and vehicle/date filters accepted by Linxio.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelRecord[] | null",
+          description: "Fuel records from the by-vehicle endpoint.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when records cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Fuel by vehicle" lineNumbers
+const records = await linxio.fuel.recordsByVehicle({
+  vehicleId,
+  limit: 100,
+});
+
+if (records.error) {
+  throw records.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.cards()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel cards" method="GET" path="/fuel-cards/json" sdk="linxio.fuel.cards(params)">
+      Lists fuel card records. This endpoint shares the dashboard path used by
+      fuel transaction records, so returned columns can depend on tenant setup.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "params",
+          type: "LinxioFuelListParams",
+          description: "Pagination, field projection, sorting, and dashboard-derived filters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelCard[] | null",
+          description: "Fuel card records with id, cardNumber, and vehicleId when supplied.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when cards cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Fuel cards" lineNumbers
+const cards = await linxio.fuel.cards({ limit: 100 });
+
+if (cards.error) {
+  throw cards.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.fuelTypes()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel types" method="GET" path="/fuel-types" sdk="linxio.fuel.fuelTypes()">
+      Lists fuel types configured by Linxio.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "fuelTypes() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioRecord[] | null",
+          description: "Fuel type records. Shape can vary by tenant.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when fuel types cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Fuel types" lineNumbers
+const fuelTypes = await linxio.fuel.fuelTypes();
+
+if (fuelTypes.error) {
+  throw fuelTypes.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## fuel.assignTransaction()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Assign fuel transaction to vehicle" method="PATCH" path="/fuel-cards/record/{recordId}" sdk="linxio.fuel.assignTransaction(recordId, vehicleId)">
+      Assigns a fuel transaction record to a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "recordId",
+          type: "LinxioId",
+          required: true,
+          description: "Fuel transaction record identifier.",
+        },
+        {
+          name: "vehicleId",
+          type: "LinxioId",
+          required: true,
+          description: "Vehicle identifier to assign to the transaction.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioFuelRecord | null",
+          description: "Updated fuel transaction record.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when assignment fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Assign fuel transaction" lineNumbers
+const assigned = await linxio.fuel.assignTransaction(recordId, vehicleId);
+
+if (assigned.error) {
+  throw assigned.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>

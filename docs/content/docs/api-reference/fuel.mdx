@@ -1,0 +1,147 @@
+---
+title: Fuel
+description: Fuel transaction, summary, card, fuel type, and transaction assignment endpoints.
+---
+
+Fuel endpoints are dashboard-derived and can include tenant-specific fields.
+
+## GET /fuel-cards/json
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel transactions" method="GET" path="/fuel-cards/json" sdk="linxio.fuel.records(params)">
+      Returns a paginated list of fuel transactions. The SDK also exposes this
+      path as `fuel.cards()` for fuel-card-shaped reads.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional fields such as transactionDate, vehicleIds, refueled, total, fuelPrice, or petrolStation." },
+      { name: "[filter]", type: "QueryValue", description: "Fuel report filters accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "data", type: "LinxioFuelRecord[]", description: "Fuel transaction records for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/fuel-cards/json?fields[]=transactionDate&fields[]=total&limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /fuel-summary-report
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel summary rows" method="GET" path="/fuel-summary-report" sdk="linxio.fuel.summary(params)">
+      Returns paginated fuel summary report rows.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "startDate / endDate", type: "ISODateString", description: "Optional report date range when supported." },
+      { name: "[filter]", type: "QueryValue", description: "Report filters accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "regNo", type: "string", description: "Vehicle registration number when supplied." },
+      { name: "mileage", type: "number", description: "Mileage when supplied." },
+      { name: "refueled", type: "number", description: "Refueled amount when supplied." },
+      { name: "total", type: "number", description: "Total cost when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/fuel-summary-report?limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /fuel-cards-by-vehicle/json
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel records by vehicle" method="GET" path="/fuel-cards-by-vehicle/json" sdk="linxio.fuel.recordsByVehicle(params)">
+      Returns fuel records grouped or filtered by vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "vehicleId", type: "LinxioId", description: "Optional vehicle filter." },
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "[filter]", type: "QueryValue", description: "Fuel filters accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioFuelRecord[]", description: "Fuel records for the current page." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/fuel-cards-by-vehicle/json?vehicleId=304&limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /fuel-types
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List fuel types" method="GET" path="/fuel-types" sdk="linxio.fuel.fuelTypes()">
+      Lists fuel types configured by Linxio.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "Fuel type records. Shape can vary by tenant." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/fuel-types" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/fuel-cards/record/{recordId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Assign fuel transaction to vehicle" method="PATCH" path="/fuel-cards/record/{recordId}" sdk="linxio.fuel.assignTransaction(recordId, vehicleId)">
+      Assigns a fuel transaction record to a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "recordId", type: "LinxioId", required: true, description: "Fuel transaction record identifier." },
+      { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier sent in the JSON body." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated fuel transaction identifier." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/fuel-cards/record/9001 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "vehicleId": 304
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>

@@ -1,0 +1,213 @@
+---
+title: Authentication
+description: Login, OTP verification, token refresh, current user, and logout HTTP endpoints.
+---
+
+Authentication endpoints create and maintain the bearer token used by the rest
+of the API.
+
+## POST /login
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a session" method="POST" path="/login" sdk="linxio.auth.login(request)">
+      Authenticates a Linxio user and returns a JWT token plus refresh token.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        { name: "email", type: "string", required: true, description: "Email address for the Linxio user." },
+        { name: "password", type: "string", required: true, description: "Password for the Linxio user." },
+        { name: "domain", type: "string", description: "Optional tenant-domain hint accepted by some login flows." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "token", type: "string", description: "JWT bearer token for authenticated requests." },
+        { name: "refreshToken", type: "string", description: "Refresh token for renewing the session." },
+        { name: "expireAt", type: "ISODateString", description: "Token expiry timestamp when supplied by Linxio." },
+        { name: "otp_required", type: "boolean", description: "Whether OTP must be completed before the session is usable." },
+        { name: "teamType", type: "string", description: "Team type such as client, reseller, or admin when supplied." },
+        { name: "roleId", type: "LinxioId", description: "Role identifier when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/login \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "user@example.com",
+    "password": "your-password"
+  }'
+```
+
+```json title="Response" lineNumbers
+{
+  "token": "eyJhbGciOi...",
+  "refreshToken": "refresh-token",
+  "expireAt": "2026-06-08T12:00:00+08:00",
+  "otp_required": false,
+  "teamType": "client",
+  "roleId": 7
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /login/otp
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Verify one-time password" method="POST" path="/login/otp" sdk="linxio.auth.verifyOtp(request)">
+      Completes OTP verification when Linxio requires it for the account.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        { name: "email", type: "string", required: true, description: "Email address used for login." },
+        { name: "code", type: "string", required: true, description: "One-time password code." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "token", type: "string", description: "JWT bearer token for authenticated requests." },
+        { name: "refreshToken", type: "string", description: "Refresh token for renewing the session." },
+        { name: "expireAt", type: "ISODateString", description: "Token expiry timestamp when supplied by Linxio." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/login/otp \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "user@example.com",
+    "code": "123456"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /token/refresh
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Refresh JWT auth token" method="POST" path="/token/refresh" sdk="linxio.auth.refresh(refreshToken)">
+      Exchanges a refresh token for a new JWT token.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        { name: "refreshToken", type: "string", required: true, description: "Refresh token returned by login or a previous refresh call." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "token", type: "string", description: "New JWT bearer token." },
+        { name: "refreshToken", type: "string", description: "New refresh token when Linxio rotates it." },
+        { name: "expireAt", type: "ISODateString", description: "Token expiry timestamp when supplied by Linxio." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/token/refresh \
+  -H "Content-Type: application/json" \
+  --data '{
+    "refreshToken": "refresh-token"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /me
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get current user" method="GET" path="/me" sdk="linxio.auth.me(fields)">
+      Returns the current authenticated user.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Query parameters"
+      fields={[
+        { name: "fields[]", type: "string[]", description: "Optional field projection for the current-user response." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "id", type: "LinxioId", description: "Current user ID when supplied." },
+        { name: "email", type: "string", description: "Current user email when supplied." },
+        { name: "fullName", type: "string", description: "Current user display name when supplied." },
+        { name: "teamType", type: "string", description: "Current team type when supplied." },
+        { name: "permissions", type: "string[]", description: "Permission keys when supplied." },
+        { name: "team", type: "object", description: "Current team details when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/me?fields[]=id&fields[]=email" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /logout
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Log out current session" method="POST" path="/logout" sdk="linxio.auth.logout()">
+      Logs out the current session server-side.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        { name: "none", type: "void", description: "Send an empty JSON object or no body." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response"
+      fields={[
+        { name: "status", type: "204 or JSON", description: "Linxio may return an empty success response." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/logout \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>

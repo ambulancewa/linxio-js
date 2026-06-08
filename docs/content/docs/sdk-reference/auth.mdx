@@ -1,0 +1,353 @@
+---
+title: Authentication
+description: Login, OTP, token refresh, current user, logout, and session hydration methods.
+---
+
+Use the auth service to create and maintain a Linxio session. Successful
+`login`, `verifyOtp`, and `refresh` calls update the client instance in memory,
+so later service calls send the bearer token automatically.
+
+## auth.login()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Log in to Linxio" method="POST" path="/login" sdk="linxio.auth.login(request)">
+      Authenticates a Linxio user and stores the returned session on the client.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "request.email",
+          type: "string",
+          required: true,
+          description: "Email address for the Linxio API or dashboard user.",
+        },
+        {
+          name: "request.password",
+          type: "string",
+          required: true,
+          description: "Password for the user. Load this from a secret store or environment variable.",
+        },
+        {
+          name: "request.domain",
+          type: "string",
+          description: "Optional tenant or hosted-domain hint. Most API integrations can omit it.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data.token",
+          type: "string",
+          description: "JWT bearer token used for authenticated API requests.",
+        },
+        {
+          name: "data.refreshToken",
+          type: "string",
+          description: "Refresh token used by the SDK when a recoverable 401 response is received.",
+        },
+        {
+          name: "data.expireAt",
+          type: "ISODateString",
+          description: "Token expiry timestamp when supplied by Linxio.",
+        },
+        {
+          name: "data.otp_required",
+          type: "boolean",
+          description: "True when the account must complete OTP before the session is usable.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when login fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Login" lineNumbers
+const login = await linxio.auth.login({
+  email: process.env.LINXIO_EMAIL!,
+  password: process.env.LINXIO_PASSWORD!,
+});
+
+if (login.error) {
+  throw login.error;
+}
+
+if (login.data.otp_required) {
+  console.log("Complete OTP before using the session.");
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## auth.verifyOtp()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Verify one-time password" method="POST" path="/login/otp" sdk="linxio.auth.verifyOtp(request)">
+      Completes one-time-password verification for accounts where Linxio
+      requires OTP during login.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "request.email",
+          type: "string",
+          required: true,
+          description: "Email address used for the login attempt.",
+        },
+        {
+          name: "request.code",
+          type: "string",
+          required: true,
+          description: "One-time password code supplied by Linxio.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioLoginResponse",
+          description: "The same session shape returned by auth.login().",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when OTP verification fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Verify OTP" lineNumbers
+const verified = await linxio.auth.verifyOtp({
+  email: process.env.LINXIO_EMAIL!,
+  code: oneTimeCode,
+});
+
+if (verified.error) {
+  throw verified.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## auth.refresh()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Refresh JWT auth token" method="POST" path="/token/refresh" sdk="linxio.auth.refresh(refreshToken)">
+      Refreshes a JWT manually and updates the client session. Most callers do
+      not need this because the HTTP layer refreshes automatically after a
+      recoverable 401.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "refreshToken",
+          type: "string",
+          required: true,
+          description: "Refresh token returned by login or a previous refresh call.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioSession",
+          description: "Updated in-memory token state containing token, refreshToken, and expireAt when available.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when refresh fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Manual refresh" lineNumbers
+const session = linxio.session();
+
+if (session.refreshToken) {
+  const refreshed = await linxio.auth.refresh(session.refreshToken);
+
+  if (refreshed.error) {
+    throw refreshed.error;
+  }
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## auth.me()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get current user" method="GET" path="/me" sdk="linxio.auth.me(fields)">
+      Fetches the current authenticated user. Pass fields when you only need a
+      small subset of the user profile.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "fields",
+          type: "string[]",
+          description: "Optional field projection mapped to fields[] query parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "LinxioCurrentUser",
+          description: "Current user profile, permissions, team information, and tenant-specific fields returned by Linxio.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when the user cannot be loaded.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Current user" lineNumbers
+const me = await linxio.auth.me(["id", "email", "teamType", "team"]);
+
+if (me.error) {
+  throw me.error;
+}
+
+console.log(me.data.email, me.data.teamType);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## auth.logout()
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Log out current session" method="POST" path="/logout" sdk="linxio.auth.logout()">
+      Logs out the current session server-side. The SDK returns a standard
+      result so console scripts can fail cleanly.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Input"
+      fields={[
+        {
+          name: "none",
+          type: "void",
+          description: "logout() does not take parameters.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data",
+          type: "void",
+          description: "Undefined when logout succeeds.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error when logout fails.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Logout" lineNumbers
+const loggedOut = await linxio.auth.logout();
+
+if (loggedOut.error) {
+  throw loggedOut.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Session helpers
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Manage client session" sdk="linxio.session(); linxio.setSession(session)">
+      `session()` returns a copy of the current in-memory session.
+      `setSession()` hydrates or replaces it.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="LinxioSession"
+      fields={[
+        {
+          name: "token",
+          type: "string",
+          description: "JWT bearer token.",
+        },
+        {
+          name: "refreshToken",
+          type: "string",
+          description: "Refresh token used for automatic token refresh.",
+        },
+        {
+          name: "expireAt",
+          type: "ISODateString",
+          description: "Token expiry timestamp when supplied by Linxio.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Persist and hydrate" lineNumbers
+const savedSession = linxio.session();
+await saveEncryptedSession(savedSession);
+
+const restored = await loadEncryptedSession();
+linxio.setSession(restored);
+```
+
+  </CodeRail>
+</ReferenceGrid>

@@ -1,0 +1,294 @@
+---
+title: Reports and Forms
+description: Scheduled report and digital form answer HTTP endpoints.
+---
+
+Report and digital form endpoints are dashboard-derived. Payload and response
+fields can vary by enabled tenant features and form schemas.
+
+## GET /scheduled-report
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List scheduled reports" method="GET" path="/scheduled-report" sdk="linxio.reports.scheduled(params)">
+      Returns a paginated list of scheduled reports.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "format", type: "csv | pdf | xlsx", description: "Optional format filter when accepted by Linxio." },
+      { name: "startDate / endDate", type: "ISODateString", description: "Optional date range filters when accepted by Linxio." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "data", type: "LinxioScheduledReport[]", description: "Scheduled reports for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/scheduled-report?limit=50&page=1" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /scheduled-report/template
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get scheduled report template" method="GET" path="/scheduled-report/template" sdk="linxio.reports.scheduledTemplate()">
+      Returns scheduled-report template metadata used by the dashboard.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Template metadata. Shape can vary by tenant." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/scheduled-report/template" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/scheduled-report/{reportId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a scheduled report" method="GET" path="/scheduled-report/{reportId}" sdk="linxio.reports.getScheduled(reportId)">
+      Returns one scheduled report by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Scheduled report identifier." },
+      { name: "name", type: "string", description: "Report display name when supplied." },
+      { name: "type", type: "string", description: "Report type when supplied." },
+      { name: "format", type: "csv | pdf | xlsx", description: "Output format when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/scheduled-report/123" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /scheduled-report
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a scheduled report" method="POST" path="/scheduled-report" sdk="linxio.reports.createScheduled(payload)">
+      Creates a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable title="Body parameters" fields={[
+      { name: "name", type: "string", required: true, description: "Report display name." },
+      { name: "type", type: "string", required: true, description: "Report type accepted by Linxio." },
+      { name: "format", type: "csv | pdf | xlsx", required: true, description: "Output format." },
+      { name: "params", type: "Record<string, unknown>", description: "Report-specific parameters such as schedule, recipients, date range, filters, or vehicle IDs." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created scheduled report ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/scheduled-report \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Weekly Fleet Summary",
+    "type": "fleet-summary",
+    "format": "pdf",
+    "params": {
+      "timezone": "Australia/Perth"
+    }
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/scheduled-report/{reportId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a scheduled report" method="PATCH" path="/scheduled-report/{reportId}" sdk="linxio.reports.updateScheduled(reportId, payload)">
+      Updates a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." },
+      { name: "body", type: "Partial<LinxioScheduledReportPayload>", required: true, description: "Fields to update." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated scheduled report ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/scheduled-report/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "name": "Updated Weekly Fleet Summary"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## DELETE `/scheduled-report/{reportId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Delete a scheduled report" method="DELETE" path="/scheduled-report/{reportId}" sdk="linxio.reports.deleteScheduled(reportId)">
+      Deletes a scheduled report.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X DELETE https://api.linxio.com/api/scheduled-report/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/scheduled-report/{reportId}/restore`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a scheduled report" method="PATCH" path="/scheduled-report/{reportId}/restore" sdk="linxio.reports.restoreScheduled(reportId)">
+      Restores a scheduled report when the dashboard-derived endpoint is
+      available.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/scheduled-report/123/restore \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /digital-form/form
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List digital forms" method="GET" path="/digital-form/form" sdk="linxio.digitalForms.list()">
+      Lists digital forms visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Digital form identifier." },
+      { name: "name", type: "string", description: "Digital form display name when supplied." },
+      { name: "status", type: "string", description: "Form status when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/digital-form/form" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/digital-form/form/{formId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a digital form" method="GET" path="/digital-form/form/{formId}" sdk="linxio.digitalForms.get(formId)">
+      Returns one digital form by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "formId", type: "LinxioId", required: true, description: "Digital form identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Digital form identifier." },
+      { name: "name", type: "string", description: "Digital form display name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/digital-form/form/50" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/digital-form/answer/{answerId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a form answer" method="GET" path="/digital-form/answer/{answerId}" sdk="linxio.digitalForms.answer(answerId)">
+      Returns one digital form answer. Shape depends on the form schema.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Answer payload. Shape varies by form schema." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/digital-form/answer/9001" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/digital-form/answer/{answerId}/pdf`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Download a form answer PDF" method="GET" path="/digital-form/answer/{answerId}/pdf" sdk="linxio.digitalForms.answerPdf(answerId)">
+      Downloads a digital form answer as a PDF.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "body", type: "application/pdf", description: "PDF binary body." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/digital-form/answer/9001/pdf" \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  --output answer.pdf
+```
+
+  </CodeRail>
+</ReferenceGrid>

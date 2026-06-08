@@ -1,0 +1,240 @@
+---
+title: SDK Reference
+description: TypeScript client options, result contracts, service pages, and shared SDK conventions.
+---
+
+The SDK reference is split by service so scripts and agents can retrieve the
+piece they need without loading the whole surface area.
+
+## Services
+
+<ServiceTable
+  rows={[
+    {
+      service: "linxio.auth",
+      methods: "login, verifyOtp, refresh, me, logout",
+    },
+    {
+      service: "linxio.vehicles",
+      methods: "list, iterate, stream, get, create, update, archive, restore, getOdometer, recalibrateOdometer, getEngineHours, count, types",
+    },
+    {
+      service: "linxio.devices",
+      methods: "list, iterate, stream, get, create, update, install, uninstall, archive, restore, coordinates, sensors, history, vendors, installations, cameras",
+    },
+    {
+      service: "linxio.users, linxio.clients, linxio.drivers, linxio.resellers",
+      methods: "user, client, driver, and reseller account workflows",
+    },
+    {
+      service: "linxio.geofences",
+      methods: "area and area-group lifecycle workflows",
+    },
+    {
+      service: "linxio.fuel",
+      methods: "records, summaries, cards, fuel types, transaction assignment",
+    },
+    {
+      service: "linxio.reports, linxio.digitalForms",
+      methods: "scheduled reports and digital form answer downloads",
+    },
+    {
+      service: "linxio.routes, linxio.sensors, linxio.cameras",
+      methods: "route history, temperature/humidity reports, and camera events",
+    },
+    {
+      service: "linxio.metadata",
+      methods: "read-only tenant settings and reference data",
+    },
+    {
+      service: "linxio.realtime",
+      methods: "connect, subscribe, onPosition, onNotification, disconnect",
+    },
+    {
+      service: "linxio.request, linxio.http",
+      methods: "raw HTTP access with SDK auth, retry, timeout, and refresh behavior",
+    },
+  ]}
+/>
+
+## Create a client
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a client" sdk="createClient(options)">
+      Creates a reusable Linxio SDK client. Use one client per Linxio session in
+      scripts, workers, and backend services.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Options"
+      fields={[
+        {
+          name: "baseUrl",
+          type: "string",
+          description: "REST API base URL.",
+          defaultValue: "https://api.linxio.com/api",
+        },
+        {
+          name: "token",
+          type: "string",
+          description: "JWT bearer token for an existing session.",
+        },
+        {
+          name: "refreshToken",
+          type: "string",
+          description: "Refresh token used for automatic 401 recovery.",
+        },
+        {
+          name: "timeoutMs",
+          type: "number",
+          description: "Per-request timeout in milliseconds.",
+          defaultValue: "30000",
+        },
+        {
+          name: "retry",
+          type: "RetryOptions",
+          description: "Retry configuration for idempotent requests that fail with transient network or 5xx errors.",
+        },
+        {
+          name: "fetch",
+          type: "FetchLike",
+          description: "Custom fetch implementation for tests, proxies, or non-standard runtimes.",
+        },
+        {
+          name: "realtimeBaseUrl",
+          type: "string",
+          description: "Socket.IO tracking host.",
+          defaultValue: "https://track.linxio.com",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Client setup" lineNumbers
+import { createClient } from "linxio-js";
+
+const linxio = createClient({
+  timeoutMs: 30_000,
+  retry: {
+    retries: 3,
+    delayMs: 1_000,
+  },
+});
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Result Contract
+
+Domain service methods return result objects so scripts can branch without
+wrapping every call in `try/catch`.
+
+<FieldTable
+  title="LinxioResult<T>"
+  fields={[
+    {
+      name: "data",
+      type: "T | null",
+      description: "Successful response payload. Null when the call failed.",
+    },
+    {
+      name: "error",
+      type: "LinxioError | null",
+      description: "Typed SDK error. Null when the call succeeded.",
+    },
+  ]}
+/>
+
+<FieldTable
+  title="LinxioPageResult<T>"
+  fields={[
+    {
+      name: "data",
+      type: "T[] | null",
+      description: "Current page of records, or null when the request failed.",
+    },
+    {
+      name: "error",
+      type: "LinxioError | null",
+      description: "Typed SDK error. Null when the page was loaded successfully.",
+    },
+    {
+      name: "meta",
+      type: "{ page: number; limit: number; total: number } | null",
+      description: "Normalized pagination metadata.",
+    },
+    {
+      name: "aggregations",
+      type: "unknown",
+      description: "Aggregation payload returned by Linxio when the endpoint includes it.",
+    },
+  ]}
+/>
+
+## Shared list parameters
+
+<FieldTable
+  fields={[
+    {
+      name: "limit",
+      type: "number",
+      description: "Number of records to request per page.",
+    },
+    {
+      name: "page",
+      type: "number",
+      description: "Page number to request.",
+      defaultValue: "1",
+    },
+    {
+      name: "sort",
+      type: "string",
+      description: "Sort expression accepted by the underlying Linxio endpoint.",
+    },
+    {
+      name: "fields",
+      type: "string[]",
+      description: "Mapped to Linxio's fields[] query parameter to keep responses small.",
+    },
+    {
+      name: "[filter]",
+      type: "string | number | boolean | string[] | number[]",
+      description: "Additional endpoint-specific filters are forwarded as query parameters.",
+    },
+  ]}
+/>
+
+## Pagination helpers
+
+Use `list()` when you want one page, `iterate()` when you want a result object
+containing every page, and `stream()` when you want to process large tenants
+without holding every record in memory.
+
+```ts title="One page" lineNumbers
+const page = await linxio.vehicles.list({
+  fields: ["id", "regNo"],
+  limit: 100,
+  page: 1,
+});
+```
+
+```ts title="All pages with a result object" lineNumbers
+const { data: vehicles, error } = await linxio.vehicles.iterate({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+```
+
+```ts title="Lazy streaming" lineNumbers
+for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
+  console.log(vehicle.id, vehicle.regNo);
+}
+```

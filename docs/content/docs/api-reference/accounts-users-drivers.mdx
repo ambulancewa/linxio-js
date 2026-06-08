@@ -1,0 +1,518 @@
+---
+title: Accounts, Users, and Drivers
+description: Client accounts, account users, client users, drivers, driver assignment, and resellers.
+---
+
+The SDK exposes related account APIs through several services. Use `/users` for
+account-level user management, `/clients/{clientId}/users` for users inside a
+client account, and driver assignment endpoints for vehicle-driver links.
+
+## GET /users
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List users" method="GET" path="/users" sdk="linxio.users.list(params)">
+      Returns a paginated list of users visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional field projection such as id, email, fullName, role, or status." },
+      { name: "role", type: "string", description: "Optional role filter." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "data", type: "LinxioUser[]", description: "Users for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/users?fields[]=id&fields[]=email&limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/users/{userId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a user" method="GET" path="/users/{userId}" sdk="linxio.users.get(userId)">
+      Returns one user by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "User identifier." },
+      { name: "email", type: "string", description: "Email address when supplied." },
+      { name: "fullName", type: "string", description: "Display name when supplied." },
+      { name: "role", type: "string", description: "Role name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/users/123" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /users
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a user" method="POST" path="/users" sdk="linxio.users.create(payload)">
+      Creates a user.
+    </ReferenceHeader>
+
+    <FieldTable title="Body parameters" fields={[
+      { name: "email", type: "string", description: "User email address." },
+      { name: "firstName", type: "string", description: "Given name." },
+      { name: "lastName", type: "string", description: "Family name." },
+      { name: "fullName", type: "string", description: "Full display name." },
+      { name: "phone", type: "string", description: "Phone number." },
+      { name: "roleId", type: "LinxioId", description: "Role identifier." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/users \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "new-user@example.com",
+    "firstName": "New",
+    "lastName": "User",
+    "roleId": 7
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/users/{userId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a user" method="PATCH" path="/users/{userId}" sdk="linxio.users.update(userId, payload)">
+      Updates a user.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
+      { name: "body", type: "LinxioUserPayload", required: true, description: "Fields to update." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/users/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "phone": "+61 400 000 000"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/users/{userId}/archive`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a user" method="PATCH" path="/users/{userId}/archive" sdk="linxio.users.archive(userId)">
+      Soft-archives a user.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/users/123/archive \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/users/{userId}/restore`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a user" method="PATCH" path="/users/{userId}/restore" sdk="linxio.users.restore(userId)">
+      Restores a previously archived user.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "Archived user identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/users/123/restore \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /clients/json
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List client accounts" method="GET" path="/clients/json" sdk="linxio.clients.list(params)">
+      Returns a paginated list of client accounts.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+      { name: "[filter]", type: "QueryValue", description: "Dashboard-derived filters." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Client account identifier." },
+      { name: "name", type: "string", description: "Client account display name when supplied." },
+      { name: "timezone", type: "LinxioId", description: "Timezone identifier when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/clients/json?limit=100&page=1" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/clients/{clientId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a client account" method="GET" path="/clients/{clientId}" sdk="linxio.clients.get(clientId)">
+      Returns one client account by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Client account identifier." },
+      { name: "name", type: "string", description: "Client account display name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/clients/10" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/clients/{clientId}/users`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List client users" method="GET" path="/clients/{clientId}/users" sdk="linxio.clients.listUsers(clientId, params)">
+      Returns a paginated list of users for a client account.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and query parameters" fields={[
+      { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
+      { name: "role", type: "string", description: "Optional role filter, such as driver." },
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "data", type: "LinxioUser[]", description: "Client users for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/clients/{clientId}/users/{userId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a client user" method="GET" path="/clients/{clientId}/users/{userId}" sdk="linxio.clients.getUser(clientId, userId)">
+      Returns one user within a client account.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[
+      { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
+      { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "User identifier." },
+      { name: "email", type: "string", description: "Email when supplied." },
+      { name: "fullName", type: "string", description: "Display name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/clients/10/users/123" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/clients/{clientId}/users`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a client user" method="POST" path="/clients/{clientId}/users" sdk="linxio.clients.createUser(clientId, payload)">
+      Creates a user inside a client account.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
+      { name: "email", type: "string", description: "User email address." },
+      { name: "firstName", type: "string", description: "Given name." },
+      { name: "lastName", type: "string", description: "Family name." },
+      { name: "phone", type: "string", description: "Phone number." },
+      { name: "roleId", type: "LinxioId", description: "Role identifier." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/clients/10/users \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "driver@example.com",
+    "firstName": "Driver",
+    "lastName": "Example",
+    "roleId": 7
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/clients/{clientId}/users/{userId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a client user" method="POST" path="/clients/{clientId}/users/{userId}" sdk="linxio.clients.updateUser(clientId, userId, payload)">
+      Updates a user inside a client account.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and body parameters" fields={[
+      { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
+      { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
+      { name: "body", type: "LinxioUserPayload", required: true, description: "Fields to update." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/clients/10/users/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "phone": "+61 400 000 000"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /drivers
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List drivers" method="GET" path="/drivers" sdk="linxio.drivers.list(params)">
+      Returns a paginated list of drivers using the dashboard-derived endpoint
+      when `clientId` is not supplied to the SDK.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver records for the current page." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/drivers?limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/clients/{clientId}/users?role=driver`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List client drivers" method="GET" path="/clients/{clientId}/users?role=driver" sdk="linxio.drivers.list({ clientId })">
+      Lists drivers through the documented client-users endpoint.
+    </ReferenceHeader>
+
+    <FieldTable title="Path and query parameters" fields={[
+      { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
+      { name: "role", type: "driver", required: true, description: "Driver role filter." },
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+    ]} />
+    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver user records." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/vehicle/{vehicleId}/set-driver/{driverId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Assign driver to vehicle" method="POST" path="/vehicle/{vehicleId}/set-driver/{driverId}" sdk="linxio.drivers.assignToVehicle(vehicleId, driverId)">
+      Assigns a driver to a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[
+      { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+      { name: "driverId", type: "LinxioId", required: true, description: "Driver user identifier." },
+    ]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful assignment response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicle/304/set-driver/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/vehicle/{vehicleId}/unset-driver/{driverId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Unassign driver from vehicle" method="POST" path="/vehicle/{vehicleId}/unset-driver/{driverId}" sdk="linxio.drivers.unassignFromVehicle(vehicleId, driverId)">
+      Removes a driver assignment from a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[
+      { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+      { name: "driverId", type: "LinxioId", required: true, description: "Driver user identifier." },
+    ]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful unassignment response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicle/304/unset-driver/123 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /reseller
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List reseller accounts" method="GET" path="/reseller" sdk="linxio.resellers.list()">
+      Lists reseller accounts visible to the authenticated account.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Reseller identifier." },
+      { name: "name", type: "string", description: "Reseller display name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/reseller" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/reseller/{resellerId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a reseller account" method="GET" path="/reseller/{resellerId}" sdk="linxio.resellers.get(resellerId)">
+      Returns one reseller account by ID.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "resellerId", type: "LinxioId", required: true, description: "Reseller identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Reseller identifier." },
+      { name: "name", type: "string", description: "Reseller display name when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/reseller/20" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>

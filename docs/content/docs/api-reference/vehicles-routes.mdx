@@ -1,0 +1,426 @@
+---
+title: Vehicles and Routes
+description: Vehicle inventory, lifecycle, odometer, engine-hours, counts, types, and route history endpoints.
+---
+
+Vehicle list endpoints support field projection through repeated `fields[]`
+query parameters. Route endpoints can produce large responses when coordinates
+are requested.
+
+## GET /vehicles/fields/json
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List vehicles" method="GET" path="/vehicles/fields/json" sdk="linxio.vehicles.list(params)">
+      Returns a paginated list of vehicles.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Query parameters"
+      fields={[
+        { name: "limit", type: "number", description: "Number of records per page." },
+        { name: "page", type: "number", description: "Page number to read.", defaultValue: "1" },
+        { name: "fields[]", type: "string[]", description: "Vehicle fields to include, such as id, regNo, status, lastLoggedAt, or lastCoordinates." },
+        { name: "sort", type: "string", description: "Sort expression accepted by Linxio." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "data", type: "LinxioVehicle[]", description: "Vehicle rows for the current page." },
+        { name: "page", type: "number", description: "Current page number." },
+        { name: "limit", type: "number", description: "Page size." },
+        { name: "total", type: "number", description: "Total matching vehicle count." },
+        { name: "aggregations", type: "unknown", description: "Aggregation payload when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo&limit=100&page=1" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+```json title="Response" lineNumbers
+{
+  "page": 1,
+  "limit": 100,
+  "total": 2,
+  "data": [
+    { "id": 304, "regNo": "ABC-123" },
+    { "id": 305, "regNo": "DEF-456" }
+  ],
+  "aggregations": null
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/vehicles/{vehicleId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get a vehicle" method="GET" path="/vehicles/{vehicleId}" sdk="linxio.vehicles.get(vehicleId)">
+      Returns one vehicle by ID.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path parameters"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "id", type: "LinxioId", description: "Vehicle identifier." },
+        { name: "regNo", type: "string", description: "Registration number when supplied." },
+        { name: "defaultLabel", type: "string", description: "Display label when supplied." },
+        { name: "lastLoggedAt", type: "ISODateString", description: "Last telemetry timestamp when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/304" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST /vehicles
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a vehicle" method="POST" path="/vehicles" sdk="linxio.vehicles.create(payload)">
+      Creates a vehicle record.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        { name: "regNo", type: "string", description: "Registration number or fleet identifier." },
+        { name: "defaultLabel", type: "string", description: "Default display label." },
+        { name: "model", type: "string", description: "Vehicle model." },
+        { name: "typeId", type: "LinxioId", description: "Vehicle type identifier." },
+        { name: "depotId", type: "LinxioId | null", description: "Depot identifier." },
+        { name: "groupIds", type: "LinxioId[]", description: "Vehicle group identifiers." },
+        { name: "vin", type: "string", description: "Vehicle identification number." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "id", type: "LinxioId", description: "Created vehicle ID." },
+        { name: "regNo", type: "string", description: "Created vehicle registration number when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicles \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "regNo": "TEST-001",
+    "defaultLabel": "Temporary SDK Test Vehicle"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/vehicles/{vehicleId}`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Update a vehicle" method="POST" path="/vehicles/{vehicleId}" sdk="linxio.vehicles.update(vehicleId, payload)">
+      Updates an existing vehicle.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path and body parameters"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+        { name: "body", type: "LinxioVehiclePayload", required: true, description: "Fields to update." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "id", type: "LinxioId", description: "Updated vehicle ID." },
+        { name: "regNo", type: "string", description: "Registration number when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicles/304 \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "defaultLabel": "Updated display label"
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## PATCH `/vehicles/{vehicleId}/archive`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Archive a vehicle" method="PATCH" path="/vehicles/{vehicleId}/archive" sdk="linxio.vehicles.archive(vehicleId)">
+      Soft-archives a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X PATCH https://api.linxio.com/api/vehicles/304/archive \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/vehicles/{vehicleId}/restore`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Restore a vehicle" method="POST" path="/vehicles/{vehicleId}/restore" sdk="linxio.vehicles.restore(vehicleId)">
+      Restores a previously archived vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Archived vehicle identifier." }]} />
+    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicles/304/restore \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/vehicles/{vehicleId}/odometer`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get vehicle odometer" method="GET" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.getOdometer(vehicleId, params)">
+      Returns a vehicle odometer reading.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path and query parameters"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+        { name: "occurredAt", type: "ISODateString", description: "Optional occurrence timestamp." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "odometer", type: "number", description: "Odometer reading." },
+        { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
+        { name: "occurredAt", type: "ISODateString", description: "Reading timestamp when supplied." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/304/odometer" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## POST `/vehicles/{vehicleId}/odometer`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Recalibrate vehicle odometer" method="POST" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.recalibrateOdometer(vehicleId, payload)">
+      Recalibrates a vehicle odometer.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path and body parameters"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+        { name: "occurredAt", type: "ISODateString", required: true, description: "When the recalibrated reading applies." },
+        { name: "odometer", type: "number", required: true, description: "New odometer value." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "odometer", type: "number", description: "Updated odometer value." },
+        { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/vehicles/304/odometer \
+  -H "Authorization: Bearer $LINXIO_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "occurredAt": "2026-06-08T12:00:00+08:00",
+    "odometer": 123456
+  }'
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/vehicles/{vehicleId}/engine-hours/current`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get vehicle engine hours" method="GET" path="/vehicles/{vehicleId}/engine-hours/current" sdk="linxio.vehicles.getEngineHours(vehicleId)">
+      Returns the current engine-hours reading for a vehicle.
+    </ReferenceHeader>
+
+    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "engineHours", type: "number", description: "Current engine-hours reading." },
+      { name: "occurredAt", type: "ISODateString", description: "Reading timestamp when supplied." },
+      { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/304/engine-hours/current" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /vehicles/count
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Count vehicles" method="GET" path="/vehicles/count" sdk="linxio.vehicles.count(params)">
+      Returns a vehicle count without fetching records.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[{ name: "[filter]", type: "QueryValue", description: "Optional dashboard-derived filters." }]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "count", type: "number", description: "Vehicle count when returned by Linxio." },
+      { name: "total", type: "number", description: "Vehicle count when returned as total." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/count?status=active" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET /vehicles/types
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="List vehicle types" method="GET" path="/vehicles/types" sdk="linxio.vehicles.types(params)">
+      Lists vehicle type categories.
+    </ReferenceHeader>
+
+    <FieldTable title="Query parameters" fields={[
+      { name: "limit", type: "number", description: "Maximum type records.", defaultValue: "1000" },
+      { name: "sort", type: "string", description: "Sort expression.", defaultValue: "order" },
+    ]} />
+    <FieldTable title="Response fields" fields={[
+      { name: "id", type: "LinxioId", description: "Vehicle type identifier." },
+      { name: "name", type: "string", description: "Vehicle type display name." },
+      { name: "order", type: "number", description: "Sort order when supplied." },
+    ]} />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/types?limit=1000&sort=order" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## GET `/vehicles/{vehicleId}/routes`
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Get vehicle route history" method="GET" path="/vehicles/{vehicleId}/routes" sdk="linxio.routes.getVehicleRoutes(vehicleId, params)">
+      Returns trip and stop history for one vehicle over a date range.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path and query parameters"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
+        { name: "dateFrom", type: "ISODateString", description: "Start date/time." },
+        { name: "dateTo", type: "ISODateString", description: "End date/time." },
+        { name: "fields[]", type: "string[]", description: "Additional route fields. coordinates can be large." },
+        { name: "limit", type: "number", description: "Page size when supported." },
+        { name: "page", type: "number", description: "Page number when supported." },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier for a route group." },
+        { name: "driverId", type: "LinxioId | null", description: "Driver identifier when supplied." },
+        { name: "routes", type: "LinxioVehicleRoute[]", description: "Route segments including start/finish points, distance, duration, and optional coordinates." },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl "https://api.linxio.com/api/vehicles/304/routes?dateFrom=2026-06-01T00:00:00%2B08:00&dateTo=2026-06-08T00:00:00%2B08:00&fields[]=address" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
