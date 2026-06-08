@@ -23,12 +23,14 @@
     "scripts": {
         "build": "tsup",
         "docs:build": "pnpm --dir docs build",
+        "docs:check": "pnpm --dir docs types:check",
         "docs:dev": "pnpm --dir docs dev",
         "format": "biome check . --write --skip-parse-errors --config-path ./biome.json",
         "format:biome": "biome check . --write --skip-parse-errors --config-path ./biome.json",
+        "prepack": "pnpm build",
         "test": "vitest run",
         "typecheck": "tsc --noEmit",
-        "verify": "pnpm typecheck && pnpm test && pnpm build",
+        "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm docs:check",
         "bump-deps": "npx npm-check-updates --deep -u -x @biomejs/biome"
     },
     "keywords": [
@@ -40,6 +42,14 @@
     ],
     "author": "Ambulance WA",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ambulancewa/linxio-js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ambulancewa/linxio-js/issues"
+    },
+    "homepage": "https://github.com/ambulancewa/linxio-js#readme",
     "engines": {
         "node": ">=20.11"
     },
