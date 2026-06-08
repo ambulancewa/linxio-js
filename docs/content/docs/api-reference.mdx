@@ -1,0 +1,313 @@
+---
+title: API Reference
+description: HTTP endpoints, parameters, response envelopes, and copy-ready request examples.
+full: true
+---
+
+The default REST base URL is `https://api.linxio.com/api`. Authenticated
+requests use `Authorization: Bearer <token>`.
+
+## Response Envelope
+
+Most list endpoints return a pagination envelope:
+
+```json title="Paginated response" lineNumbers
+{
+  "page": 1,
+  "limit": 100,
+  "total": 123,
+  "data": []
+}
+```
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Create a session" method="POST" path="/login">
+      Authenticates a Linxio user and returns a bearer token plus refresh token.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        {
+          name: "email",
+          type: "string",
+          required: true,
+          description: "Email address for the Linxio user.",
+        },
+        {
+          name: "password",
+          type: "string",
+          required: true,
+          description: "Password for the Linxio user.",
+        },
+        {
+          name: "domain",
+          type: "string",
+          description: "Optional tenant-domain hint accepted by dashboard login flows.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Response fields"
+      fields={[
+        {
+          name: "token",
+          type: "string",
+          description: "JWT bearer token for subsequent API requests.",
+        },
+        {
+          name: "refreshToken",
+          type: "string",
+          description: "Refresh token for renewing the session.",
+        },
+        {
+          name: "expireAt",
+          type: "string",
+          description: "Token expiry timestamp when supplied by Linxio.",
+        },
+        {
+          name: "otp_required",
+          type: "boolean",
+          description: "Whether the user must complete OTP before the session is usable.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```bash title="Request" lineNumbers
+curl -X POST https://api.linxio.com/api/login \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "user@example.com",
+    "password": "your-password"
+  }'
+```
+
+```json title="Response" lineNumbers
+{
+  "token": "eyJhbGciOi...",
+  "refreshToken": "refresh-token",
+  "expireAt": "2026-06-08T12:00:00+08:00",
+  "otp_required": false
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader
+      title="List vehicles"
+      method="GET"
+      path="/vehicles/fields/json"
+      sdk="linxio.vehicles.list(params)"
+    >
+      Returns a paginated list of vehicles. Use `fields[]` to keep responses
+      small in scripts and scheduled jobs.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Query parameters"
+      fields={[
+        {
+          name: "limit",
+          type: "number",
+          description: "Number of records per page.",
+        },
+        {
+          name: "page",
+          type: "number",
+          description: "Page number to read.",
+          defaultValue: "1",
+        },
+        {
+          name: "fields[]",
+          type: "string[]",
+          description: "Vehicle fields to include in each row, such as id, regNo, status, or lastLoggedAt.",
+        },
+        {
+          name: "sort",
+          type: "string",
+          description: "Sort expression accepted by Linxio for this endpoint.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="SDK" lineNumbers
+const { data, error, meta } = await linxio.vehicles.list({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+  page: 1,
+});
+
+if (error) {
+  throw error;
+}
+
+console.log(meta.total, data);
+```
+
+```bash title="HTTP" lineNumbers
+curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo&limit=100&page=1" \
+  -H "Authorization: Bearer $LINXIO_TOKEN"
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader
+      title="Get vehicle routes"
+      method="GET"
+      path="/vehicles/{vehicleId}/routes"
+      sdk="linxio.routes.getVehicleRoutes(vehicleId, params)"
+    >
+      Returns trip and stop history for one vehicle over a date range. Request
+      coordinate fields only when you need full point history.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Path and query parameters"
+      fields={[
+        {
+          name: "vehicleId",
+          type: "number | string",
+          required: true,
+          description: "Internal Linxio vehicle identifier.",
+        },
+        {
+          name: "dateFrom",
+          type: "string",
+          required: true,
+          description: "Start date/time in Linxio's accepted ISO-style format.",
+        },
+        {
+          name: "dateTo",
+          type: "string",
+          required: true,
+          description: "End date/time in Linxio's accepted ISO-style format.",
+        },
+        {
+          name: "fields[]",
+          type: "string[]",
+          description: "Additional route fields to include. coordinates can be large.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="SDK" lineNumbers
+const routes = await linxio.routes.getVehicleRoutes(vehicleId, {
+  dateFrom: "2026-06-01T00:00:00+08:00",
+  dateTo: "2026-06-08T00:00:00+08:00",
+});
+
+if (routes.error) {
+  throw routes.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader
+      title="Create a geofence"
+      method="POST"
+      path="/areas"
+      sdk="linxio.geofences.create(payload)"
+    >
+      Creates a geofence area. Use a deliberately named test area when
+      validating against a live tenant, then archive or delete it afterwards.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Body parameters"
+      fields={[
+        {
+          name: "name",
+          type: "string",
+          required: true,
+          description: "Display name for the geofence.",
+        },
+        {
+          name: "type",
+          type: "circle | polygon",
+          required: true,
+          description: "Geofence geometry type.",
+        },
+        {
+          name: "coordinates",
+          type: "{ lat: number; lng: number }[]",
+          required: true,
+          description: "Geometry coordinates. Circles usually use one center point.",
+        },
+        {
+          name: "radius",
+          type: "number",
+          description: "Radius in metres for circle geofences.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="SDK" lineNumbers
+const created = await linxio.geofences.create({
+  name: "Temporary Test Area",
+  type: "circle",
+  radius: 150,
+  coordinates: [{ lat: -31.95, lng: 115.86 }],
+});
+
+if (created.error) {
+  throw created.error;
+}
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## Endpoint Families
+
+<ServiceTable
+  rows={[
+    {
+      service: "Authentication",
+      methods: "POST /login, POST /token/refresh, POST /login/otp, GET /me, POST /logout",
+    },
+    {
+      service: "Vehicles",
+      methods: "GET /vehicles/fields/json, GET /vehicles/{id}, POST /vehicles, POST /vehicles/{id}, PATCH /vehicles/{id}/archive, POST /vehicles/{id}/restore, GET /vehicles/count, GET /vehicles/types",
+    },
+    {
+      service: "Routes",
+      methods: "GET /vehicles/{id}/routes",
+    },
+    {
+      service: "Geofences",
+      methods: "GET /areas, POST /areas, GET /areas/{id}, DELETE /areas/{id}, PATCH /areas/{id}/archive, PATCH /areas/{id}/restore, area group lifecycle endpoints",
+    },
+    {
+      service: "Devices",
+      methods: "GET /devices/json, GET /devices/{id}, POST /devices, PATCH /devices/{id}, POST /devices/{id}/install, POST /devices/{id}/uninstall, GET /devices/vendors, GET /devices/installation",
+    },
+    {
+      service: "Metadata",
+      methods: "GET /country/list, GET /roles, GET /plans, GET /timezones, GET /themes, GET /settings/language/list, GET /settings/mapApiOptions",
+    },
+  ]}
+/>
