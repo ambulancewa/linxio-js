@@ -28,9 +28,9 @@ The latest analysis run covered the ten JavaScript files currently checked into
 | --- | ---: |
 | Source files analysed | 10 |
 | Dashboard endpoint candidates extracted | 169 |
-| SDK endpoint catalogue definitions | 71 |
-| Dashboard candidates covered by the SDK catalogue | 41 |
-| Dashboard candidates not yet represented in the SDK catalogue | 128 |
+| SDK endpoint catalogue definitions | 86 |
+| Dashboard candidates covered by the SDK catalogue | 56 |
+| Dashboard candidates not yet represented in the SDK catalogue | 113 |
 | SDK catalogue entries not observed in these dashboard bundles | 19 |
 
 ## What the counts mean
@@ -54,7 +54,8 @@ the captured dashboard bundles.
 The current SDK catalogue includes dashboard-derived wrappers for area group
 lifecycle actions, device vendors, device installation rows, attached device
 cameras, vehicle counts, vehicle types, scheduled-report templates, scheduled
-report restore, and the dashboard-observed vehicle restore method.
+report restore, read-only metadata and settings reference data, fuel types, and
+the dashboard-observed vehicle restore method.
 
 ## High-signal dashboard-only candidates
 
@@ -63,6 +64,8 @@ existing SDK domains and came directly from the captured dashboard bundles:
 
 | Methods | Path | Source bundle |
 | --- | --- | --- |
+| GET | `/notifications/event-types` | `main.91cbbc5b3b642d22.js` |
+| GET | `/sensors/types` | `4167.49eae6a246b4574d.js` |
 | POST | `/devices/{param}/notes` | `4167.49eae6a246b4574d.js` |
 | POST | `/fuel-cards/upload` | `5049.278d2bc7e646d60c.js` |
 

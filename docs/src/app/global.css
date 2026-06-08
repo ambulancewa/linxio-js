@@ -4,6 +4,42 @@
 
 html {
   scrollbar-gutter: stable;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+.linxio-code-rail figure {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgb(15 23 42 / 14%);
+  box-shadow:
+    0 1px 1px rgb(15 23 42 / 8%),
+    0 14px 34px rgb(15 23 42 / 12%);
+}
+
+.linxio-code-rail pre,
+.linxio-code-rail pre.shiki {
+  background: #2d3748;
+  color: #e5edf7;
+}
+
+.linxio-code-rail pre.shiki span {
+  color: var(--shiki-dark);
+}
+
+.linxio-code-rail [data-line-numbers] .line::before {
+  color: rgb(226 232 240 / 35%);
 }
 
 html > body[data-scroll-locked] {

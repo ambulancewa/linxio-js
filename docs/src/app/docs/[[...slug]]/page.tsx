@@ -20,9 +20,18 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const referencePages = new Set([
+    "api-reference",
+    "authentication",
+    "sdk-reference",
+  ]);
+  const isReferencePage = referencePages.has(page.slugs.at(-1) ?? "");
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage
+      toc={isReferencePage ? [] : page.data.toc}
+      full={page.data.full || isReferencePage}
+    >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">
         {page.data.description}
@@ -34,7 +43,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
-      <DocsBody>
+      <DocsBody className={isReferencePage ? "max-w-none" : undefined}>
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths

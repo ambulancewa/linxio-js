@@ -71,6 +71,19 @@ const installations = await linxio.devices.installations({ limit: 100 });
 const cameras = await linxio.devices.cameras(deviceId);
 ```
 
+## Metadata
+
+```ts
+const countries = await linxio.metadata.countries();
+const timezones = await linxio.metadata.timezones();
+const currentPlan = await linxio.metadata.currentPlan();
+const mapOptions = await linxio.metadata.mapApiOptions();
+```
+
+Metadata helpers expose read-only reference data and tenant settings used by the
+dashboard, including countries, roles, plans, timezones, themes, language
+options, map API options, provider settings, and feature settings.
+
 ## Drivers
 
 ```ts

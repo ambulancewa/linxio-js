@@ -1,52 +1,220 @@
 ---
 title: Authentication
-description: Login, session hydration, token refresh, and safe credential handling.
+description: Login, session hydration, token refresh, OTP, and safe credential handling.
+full: true
 ---
 
-## Login
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader
+      title="Login"
+      method="POST"
+      path="/login"
+      sdk="linxio.auth.login(payload)"
+    >
+      Authenticates an API user and stores the returned session in the client
+      instance. Future SDK requests automatically include the bearer token.
+    </ReferenceHeader>
 
-```ts
+    <FieldTable
+      title="Method parameters"
+      fields={[
+        {
+          name: "email",
+          type: "string",
+          required: true,
+          description: "Email address for the Linxio API or dashboard user.",
+        },
+        {
+          name: "password",
+          type: "string",
+          required: true,
+          description: "Password for the user. Load it from a secret store or environment variable.",
+        },
+        {
+          name: "domain",
+          type: "string",
+          description: "Optional tenant or hosted-domain hint. Most API integrations can omit it.",
+        },
+      ]}
+    />
+
+    <FieldTable
+      title="Returns"
+      fields={[
+        {
+          name: "data.token",
+          type: "string",
+          description: "JWT bearer token used for authenticated API requests.",
+        },
+        {
+          name: "data.refreshToken",
+          type: "string",
+          description: "Refresh token used by the SDK when a request receives a recoverable 401 response.",
+        },
+        {
+          name: "data.expireAt",
+          type: "string",
+          description: "Token expiry timestamp returned by Linxio when available.",
+        },
+        {
+          name: "data.otpRequired",
+          type: "boolean",
+          description: "Whether Linxio requires an OTP challenge before the session can be used.",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error. Null when authentication succeeds.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Login and read vehicles" lineNumbers
+import { createClient } from "linxio-js";
+
+const linxio = createClient();
+
 const login = await linxio.auth.login({
-  email,
-  password,
-  domain: "optional-domain",
+  email: process.env.LINXIO_EMAIL!,
+  password: process.env.LINXIO_PASSWORD!,
 });
 
 if (login.error) {
   throw login.error;
 }
 
-console.log(login.data.expireAt);
+const { data: vehicles, error } = await linxio.vehicles.list({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+});
+
+if (error) {
+  throw error;
+}
+
+console.log(vehicles);
 ```
 
-`auth.login()` updates the client's in-memory session. The HTTP layer adds `Authorization: Bearer <token>` to future requests.
+```bash title="Equivalent HTTP request" lineNumbers
+curl -X POST https://api.linxio.com/api/login \
+  -H "Content-Type: application/json" \
+  --data '{
+    "email": "user@example.com",
+    "password": "your-password"
+  }'
+```
 
-## Hydrate an existing session
+  </CodeRail>
+</ReferenceGrid>
 
-```ts
+## Session Hydration
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Hydrate a client" sdk="createClient(options)">
+      Use this when you persist sessions yourself and want a new process to
+      resume without calling `auth.login()` again.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Options"
+      fields={[
+        {
+          name: "token",
+          type: "string",
+          description: "JWT bearer token to use for authenticated requests.",
+        },
+        {
+          name: "refreshToken",
+          type: "string",
+          description: "Refresh token used for automatic token recovery.",
+        },
+        {
+          name: "timeoutMs",
+          type: "number",
+          description: "Per-request timeout in milliseconds.",
+          defaultValue: "30000",
+        },
+        {
+          name: "retry",
+          type: "{ retries?: number; delayMs?: number }",
+          description: "Retry policy for idempotent requests that fail with transient network or 5xx errors.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Restore a persisted session" lineNumbers
+import { createClient } from "linxio-js";
+
 const linxio = createClient({
   token: stored.token,
   refreshToken: stored.refreshToken,
 });
+
+linxio.setSession({
+  token: nextToken,
+  refreshToken: nextRefreshToken,
+});
+
+const current = linxio.session();
 ```
 
-You can also update a client later:
+  </CodeRail>
+</ReferenceGrid>
 
-```ts
-linxio.setSession({ token, refreshToken });
-```
+## Automatic Refresh
 
-## Automatic refresh
-
-When a request receives `401` and a refresh token is available, the SDK calls `/token/refresh`, updates the session, and retries the original request once.
-
-Concurrent refreshes are coalesced. If several requests hit `401` at the same time, only one refresh call is sent.
+When a request receives `401` and a refresh token is available, the SDK calls
+`/token/refresh`, updates the in-memory session, and retries the original
+request once. Concurrent refreshes are coalesced, so several simultaneous `401`
+responses only trigger one refresh request.
 
 ## OTP
 
-```ts
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader
+      title="Verify OTP"
+      method="POST"
+      path="/login/otp"
+      sdk="linxio.auth.verifyOtp(payload)"
+    >
+      Completes an OTP challenge for accounts where Linxio requires a one-time
+      code. Linxio's public integration notes recommend disabling OTP for
+      integration users.
+    </ReferenceHeader>
+
+    <FieldTable
+      title="Method parameters"
+      fields={[
+        {
+          name: "email",
+          type: "string",
+          required: true,
+          description: "Email address for the Linxio user completing the OTP challenge.",
+        },
+        {
+          name: "code",
+          type: "string",
+          required: true,
+          description: "One-time code provided by Linxio's OTP flow.",
+        },
+      ]}
+    />
+  </div>
+
+  <CodeRail>
+
+```ts title="Verify an OTP challenge" lineNumbers
 const otp = await linxio.auth.verifyOtp({
-  email,
+  email: process.env.LINXIO_EMAIL!,
   code,
 });
 
@@ -55,8 +223,10 @@ if (otp.error) {
 }
 ```
 
-Linxio's public integration notes recommend disabling OTP for integration users.
+  </CodeRail>
+</ReferenceGrid>
 
 ## Secrets
 
-Do not commit credentials. Prefer environment variables, a secret manager, or your deployment platform's encrypted environment configuration.
+Do not commit credentials. Prefer environment variables, a secret manager, or
+your deployment platform's encrypted environment configuration.
