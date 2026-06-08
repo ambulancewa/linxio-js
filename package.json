@@ -2,7 +2,7 @@
     "name": "linxio-js",
     "version": "0.1.0",
     "packageManager": "pnpm@11.5.2",
-    "description": "A comprehensive TypeScript SDK for the Linxio API.",
+    "description": "A typed TypeScript client for the Linxio (https://linxio.com) Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!",
     "type": "module",
     "main": "./dist/index.cjs",
     "module": "./dist/index.js",
@@ -17,7 +17,8 @@
     },
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENSE"
     ],
     "scripts": {
         "build": "tsup",
@@ -38,7 +39,7 @@
         "typescript"
     ],
     "author": "Ambulance WA",
-    "license": "ISC",
+    "license": "MIT",
     "engines": {
         "node": ">=20.11"
     },
@@ -68,11 +69,5 @@
         "ultracite": "^7.8.1",
         "vitest": "^4.1.6"
     },
-    "devEngines": {
-        "packageManager": {
-            "name": "pnpm",
-            "version": "^11.5.2",
-            "onFail": "download"
-        }
-    }
+    "sideEffects": false
 }
