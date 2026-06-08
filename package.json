@@ -1,0 +1,78 @@
+{
+    "name": "linxio-js",
+    "version": "0.1.0",
+    "packageManager": "pnpm@11.5.2",
+    "description": "A comprehensive TypeScript SDK for the Linxio API.",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "docs:build": "pnpm --dir docs build",
+        "docs:dev": "pnpm --dir docs dev",
+        "format": "biome check . --write --skip-parse-errors --config-path ./biome.json",
+        "format:biome": "biome check . --write --skip-parse-errors --config-path ./biome.json",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "verify": "pnpm typecheck && pnpm test && pnpm build",
+        "bump-deps": "npx npm-check-updates --deep -u -x @biomejs/biome"
+    },
+    "keywords": [
+        "linxio",
+        "fleet",
+        "gps",
+        "sdk",
+        "typescript"
+    ],
+    "author": "Ambulance WA",
+    "license": "ISC",
+    "engines": {
+        "node": ">=20.11"
+    },
+    "dependencies": {
+        "socket.io-client": "^4.8.3"
+    },
+    "devDependencies": {
+        "@auto-it/first-time-contributor": "^11.3.6",
+        "@biomejs/biome": "2.4.15",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/commit-analyzer": "^13.0.1",
+        "@semantic-release/git": "^10.0.1",
+        "@semantic-release/github": "^12.0.8",
+        "@semantic-release/npm": "^13.1.5",
+        "@semantic-release/release-notes-generator": "^14.1.1",
+        "@total-typescript/ts-reset": "^0.6.1",
+        "@types/node": "^25.9.1",
+        "prettier": "^3.8.3",
+        "prettier-plugin-tailwindcss": "^0.8.0",
+        "prettier-plugin-tailwindcss-canonical-classes": "^0.1.5",
+        "semantic-release": "^25.0.3",
+        "sharp": "^0.34.5",
+        "tsup": "^8.5.1",
+        "turbo": "^2.9.16",
+        "typed-query-selector": "^2.12.2",
+        "typescript": "^6.0.3",
+        "ultracite": "^7.8.1",
+        "vitest": "^4.1.6"
+    },
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "^11.5.2",
+            "onFail": "download"
+        }
+    }
+}
