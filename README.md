@@ -41,6 +41,8 @@ pnpm add linxio-js
 npm install linxio-js
 ```
 
+Full documentation is available at our Open Source Software Projects (OSSP) site: https://linxio-js.ambulancewa.dev
+
 ## Authentication
 
 ```ts
