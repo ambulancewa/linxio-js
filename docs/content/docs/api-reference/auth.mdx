@@ -17,7 +17,7 @@ of the API.
     <RequiredHeaders auth={false} json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "email", type: "string", required: true, description: "Email address for the Linxio user." },
         { name: "password", type: "string", required: true, description: "Password for the Linxio user." },
@@ -26,7 +26,7 @@ of the API.
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "token", type: "string", description: "JWT bearer token for authenticated requests." },
         { name: "refreshToken", type: "string", description: "Refresh token for renewing the session." },
@@ -49,17 +49,6 @@ curl -X POST https://api.linxio.com/api/login \
   }'
 ```
 
-```json title="Response" lineNumbers
-{
-  "token": "eyJhbGciOi...",
-  "refreshToken": "refresh-token",
-  "expireAt": "2026-06-08T12:00:00+08:00",
-  "otp_required": false,
-  "teamType": "client",
-  "roleId": 7
-}
-```
-
   </CodeRail>
 </ReferenceGrid>
 
@@ -74,7 +63,7 @@ curl -X POST https://api.linxio.com/api/login \
     <RequiredHeaders auth={false} json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "email", type: "string", required: true, description: "Email address used for login." },
         { name: "code", type: "string", required: true, description: "One-time password code." },
@@ -82,7 +71,7 @@ curl -X POST https://api.linxio.com/api/login \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "token", type: "string", description: "JWT bearer token for authenticated requests." },
         { name: "refreshToken", type: "string", description: "Refresh token for renewing the session." },
@@ -116,14 +105,14 @@ curl -X POST https://api.linxio.com/api/login/otp \
     <RequiredHeaders auth={false} json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "refreshToken", type: "string", required: true, description: "Refresh token returned by login or a previous refresh call." },
       ]}
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "token", type: "string", description: "New JWT bearer token." },
         { name: "refreshToken", type: "string", description: "New refresh token when Linxio rotates it." },
@@ -156,14 +145,14 @@ curl -X POST https://api.linxio.com/api/token/refresh \
     <RequiredHeaders />
 
     <FieldTable
-      title="Query parameters"
+      title="Request query parameters" iconName="forward" 
       fields={[
         { name: "fields[]", type: "string[]", description: "Optional field projection for the current-user response." },
       ]}
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "id", type: "LinxioId", description: "Current user ID when supplied." },
         { name: "email", type: "string", description: "Current user email when supplied." },
@@ -196,14 +185,14 @@ curl "https://api.linxio.com/api/me?fields[]=id&fields[]=email" \
     <RequiredHeaders json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "none", type: "void", description: "Send an empty JSON object or no body." },
       ]}
     />
 
     <FieldTable
-      title="Response"
+      title="Response headers"
       fields={[
         { name: "status", type: "204 or JSON", description: "Linxio may return an empty success response." },
       ]}

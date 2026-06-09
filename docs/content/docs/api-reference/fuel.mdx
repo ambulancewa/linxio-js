@@ -16,13 +16,13 @@ Fuel endpoints are dashboard-derived and can include tenant-specific fields.
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional fields such as transactionDate, vehicleIds, refueled, total, fuelPrice, or petrolStation." },
       { name: "[filter]", type: "QueryValue", description: "Fuel report filters accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioFuelRecord[]", description: "Fuel transaction records for the current page." },
       { name: "page / limit / total", type: "number", description: "Pagination metadata." },
     ]} />
@@ -48,13 +48,13 @@ curl "https://api.linxio.com/api/fuel-cards/json?fields[]=transactionDate&fields
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "startDate / endDate", type: "ISODateString", description: "Optional report date range when supported." },
       { name: "[filter]", type: "QueryValue", description: "Report filters accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "regNo", type: "string", description: "Vehicle registration number when supplied." },
       { name: "mileage", type: "number", description: "Mileage when supplied." },
       { name: "refueled", type: "number", description: "Refueled amount when supplied." },
@@ -82,13 +82,13 @@ curl "https://api.linxio.com/api/fuel-summary-report?limit=100" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "vehicleId", type: "LinxioId", description: "Optional vehicle filter." },
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "[filter]", type: "QueryValue", description: "Fuel filters accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioFuelRecord[]", description: "Fuel records for the current page." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data", type: "LinxioFuelRecord[]", description: "Fuel records for the current page." }]} />
   </div>
 
   <CodeRail>
@@ -111,7 +111,7 @@ curl "https://api.linxio.com/api/fuel-cards-by-vehicle/json?vehicleId=304&limit=
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "Fuel type records. Shape can vary by tenant." }]} />
   </div>
 
@@ -139,7 +139,7 @@ curl "https://api.linxio.com/api/fuel-types" \
       { name: "recordId", type: "LinxioId", required: true, description: "Fuel transaction record identifier." },
       { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier sent in the JSON body." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated fuel transaction identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated fuel transaction identifier." }]} />
   </div>
 
   <CodeRail>

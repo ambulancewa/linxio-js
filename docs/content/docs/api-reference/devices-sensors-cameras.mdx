@@ -17,7 +17,7 @@ camera endpoints are a mix of publicly documented and dashboard-derived paths.
     <RequiredHeaders />
 
     <FieldTable
-      title="Query parameters"
+      title="Request query parameters" iconName="forward" 
       fields={[
         { name: "limit", type: "number", description: "Number of records per page." },
         { name: "page", type: "number", description: "Page number to read.", defaultValue: "1" },
@@ -27,7 +27,7 @@ camera endpoints are a mix of publicly documented and dashboard-derived paths.
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "data", type: "LinxioDevice[]", description: "Device rows for the current page." },
         { name: "page", type: "number", description: "Current page number." },
@@ -57,8 +57,8 @@ curl "https://api.linxio.com/api/devices/json?fields[]=id&fields[]=imei&limit=10
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Device identifier." },
       { name: "imei", type: "string", description: "IMEI when supplied." },
       { name: "serial", type: "string", description: "Serial number when supplied." },
@@ -87,7 +87,7 @@ curl "https://api.linxio.com/api/devices/545" \
     <RequiredHeaders json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "imei", type: "string", description: "IMEI or unique hardware identifier." },
         { name: "serial", type: "string", description: "Device serial number." },
@@ -97,7 +97,7 @@ curl "https://api.linxio.com/api/devices/545" \
       ]}
     />
 
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created device ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created device ID." }]} />
   </div>
 
   <CodeRail>
@@ -129,7 +129,7 @@ curl -X POST https://api.linxio.com/api/devices \
       { name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." },
       { name: "body", type: "LinxioDevicePayload", required: true, description: "Fields to update." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
   </div>
 
   <CodeRail>
@@ -166,7 +166,7 @@ curl -X PATCH https://api.linxio.com/api/devices/545 \
       ]}
     />
 
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
   </div>
 
   <CodeRail>
@@ -204,7 +204,7 @@ curl -X POST https://api.linxio.com/api/devices/545/install \
       ]}
     />
 
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated device ID." }]} />
   </div>
 
   <CodeRail>
@@ -231,8 +231,8 @@ curl -X POST https://api.linxio.com/api/devices/545/uninstall \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
 
   <CodeRail>
@@ -257,8 +257,8 @@ curl -X PATCH https://api.linxio.com/api/devices/545/archive \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Archived device identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Archived device identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -283,8 +283,8 @@ curl -X PATCH https://api.linxio.com/api/devices/545/restore \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "lat", type: "number", description: "Latitude." },
       { name: "lng", type: "number", description: "Longitude." },
       { name: "ts", type: "ISODateString", description: "Timestamp when supplied." },
@@ -311,8 +311,8 @@ curl "https://api.linxio.com/api/devices/545/coordinates" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
       { name: "name", type: "string", description: "Sensor display name when supplied." },
       { name: "type", type: "string", description: "Sensor type when supplied." },
@@ -339,7 +339,7 @@ curl "https://api.linxio.com/api/devices/545/sensors" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "History records. Shape can vary by device type." }]} />
   </div>
 
@@ -363,8 +363,8 @@ curl "https://api.linxio.com/api/devices/545/history" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Vendor identifier when supplied." },
       { name: "name", type: "string", description: "Vendor display name." },
     ]} />
@@ -390,12 +390,12 @@ curl "https://api.linxio.com/api/devices/vendors" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "[filter]", type: "QueryValue", description: "Dashboard-derived installation filters." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "deviceId", type: "LinxioId", description: "Device identifier." },
       { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier when supplied." },
       { name: "installedAt", type: "ISODateString", description: "Installation timestamp when supplied." },
@@ -423,8 +423,8 @@ curl "https://api.linxio.com/api/devices/installation?limit=100&page=1" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Camera identifier when supplied." },
       { name: "deviceId", type: "LinxioId", description: "Device identifier." },
       { name: "name", type: "string", description: "Camera display name when supplied." },
@@ -452,8 +452,8 @@ curl "https://api.linxio.com/api/devices/545/cameras" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
       { name: "name", type: "string", description: "Sensor display name when supplied." },
       { name: "type", type: "string", description: "Sensor type when supplied." },
@@ -480,8 +480,8 @@ curl "https://api.linxio.com/api/sensors" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "sensorId", type: "LinxioId", required: true, description: "Sensor identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "sensorId", type: "LinxioId", required: true, description: "Sensor identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
       { name: "deviceId", type: "LinxioId", description: "Paired device ID when supplied." },
       { name: "vehicleId", type: "LinxioId", description: "Vehicle ID when supplied." },
@@ -512,7 +512,7 @@ curl "https://api.linxio.com/api/sensors/123" \
       { name: "sensorId", type: "LinxioId", required: true, description: "Sensor identifier." },
       { name: "deviceId", type: "LinxioId", required: true, description: "Device identifier sent in the JSON body." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated sensor ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated sensor ID." }]} />
   </div>
 
   <CodeRail>
@@ -539,7 +539,7 @@ curl -X POST https://api.linxio.com/api/sensors/123/install \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "startDate / endDate", type: "ISODateString", description: "Report date range." },
       { name: "dateFrom / dateTo", type: "ISODateString", description: "Alternative date range names used by some Linxio report flows." },
       { name: "sensorId", type: "LinxioId", description: "Optional sensor filter." },
@@ -547,7 +547,7 @@ curl -X POST https://api.linxio.com/api/sensors/123/install \
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "temperature", type: "number", description: "Temperature reading when supplied." },
       { name: "humidity", type: "number", description: "Humidity reading when supplied." },
       { name: "occurredAt", type: "ISODateString", description: "Reading timestamp when supplied." },
@@ -574,14 +574,14 @@ curl "https://api.linxio.com/api/devices/sensors/report/temp-and-humidity?startD
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "startDate / endDate", type: "ISODateString", description: "Report date range." },
       { name: "sensorId", type: "LinxioId", description: "Optional sensor filter." },
       { name: "vehicleId", type: "LinxioId", description: "Optional vehicle filter." },
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier when supplied." },
       { name: "temperature", type: "number", description: "Temperature reading when supplied." },
       { name: "humidity", type: "number", description: "Humidity reading when supplied." },
@@ -609,7 +609,7 @@ curl "https://api.linxio.com/api/vehicles/report/sensors/temp-and-humidity?vehic
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection." },
@@ -638,7 +638,7 @@ curl "https://api.linxio.com/api/devices/cameras/events?limit=100&page=1" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "Camera event type records." }]} />
   </div>
 

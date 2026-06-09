@@ -17,13 +17,13 @@ permanently.
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection." },
       { name: "sort", type: "string", description: "Sort expression accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioGeofence[]", description: "Geofence records for the current page." },
       { name: "page / limit / total", type: "number", description: "Pagination metadata." },
     ]} />
@@ -49,8 +49,8 @@ curl "https://api.linxio.com/api/areas?limit=100&page=1" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Geofence area identifier." },
       { name: "name", type: "string", description: "Geofence display name." },
       { name: "type", type: "circle | polygon | polyline | rectangle", description: "Geometry type." },
@@ -79,14 +79,14 @@ curl "https://api.linxio.com/api/areas/21" \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Body parameters" fields={[
+    <FieldTable title="Request body parameters" iconName="urlParams" fields={[
       { name: "name", type: "string", required: true, description: "Display name." },
       { name: "type", type: "circle | polygon | polyline | rectangle", required: true, description: "Geometry type." },
       { name: "coordinates", type: "LatLng[]", description: "Geometry coordinates. Circles typically use one centre point." },
       { name: "radius", type: "number", description: "Circle radius in metres." },
       { name: "color", type: "string", description: "Display colour accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created geofence area ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created geofence area ID." }]} />
   </div>
 
   <CodeRail>
@@ -120,7 +120,7 @@ curl -X POST https://api.linxio.com/api/areas \
       { name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." },
       { name: "body", type: "Partial<LinxioGeofencePayload>", required: true, description: "Fields to update." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated geofence area ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated geofence area ID." }]} />
   </div>
 
   <CodeRail>
@@ -147,8 +147,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
 
   <CodeRail>
@@ -173,8 +173,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21/archive \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Archived geofence area identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Archived geofence area identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -199,8 +199,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21/restore \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
   </div>
 
   <CodeRail>
@@ -223,8 +223,8 @@ curl -X DELETE https://api.linxio.com/api/areas/21 \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Area group identifier." },
       { name: "name", type: "string", description: "Area group display name." },
     ]} />
@@ -250,8 +250,8 @@ curl "https://api.linxio.com/api/area-groups" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Area group identifier." },
       { name: "name", type: "string", description: "Area group display name." },
     ]} />
@@ -277,8 +277,8 @@ curl "https://api.linxio.com/api/area-groups/5" \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Body parameters" fields={[{ name: "name", type: "string", required: true, description: "Area group display name." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created area group ID." }]} />
+    <FieldTable title="Request body parameters" iconName="urlParams" fields={[{ name: "name", type: "string", required: true, description: "Area group display name." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created area group ID." }]} />
   </div>
 
   <CodeRail>
@@ -309,7 +309,7 @@ curl -X POST https://api.linxio.com/api/area-groups \
       { name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." },
       { name: "name", type: "string", description: "Updated group name." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated area group ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated area group ID." }]} />
   </div>
 
   <CodeRail>
@@ -336,8 +336,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
 
   <CodeRail>
@@ -362,8 +362,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5/archive \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Archived area group identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Archived area group identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -388,8 +388,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5/restore \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
   </div>
 
   <CodeRail>

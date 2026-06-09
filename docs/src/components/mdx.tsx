@@ -1,5 +1,13 @@
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import {
+    BracesIcon,
+    FileBracesCornerIcon,
+    ForwardIcon,
+    Link2Icon,
+    type LucideIcon,
+    ReplyIcon,
+} from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import {
     Children,
@@ -189,7 +197,7 @@ export function ReferenceGrid({ children }: { children: ReactNode }) {
 export function Note({ children }: { children: ReactNode }) {
     return (
         <div className="mb-4 border-l-4 border-l-blue-700 px-4 pt-1.5 pb-3 pl-5">
-            <p className="flex flex-row items-center font-semibold text-blue-700">
+            <p className="m-0! flex flex-row items-center font-semibold text-blue-700">
                 <svg
                     data-component="Octicon"
                     className="mr-2 size-4"
@@ -205,7 +213,59 @@ export function Note({ children }: { children: ReactNode }) {
                 Note
             </p>
 
-            <p className="m-0 mt-1 space-y-4 text-fd-muted-foreground text-sm leading-[1.5]">
+            <div className="block! [&_p]:block! m-0! mt-1! space-y-1.5! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+export function ImportantNote({ children }: { children: ReactNode }) {
+    return (
+        <div className="mb-4 border-l-4 border-l-purple-700 px-4 pt-1.5 pb-3 pl-5">
+            <p className="m-0! flex flex-row items-center font-semibold text-purple-700">
+                <svg
+                    data-component="Octicon"
+                    className="mr-2 size-4"
+                    viewBox="0 0 16 16"
+                    version="1.1"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    fill="currentColor"
+                >
+                    <path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path>
+                </svg>
+                Important
+            </p>
+
+            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0!">
+                {children}
+            </p>
+        </div>
+    );
+}
+
+export function CautionNote({ children }: { children: ReactNode }) {
+    return (
+        <div className="mb-4 border-l-4 border-l-[#d1242f] px-4 pt-1.5 pb-3 pl-5">
+            <p className="m-0! flex flex-row items-center font-semibold text-[#d1242f]">
+                <svg
+                    data-component="Octicon"
+                    className="mr-2 size-4"
+                    viewBox="0 0 16 16"
+                    version="1.1"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    fill="currentColor"
+                >
+                    <path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path>
+                </svg>
+                Caution
+            </p>
+
+            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0!">
                 {children}
             </p>
         </div>
@@ -345,16 +405,48 @@ export function FieldTable({
     examplePlacement = "inline",
     fields,
     title = "Parameters",
-}: FieldTableProps) {
+    icon,
+    iconName,
+}: FieldTableProps & {
+    icon?: LucideIcon;
+    iconName?: string;
+}) {
     const normalizedFields = normalizeReferenceFields(fields, title);
     const example = getReferenceExample(normalizedFields, title);
 
+    const iconMap = {
+        forward: ForwardIcon,
+        reply: ReplyIcon,
+        urlParams: BracesIcon,
+        queryParams: Link2Icon,
+        bodyParams: FileBracesCornerIcon,
+    };
+
+    const Icon = icon || iconMap[iconName as keyof typeof iconMap] || undefined;
+
     return (
         <section className="not-prose my-8">
-            {title ? <h3 className="mb-3 font-bold text-lg">{title}</h3> : null}
+            {title ? (
+                <h3 className="mb-3 flex flex-row items-center font-bold text-lg">
+                    {Icon ? (
+                        <Icon className="mr-2 h-auto w-5 opacity-50" />
+                    ) : null}
+                    {title}
+                </h3>
+            ) : null}
+
             <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
-                <FieldRows fields={normalizedFields} tableTitle={title} />
+                <FieldRows
+                    fields={normalizedFields}
+                    tableTitle={title}
+                    className={
+                        title === "Response body fields"
+                            ? "bg-fd-muted"
+                            : undefined
+                    }
+                />
             </div>
+
             {example && examplePlacement === "inline" ? (
                 <div className="mt-4">
                     <ExampleResponse value={example} />
@@ -369,11 +461,13 @@ function FieldRows({
     expandedTypes = new Set<string>(),
     fields,
     tableTitle,
+    className,
 }: {
     depth?: number;
     expandedTypes?: ReadonlySet<string>;
     fields: ReferenceField[];
     tableTitle: string;
+    className?: string;
 }) {
     return fields.map((field) => {
         const childShape = findReferenceShape(field.type);
@@ -391,6 +485,7 @@ function FieldRows({
                 className={cn(
                     "grid gap-x-8 gap-y-1 px-4 py-4",
                     depth > 0 && "bg-fd-muted/15 px-3 py-3",
+                    className,
                 )}
             >
                 <div>
@@ -678,7 +773,13 @@ export function RequiredHeaders({
         return null;
     }
 
-    return <FieldTable title="Required headers" fields={fields} />;
+    return (
+        <FieldTable
+            title="Request headers"
+            icon={ForwardIcon}
+            fields={fields}
+        />
+    );
 }
 
 export function MethodTable({
@@ -773,6 +874,8 @@ export function getMDXComponents(components?: MDXComponents) {
         ServiceTable,
         TypeShape,
         Note,
+        ImportantNote,
+        CautionNote,
         pre: ({ ref: _ref, ...props }: ComponentProps<"pre">) => (
             <CodeBlock {...props}>
                 <Pre>{props.children}</Pre>

@@ -18,7 +18,7 @@ are requested.
     <RequiredHeaders />
 
     <FieldTable
-      title="Query parameters"
+      title="Request query parameters" iconName="forward" 
       fields={[
         { name: "limit", type: "number", description: "Number of records per page." },
         { name: "page", type: "number", description: "Page number to read.", defaultValue: "1" },
@@ -28,7 +28,7 @@ are requested.
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "data", type: "LinxioVehicle[]", description: "Vehicle rows for the current page." },
         { name: "page", type: "number", description: "Current page number." },
@@ -46,19 +46,6 @@ curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
-```json title="Response" lineNumbers
-{
-  "page": 1,
-  "limit": 100,
-  "total": 2,
-  "data": [
-    { "id": 304, "regNo": "ABC-123" },
-    { "id": 305, "regNo": "DEF-456" }
-  ],
-  "aggregations": null
-}
-```
-
   </CodeRail>
 </ReferenceGrid>
 
@@ -73,14 +60,14 @@ curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo
     <RequiredHeaders />
 
     <FieldTable
-      title="Path parameters"
+      title="Request url parameters" iconName="urlParams" 
       fields={[
         { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
       ]}
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "id", type: "LinxioId", description: "Vehicle identifier." },
         { name: "regNo", type: "string", description: "Registration number when supplied." },
@@ -111,7 +98,7 @@ curl "https://api.linxio.com/api/vehicles/304" \
     <RequiredHeaders json />
 
     <FieldTable
-      title="Body parameters"
+      title="Request body parameters" iconName="urlParams"
       fields={[
         { name: "regNo", type: "string", description: "Registration number or fleet identifier." },
         { name: "defaultLabel", type: "string", description: "Default display label." },
@@ -124,7 +111,7 @@ curl "https://api.linxio.com/api/vehicles/304" \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "id", type: "LinxioId", description: "Created vehicle ID." },
         { name: "regNo", type: "string", description: "Created vehicle registration number when supplied." },
@@ -166,7 +153,7 @@ curl -X POST https://api.linxio.com/api/vehicles \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "id", type: "LinxioId", description: "Updated vehicle ID." },
         { name: "regNo", type: "string", description: "Registration number when supplied." },
@@ -198,8 +185,8 @@ curl -X POST https://api.linxio.com/api/vehicles/304 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
 
   <CodeRail>
@@ -224,8 +211,8 @@ curl -X PATCH https://api.linxio.com/api/vehicles/304/archive \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Archived vehicle identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Archived vehicle identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -259,7 +246,7 @@ curl -X POST https://api.linxio.com/api/vehicles/304/restore \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "odometer", type: "number", description: "Odometer reading." },
         { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
@@ -298,7 +285,7 @@ curl "https://api.linxio.com/api/vehicles/304/odometer" \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "odometer", type: "number", description: "Updated odometer value." },
         { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
@@ -331,8 +318,8 @@ curl -X POST https://api.linxio.com/api/vehicles/304/odometer \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "engineHours", type: "number", description: "Current engine-hours reading." },
       { name: "occurredAt", type: "ISODateString", description: "Reading timestamp when supplied." },
       { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier." },
@@ -359,8 +346,8 @@ curl "https://api.linxio.com/api/vehicles/304/engine-hours/current" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "[filter]", type: "QueryValue", description: "Optional dashboard-derived filters." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "[filter]", type: "QueryValue", description: "Optional dashboard-derived filters." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "count", type: "number", description: "Vehicle count when returned by Linxio." },
       { name: "total", type: "number", description: "Vehicle count when returned as total." },
     ]} />
@@ -386,11 +373,11 @@ curl "https://api.linxio.com/api/vehicles/count?status=active" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Maximum type records.", defaultValue: "1000" },
       { name: "sort", type: "string", description: "Sort expression.", defaultValue: "order" },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Vehicle type identifier." },
       { name: "name", type: "string", description: "Vehicle type display name." },
       { name: "order", type: "number", description: "Sort order when supplied." },
@@ -430,7 +417,7 @@ curl "https://api.linxio.com/api/vehicles/types?limit=1000&sort=order" \
     />
 
     <FieldTable
-      title="Response fields"
+      title="Response body fields" iconName="bodyParams" 
       fields={[
         { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier for a route group." },
         { name: "driverId", type: "LinxioId | null", description: "Driver identifier when supplied." },

@@ -3,8 +3,11 @@ title: Geofences
 description: Area and area-group lifecycle methods, including create, update, archive, restore, and delete.
 ---
 
-Linxio calls geofences `areas` in the REST API. The SDK uses
-`linxio.geofences` to make that domain clearer.
+<Note>
+Linxio calls geofences `areas` in the REST API. 
+
+This SDK uses `linxio.geofences` to make that domain clearer.
+</Note>
 
 ## geofences.list()
 
@@ -13,6 +16,8 @@ Linxio calls geofences `areas` in the REST API. The SDK uses
     <ReferenceHeader title="List geofences" method="GET" path="/areas" sdk="linxio.geofences.list(params)">
       Loads one page of geofence areas.
     </ReferenceHeader>
+
+    <ImportantNote>If your tenant has many complicated geofences, or many geofence areas, the API can return extremely large response payloads. Consider whether using `geofences.list()` in production implementations is appropriate for your use case.</ImportantNote>
 
     <FieldTable
       title="Input"
@@ -86,6 +91,8 @@ if (areas.error) {
     <ReferenceHeader title="Load all geofences" method="GET" path="/areas" sdk="linxio.geofences.iterate(params)">
       Auto-paginates geofence pages into one result object.
     </ReferenceHeader>
+
+    <ImportantNote>If your tenant has many complicated geofences, or many geofence areas, the API can return extremely large response payloads. <strong>Avoid using `geofences.iterate()` in production implementations.</strong></ImportantNote>
 
     <FieldTable
       title="Input"

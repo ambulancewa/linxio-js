@@ -16,13 +16,13 @@ fields can vary by enabled tenant features and form schemas.
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "format", type: "csv | pdf | xlsx", description: "Optional format filter when accepted by Linxio." },
       { name: "startDate / endDate", type: "ISODateString", description: "Optional date range filters when accepted by Linxio." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioScheduledReport[]", description: "Scheduled reports for the current page." },
       { name: "page / limit / total", type: "number", description: "Pagination metadata." },
     ]} />
@@ -48,7 +48,7 @@ curl "https://api.linxio.com/api/scheduled-report?limit=50&page=1" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Template metadata. Shape can vary by tenant." }]} />
   </div>
 
@@ -72,8 +72,8 @@ curl "https://api.linxio.com/api/scheduled-report/template" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Scheduled report identifier." },
       { name: "name", type: "string", description: "Report display name when supplied." },
       { name: "type", type: "string", description: "Report type when supplied." },
@@ -101,13 +101,13 @@ curl "https://api.linxio.com/api/scheduled-report/123" \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Body parameters" fields={[
+    <FieldTable title="Request body parameters" iconName="urlParams" fields={[
       { name: "name", type: "string", required: true, description: "Report display name." },
       { name: "type", type: "string", required: true, description: "Report type accepted by Linxio." },
       { name: "format", type: "csv | pdf | xlsx", required: true, description: "Output format." },
       { name: "params", type: "Record<string, unknown>", description: "Report-specific parameters such as schedule, recipients, date range, filters, or vehicle IDs." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created scheduled report ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created scheduled report ID." }]} />
   </div>
 
   <CodeRail>
@@ -143,7 +143,7 @@ curl -X POST https://api.linxio.com/api/scheduled-report \
       { name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." },
       { name: "body", type: "Partial<LinxioScheduledReportPayload>", required: true, description: "Fields to update." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated scheduled report ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated scheduled report ID." }]} />
   </div>
 
   <CodeRail>
@@ -170,8 +170,8 @@ curl -X PATCH https://api.linxio.com/api/scheduled-report/123 \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
   </div>
 
   <CodeRail>
@@ -195,8 +195,8 @@ curl -X DELETE https://api.linxio.com/api/scheduled-report/123 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
+    <FieldTable title="Response headers"  fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -221,8 +221,8 @@ curl -X PATCH https://api.linxio.com/api/scheduled-report/123/restore \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Digital form identifier." },
       { name: "name", type: "string", description: "Digital form display name when supplied." },
       { name: "status", type: "string", description: "Form status when supplied." },
@@ -249,8 +249,8 @@ curl "https://api.linxio.com/api/digital-form/form" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "formId", type: "LinxioId", required: true, description: "Digital form identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "formId", type: "LinxioId", required: true, description: "Digital form identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Digital form identifier." },
       { name: "name", type: "string", description: "Digital form display name when supplied." },
     ]} />
@@ -276,7 +276,7 @@ curl "https://api.linxio.com/api/digital-form/form/50" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Answer payload. Shape varies by form schema." }]} />
   </div>
 
@@ -300,7 +300,7 @@ curl "https://api.linxio.com/api/digital-form/answer/9001" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "body", type: "application/pdf", description: "PDF binary body." }]} />
   </div>
 

@@ -15,6 +15,8 @@ timeout, retry, and token-refresh behavior as service methods.
       Sends a raw request through the client's HTTP layer.
     </ReferenceHeader>
 
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
+
     <FieldTable
       title="Input"
       fields={[
@@ -93,6 +95,8 @@ const vehicle = await linxio.request("POST", "/vehicles", {
       Sends a low-level GET request and returns the parsed response.
     </ReferenceHeader>
 
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
+
     <FieldTable
       title="Input"
       fields={[
@@ -132,6 +136,8 @@ const me = await linxio.http.get("/me", {
       Sends a low-level POST request. JSON-compatible objects are encoded
       automatically.
     </ReferenceHeader>
+
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
 
     <FieldTable
       title="Input"
@@ -176,6 +182,8 @@ const created = await linxio.http.post("/vehicles", {
     <ReferenceHeader title="Send a PATCH request" sdk="linxio.http.patch(path, body, options)">
       Sends a low-level PATCH request.
     </ReferenceHeader>
+
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
 
     <FieldTable
       title="Input"
@@ -223,6 +231,8 @@ await linxio.http.patch(`/devices/${deviceId}`, {
       Sends a low-level PUT request.
     </ReferenceHeader>
 
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
+
     <FieldTable
       title="Input"
       fields={[
@@ -266,6 +276,8 @@ const updated = await linxio.http.put("/custom-endpoint", payload);
     <ReferenceHeader title="Send a DELETE request" sdk="linxio.http.delete(path, options)">
       Sends a low-level DELETE request.
     </ReferenceHeader>
+
+    <CautionNote>Raw HTTP methods are not intended for production use. They are not typed, do not have any guardrails, and are provided for advanced use cases and testing. Where possible, use the domain services instead.</CautionNote>
 
     <FieldTable
       title="Input"

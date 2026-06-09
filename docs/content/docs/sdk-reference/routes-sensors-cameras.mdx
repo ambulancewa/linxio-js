@@ -3,9 +3,6 @@ title: Routes, Sensors, and Cameras
 description: Vehicle route history, temperature/humidity reports, sensor inventory, and camera event helpers.
 ---
 
-Route and sensor report endpoints can return large payloads. Use pagination,
-date ranges, and field projection deliberately.
-
 ## routes.getVehicleRoutes()
 
 <ReferenceGrid>
@@ -14,6 +11,8 @@ date ranges, and field projection deliberately.
       Fetches route history for one vehicle. Request `coordinates` only when
       you need every recorded point.
     </ReferenceHeader>
+    
+    <ImportantNote>Vehicle route history can return large payloads. Use date ranges and field projection deliberately. If your tenant has many vehicles and/or vehicles with long route histories, <strong>avoid using `routes.getVehicleRoutes()` in production implementations.</strong></ImportantNote>
 
     <FieldTable
       title="Input"
@@ -394,6 +393,8 @@ if (report.error) {
       Auto-paginates the device temperature/humidity report into one result
       object.
     </ReferenceHeader>
+    
+    <ImportantNote>Device temperature and humidity reports can return large payloads, especially when using the iterate method. Use pagination, date ranges, and field projection deliberately. Avoid using `iterate()` in production implementations. It is better to use <a href="/docs/sdk-reference/routes-sensors-cameras#sensorsstreamdevicetemperaturehumidityreport" className="text-fd-foreground underline decoration-fd-muted-foreground/35 underline-offset-4 transition-colors hover:text-fd-primary hover:decoration-fd-primary/70">`sensors.streamDeviceTemperatureHumidityReport()`</a> for lazy async iteration where possible.</ImportantNote>
 
     <FieldTable
       title="Input"

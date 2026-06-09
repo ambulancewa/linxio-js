@@ -17,13 +17,13 @@ client account, and driver assignment endpoints for vehicle-driver links.
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection such as id, email, fullName, role, or status." },
       { name: "role", type: "string", description: "Optional role filter." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioUser[]", description: "Users for the current page." },
       { name: "page / limit / total", type: "number", description: "Pagination metadata." },
     ]} />
@@ -49,8 +49,8 @@ curl "https://api.linxio.com/api/users?fields[]=id&fields[]=email&limit=100" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "User identifier." },
       { name: "email", type: "string", description: "Email address when supplied." },
       { name: "fullName", type: "string", description: "Display name when supplied." },
@@ -78,7 +78,7 @@ curl "https://api.linxio.com/api/users/123" \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Body parameters" fields={[
+    <FieldTable title="Request body parameters" iconName="urlParams" fields={[
       { name: "email", type: "string", description: "User email address." },
       { name: "firstName", type: "string", description: "Given name." },
       { name: "lastName", type: "string", description: "Family name." },
@@ -86,7 +86,7 @@ curl "https://api.linxio.com/api/users/123" \
       { name: "phone", type: "string", description: "Phone number." },
       { name: "roleId", type: "LinxioId", description: "Role identifier." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
   </div>
 
   <CodeRail>
@@ -120,7 +120,7 @@ curl -X POST https://api.linxio.com/api/users \
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
       { name: "body", type: "LinxioUserPayload", required: true, description: "Fields to update." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
   </div>
 
   <CodeRail>
@@ -147,8 +147,8 @@ curl -X PATCH https://api.linxio.com/api/users/123 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
+    <FieldTable title="Response headers" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
 
   <CodeRail>
@@ -173,8 +173,8 @@ curl -X PATCH https://api.linxio.com/api/users/123/archive \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "Archived user identifier." }]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "userId", type: "LinxioId", required: true, description: "Archived user identifier." }]} />
+    <FieldTable title="Response headers" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
 
   <CodeRail>
@@ -199,13 +199,13 @@ curl -X PATCH https://api.linxio.com/api/users/123/restore \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection." },
       { name: "[filter]", type: "QueryValue", description: "Dashboard-derived filters." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Client account identifier." },
       { name: "name", type: "string", description: "Client account display name when supplied." },
       { name: "timezone", type: "LinxioId", description: "Timezone identifier when supplied." },
@@ -232,8 +232,8 @@ curl "https://api.linxio.com/api/clients/json?limit=100&page=1" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Client account identifier." },
       { name: "name", type: "string", description: "Client account display name when supplied." },
     ]} />
@@ -266,7 +266,7 @@ curl "https://api.linxio.com/api/clients/10" \
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioUser[]", description: "Client users for the current page." },
       { name: "page / limit / total", type: "number", description: "Pagination metadata." },
     ]} />
@@ -292,11 +292,11 @@ curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
     ]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "User identifier." },
       { name: "email", type: "string", description: "Email when supplied." },
       { name: "fullName", type: "string", description: "Display name when supplied." },
@@ -331,7 +331,7 @@ curl "https://api.linxio.com/api/clients/10/users/123" \
       { name: "phone", type: "string", description: "Phone number." },
       { name: "roleId", type: "LinxioId", description: "Role identifier." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created user ID." }]} />
   </div>
 
   <CodeRail>
@@ -366,7 +366,7 @@ curl -X POST https://api.linxio.com/api/clients/10/users \
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
       { name: "body", type: "LinxioUserPayload", required: true, description: "Fields to update." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Updated user ID." }]} />
   </div>
 
   <CodeRail>
@@ -394,12 +394,12 @@ curl -X POST https://api.linxio.com/api/clients/10/users/123 \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
       { name: "fields[]", type: "string[]", description: "Optional field projection." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver records for the current page." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver records for the current page." }]} />
   </div>
 
   <CodeRail>
@@ -428,7 +428,7 @@ curl "https://api.linxio.com/api/drivers?limit=100" \
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
     ]} />
-    <FieldTable title="Response fields" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver user records." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver user records." }]} />
   </div>
 
   <CodeRail>
@@ -451,11 +451,11 @@ curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[
       { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
       { name: "driverId", type: "LinxioId", required: true, description: "Driver user identifier." },
     ]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful assignment response." }]} />
+    <FieldTable title="Response headers" fields={[{ name: "status", type: "204 or JSON", description: "Successful assignment response." }]} />
   </div>
 
   <CodeRail>
@@ -480,11 +480,11 @@ curl -X POST https://api.linxio.com/api/vehicle/304/set-driver/123 \
 
     <RequiredHeaders json />
 
-    <FieldTable title="Path parameters" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[
       { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
       { name: "driverId", type: "LinxioId", required: true, description: "Driver user identifier." },
     ]} />
-    <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful unassignment response." }]} />
+    <FieldTable title="Response headers" fields={[{ name: "status", type: "204 or JSON", description: "Successful unassignment response." }]} />
   </div>
 
   <CodeRail>
@@ -509,8 +509,8 @@ curl -X POST https://api.linxio.com/api/vehicle/304/unset-driver/123 \
 
     <RequiredHeaders />
 
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Reseller identifier." },
       { name: "name", type: "string", description: "Reseller display name when supplied." },
     ]} />
@@ -536,8 +536,8 @@ curl "https://api.linxio.com/api/reseller" \
 
     <RequiredHeaders />
 
-    <FieldTable title="Path parameters" fields={[{ name: "resellerId", type: "LinxioId", required: true, description: "Reseller identifier." }]} />
-    <FieldTable title="Response fields" fields={[
+    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "resellerId", type: "LinxioId", required: true, description: "Reseller identifier." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Reseller identifier." },
       { name: "name", type: "string", description: "Reseller display name when supplied." },
     ]} />

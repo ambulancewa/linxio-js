@@ -32,8 +32,8 @@ Most shapes are tenant-configurable, so the SDK preserves unknown fields.
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "code", type: "string", description: "Country code when supplied." }, { name: "name", type: "string", description: "Country display name." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "code", type: "string", description: "Country code when supplied." }, { name: "name", type: "string", description: "Country display name." }]} />
   </div>
   <CodeRail>
 
@@ -54,8 +54,8 @@ curl "https://api.linxio.com/api/country/list" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Role identifier." }, { name: "name", type: "string", description: "Role display name." }, { name: "type", type: "string", description: "Role scope when supplied." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Role identifier." }, { name: "name", type: "string", description: "Role display name." }, { name: "type", type: "string", description: "Role scope when supplied." }]} />
   </div>
   <CodeRail>
 
@@ -76,8 +76,8 @@ curl "https://api.linxio.com/api/roles" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Plan identifier when supplied." }, { name: "name", type: "string", description: "Plan display name." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Plan identifier when supplied." }, { name: "name", type: "string", description: "Plan display name." }]} />
   </div>
   <CodeRail>
 
@@ -98,8 +98,8 @@ curl "https://api.linxio.com/api/plans" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "name", type: "string", description: "Timezone name or value." }, { name: "offset", type: "string", description: "UTC offset label when supplied." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "name", type: "string", description: "Timezone name or value." }, { name: "offset", type: "string", description: "UTC offset label when supplied." }]} />
   </div>
   <CodeRail>
 
@@ -120,8 +120,8 @@ curl "https://api.linxio.com/api/timezones" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Theme identifier when supplied." }, { name: "name", type: "string", description: "Theme display name." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Theme identifier when supplied." }, { name: "name", type: "string", description: "Theme display name." }]} />
   </div>
   <CodeRail>
 
@@ -142,8 +142,8 @@ curl "https://api.linxio.com/api/themes" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Theme identifier when supplied." }, { name: "name", type: "string", description: "Theme display name." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Theme identifier when supplied." }, { name: "name", type: "string", description: "Theme display name." }]} />
   </div>
   <CodeRail>
 
@@ -164,8 +164,8 @@ curl "https://api.linxio.com/api/themes/my" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "features", type: "string[]", description: "Enabled feature keys when supplied." }, { name: "permissions", type: "object", description: "Permission flags keyed by feature or module." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "features", type: "string[]", description: "Enabled feature keys when supplied." }, { name: "permissions", type: "object", description: "Permission flags keyed by feature or module." }]} />
   </div>
   <CodeRail>
 
@@ -186,8 +186,8 @@ curl "https://api.linxio.com/api/permissions/current-plan" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "domain", type: "string", description: "Tenant domain when supplied." }, { name: "host", type: "string", description: "Hostname when supplied." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "domain", type: "string", description: "Tenant domain when supplied." }, { name: "host", type: "string", description: "Hostname when supplied." }]} />
   </div>
   <CodeRail>
 
@@ -208,8 +208,8 @@ curl "https://api.linxio.com/api/platform-settings/domain" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response fields" fields={[{ name: "code", type: "string", description: "Locale or language code." }, { name: "name", type: "string", description: "Language display name." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "code", type: "string", description: "Locale or language code." }, { name: "name", type: "string", description: "Language display name." }]} />
   </div>
   <CodeRail>
 
@@ -230,7 +230,7 @@ curl "https://api.linxio.com/api/settings/language/list" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioMapApiOption[]", description: "Map API option records." }]} />
   </div>
   <CodeRail>
@@ -252,7 +252,7 @@ curl "https://api.linxio.com/api/settings/mapApiOptions" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioProviderSetting[]", description: "Provider setting records." }]} />
   </div>
   <CodeRail>
@@ -274,7 +274,7 @@ curl "https://api.linxio.com/api/settings/provider" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioDigitalFormSettings", description: "Digital-form feature settings." }]} />
   </div>
   <CodeRail>
@@ -296,7 +296,7 @@ curl "https://api.linxio.com/api/settings/digitalForm" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioEcoSpeedSettings", description: "Eco-speed feature settings." }]} />
   </div>
   <CodeRail>
@@ -318,7 +318,7 @@ curl "https://api.linxio.com/api/settings/ecoSpeed" \
     </ReferenceHeader>
 
     <RequiredHeaders />
-    <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioExcessiveIdlingSettings", description: "Excessive-idling feature settings." }]} />
   </div>
   <CodeRail>

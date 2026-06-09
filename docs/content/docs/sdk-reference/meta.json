@@ -1,19 +1,19 @@
 {
-  "title": "SDK Reference",
-  "pages": [
-    "index",
-    "auth",
-    "vehicles",
-    "devices",
-    "users-clients-drivers",
-    "geofences",
-    "fuel",
-    "reports-forms",
-    "routes-sensors-cameras",
-    "metadata",
-    "realtime",
-    "http",
-    "types",
-    "utilities"
-  ]
+    "title": "SDK Reference",
+    "pages": [
+        "index",
+        "auth",
+        "vehicles",
+        "devices",
+        "users-clients-drivers",
+        "geofences",
+        "fuel",
+        "reports-forms",
+        "routes-sensors-cameras",
+        "metadata",
+        "realtime",
+        "http",
+        "types",
+        "utilities"
+    ]
 }
