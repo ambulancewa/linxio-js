@@ -107,6 +107,7 @@
             "!**/node_modules",
             "!**/dist",
             "!**/build",
+            "!**/out",
             "!**/.next",
             "!**/_next",
             "!**/_out",
