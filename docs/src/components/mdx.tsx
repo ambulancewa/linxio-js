@@ -17,6 +17,7 @@ import {
     type ReactElement,
     type ReactNode,
 } from "react";
+import { CopyTextInline } from "@/components/copy-text-inline";
 import { MultiPackageManager } from "@/components/package-manager-install";
 import { cn } from "@/lib/cn";
 import {
@@ -422,15 +423,16 @@ export function FieldTable({
         bodyParams: FileBracesCornerIcon,
     };
 
-    const Icon = icon || iconMap[iconName as keyof typeof iconMap] || undefined;
+    const _Icon =
+        icon || iconMap[iconName as keyof typeof iconMap] || undefined;
 
     return (
         <section className="not-prose my-8">
             {title ? (
                 <h3 className="mb-3 flex flex-row items-center font-bold text-lg">
-                    {Icon ? (
+                    {/* {Icon ? (
                         <Icon className="mr-2 h-auto w-5 opacity-50" />
-                    ) : null}
+                    ) : null} */}
                     {title}
                 </h3>
             ) : null}
@@ -490,9 +492,11 @@ function FieldRows({
             >
                 <div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
-                            {field.name}
-                        </code>
+                        <CopyTextInline text={field.name} className="flex">
+                            <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
+                                {field.name}
+                            </code>
+                        </CopyTextInline>
 
                         <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
                             <TypeText type={field.type} />
