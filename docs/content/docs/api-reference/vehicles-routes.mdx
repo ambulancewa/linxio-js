@@ -22,7 +22,7 @@ are requested.
       fields={[
         { name: "limit", type: "number", description: "Number of records per page." },
         { name: "page", type: "number", description: "Page number to read.", defaultValue: "1" },
-        { name: "fields[]", type: "string[]", description: "Vehicle fields to include, such as id, regNo, status, lastLoggedAt, or lastCoordinates." },
+        { name: "fields[]", type: "VehicleField[]", description: "Vehicle fields to include in the response projection." },
         { name: "sort", type: "string", description: "Sort expression accepted by Linxio." },
       ]}
     />
@@ -410,7 +410,7 @@ curl "https://api.linxio.com/api/vehicles/types?limit=1000&sort=order" \
         { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
         { name: "dateFrom", type: "ISODateString", description: "Start date/time." },
         { name: "dateTo", type: "ISODateString", description: "End date/time." },
-        { name: "fields[]", type: "string[]", description: "Additional route fields. coordinates can be large." },
+        { name: "fields[]", type: "RouteField[]", description: "Route fields to include in the response projection." },
         { name: "limit", type: "number", description: "Page size when supported." },
         { name: "page", type: "number", description: "Page number when supported." },
       ]}

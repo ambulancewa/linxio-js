@@ -19,7 +19,7 @@ fields can vary by enabled tenant features and form schemas.
     <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
-      { name: "format", type: "csv | pdf | xlsx", description: "Optional format filter when accepted by Linxio." },
+      { name: "format", type: "LinxioFileFormat", description: "Optional format filter when accepted by Linxio." },
       { name: "startDate / endDate", type: "ISODateString", description: "Optional date range filters when accepted by Linxio." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
@@ -77,7 +77,7 @@ curl "https://api.linxio.com/api/scheduled-report/template" \
       { name: "id", type: "LinxioId", description: "Scheduled report identifier." },
       { name: "name", type: "string", description: "Report display name when supplied." },
       { name: "type", type: "string", description: "Report type when supplied." },
-      { name: "format", type: "csv | pdf | xlsx", description: "Output format when supplied." },
+      { name: "format", type: "LinxioFileFormat", description: "Output format when supplied." },
     ]} />
   </div>
 
@@ -104,7 +104,7 @@ curl "https://api.linxio.com/api/scheduled-report/123" \
     <FieldTable title="Request body parameters" iconName="urlParams" fields={[
       { name: "name", type: "string", required: true, description: "Report display name." },
       { name: "type", type: "string", required: true, description: "Report type accepted by Linxio." },
-      { name: "format", type: "csv | pdf | xlsx", required: true, description: "Output format." },
+      { name: "format", type: "LinxioFileFormat", required: true, description: "Output format." },
       { name: "params", type: "Record<string, unknown>", description: "Report-specific parameters such as schedule, recipients, date range, filters, or vehicle IDs." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "id", type: "LinxioId", description: "Created scheduled report ID." }]} />

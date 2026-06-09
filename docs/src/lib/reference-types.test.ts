@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     buildReferenceExample,
     findReferenceShape,
+    getReferenceEnumValues,
     getReferenceTypeHref,
     getReferenceTypeNames,
     groupDottedReferenceFields,
@@ -49,6 +50,38 @@ describe("reference type helpers", () => {
             },
             { text: "[] | null" },
         ]);
+    });
+
+    it("resolves enum values from scalar and array type text", () => {
+        expect(
+            getReferenceEnumValues("VehicleField[]")?.map((v) => v.value),
+        ).toEqual([
+            "id",
+            "regNo",
+            "defaultLabel",
+            "model",
+            "depotName",
+            "groupsList",
+            "driver",
+            "status",
+            "lastLoggedAt",
+            "lastCoordinates",
+            "todayData",
+        ]);
+
+        expect(
+            getReferenceEnumValues("LinxioFileFormat")?.map((v) => v.value),
+        ).toEqual(["csv", "pdf", "xlsx"]);
+    });
+
+    it("uses concrete enum metadata on typed list parameter shapes", () => {
+        const shape = findReferenceShape("LinxioVehicleListParams");
+        const fields = shape?.fields.find((field) => field.name === "fields");
+
+        expect(fields?.type).toBe("VehicleField[]");
+        expect(fields?.enumValues?.map((value) => value.value)).toContain(
+            "lastCoordinates",
+        );
     });
 
     it("preserves unlinked capitalized type names as plain text", () => {

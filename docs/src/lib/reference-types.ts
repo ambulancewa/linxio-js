@@ -1,7 +1,13 @@
+export type ReferenceEnumValue = {
+    description?: string;
+    value: string;
+};
+
 export type ReferenceShapeField = {
     allowedValues?: string[];
     defaultValue?: string;
     description: string;
+    enumValues?: readonly ReferenceEnumValue[];
     name: string;
     required?: boolean;
     type: string;
@@ -35,37 +41,6 @@ const timestampedLatLngFields: ReferenceShapeField[] = [
         name: "ts",
         type: "ISODateString",
         description: "Telemetry timestamp when supplied by Linxio.",
-    },
-];
-
-const listParamsFields: ReferenceShapeField[] = [
-    {
-        name: "fields",
-        type: "FieldSelector<TField>",
-        description:
-            "Field projection sent as repeated fields[] query parameters.",
-    },
-    {
-        name: "limit",
-        type: "number",
-        description: "Maximum records to request per page.",
-    },
-    {
-        name: "page",
-        type: "number",
-        description: "Page number to request.",
-        defaultValue: "1",
-    },
-    {
-        name: "sort",
-        type: "string",
-        description: "Sort expression accepted by Linxio for that endpoint.",
-    },
-    {
-        name: "[filter]",
-        type: "QueryValue",
-        description:
-            "Additional endpoint-specific filters forwarded as query parameters.",
     },
 ];
 
@@ -107,6 +82,134 @@ const metadataRecordFields: ReferenceShapeField[] = [
         description: "Machine-readable value used by dashboard dropdowns.",
     },
 ];
+
+export const referenceEnumValues = {
+    DeviceField: [
+        { value: "id", description: "Device identifier." },
+        { value: "imei", description: "Device IMEI." },
+        { value: "serial", description: "Device serial number." },
+        { value: "status", description: "Device status." },
+        { value: "vehicle", description: "Assigned vehicle summary." },
+        { value: "usage", description: "Usage label when supplied." },
+        { value: "vendor", description: "Device vendor label." },
+    ],
+    DriverField: [
+        { value: "id", description: "Driver user identifier." },
+        { value: "fullName", description: "Driver display name." },
+        { value: "email", description: "Driver email address." },
+        { value: "phone", description: "Driver phone number." },
+        { value: "role", description: "Driver role label." },
+    ],
+    FuelRecordField: [
+        {
+            value: "transactionDate",
+            description: "Fuel transaction timestamp.",
+        },
+        { value: "vehicleIds", description: "Related vehicle identifiers." },
+        { value: "driverId", description: "Related driver identifier." },
+        { value: "refueled", description: "Fuel volume." },
+        { value: "total", description: "Total transaction amount." },
+        { value: "fuelPrice", description: "Unit fuel price." },
+        { value: "petrolStation", description: "Petrol station display name." },
+    ],
+    GeofenceType: [
+        { value: "circle", description: "Circular geofence." },
+        { value: "polygon", description: "Polygon geofence." },
+        { value: "polyline", description: "Polyline geofence." },
+        { value: "rectangle", description: "Rectangular geofence." },
+    ],
+    LinxioFileFormat: [
+        { value: "csv", description: "Comma-separated values export." },
+        { value: "pdf", description: "PDF export." },
+        { value: "xlsx", description: "Excel workbook export." },
+    ],
+    LinxioTeamType: [
+        { value: "admin", description: "Administrative team." },
+        { value: "client", description: "Client-account team." },
+        { value: "reseller", description: "Reseller-account team." },
+    ],
+    RouteField: [
+        {
+            value: "coordinates",
+            description:
+                "Route coordinate points. This can produce large responses.",
+        },
+        { value: "driver", description: "Driver summary for each route." },
+        { value: "vehicle", description: "Vehicle summary for each route." },
+        { value: "address", description: "Resolved start/finish addresses." },
+    ],
+    UserField: [
+        { value: "id", description: "User identifier." },
+        { value: "email", description: "User email address." },
+        { value: "fullName", description: "User display name." },
+        { value: "role", description: "User role label." },
+        { value: "status", description: "User status." },
+    ],
+    VehicleField: [
+        { value: "id", description: "Vehicle identifier." },
+        { value: "regNo", description: "Registration number or fleet code." },
+        { value: "defaultLabel", description: "Default display label." },
+        { value: "model", description: "Vehicle model text." },
+        { value: "depotName", description: "Depot display name." },
+        { value: "groupsList", description: "Vehicle group labels." },
+        { value: "driver", description: "Assigned driver display name." },
+        { value: "status", description: "Vehicle status." },
+        { value: "lastLoggedAt", description: "Last telemetry timestamp." },
+        {
+            value: "lastCoordinates",
+            description: "Last known vehicle coordinates.",
+        },
+        {
+            value: "todayData",
+            description: "Current-day telemetry summary.",
+        },
+    ],
+} as const satisfies Record<string, readonly ReferenceEnumValue[]>;
+
+const referenceEnumValuesByName: Record<string, readonly ReferenceEnumValue[]> =
+    referenceEnumValues;
+
+function listParamsFields({
+    enumValues,
+    fieldDescription = "Field projection sent as repeated fields[] query parameters.",
+    fieldType = "FieldSelector<TField>",
+}: {
+    enumValues?: readonly ReferenceEnumValue[];
+    fieldDescription?: string;
+    fieldType?: string;
+} = {}): ReferenceShapeField[] {
+    return [
+        {
+            name: "fields",
+            type: fieldType,
+            description: fieldDescription,
+            enumValues,
+        },
+        {
+            name: "limit",
+            type: "number",
+            description: "Maximum records to request per page.",
+        },
+        {
+            name: "page",
+            type: "number",
+            description: "Page number to request.",
+            defaultValue: "1",
+        },
+        {
+            name: "sort",
+            type: "string",
+            description:
+                "Sort expression accepted by Linxio for that endpoint.",
+        },
+        {
+            name: "[filter]",
+            type: "QueryValue",
+            description:
+                "Additional endpoint-specific filters forwarded as query parameters.",
+        },
+    ];
+}
 
 export const referenceShapes = {
     DateRangeParams: {
@@ -249,7 +352,7 @@ export const referenceShapes = {
         typeName: "LinxioClientUserListParams",
         description: "Parameters for client user list endpoints.",
         fields: [
-            ...listParamsFields,
+            ...listParamsFields(),
             {
                 name: "role",
                 type: "string",
@@ -411,6 +514,16 @@ export const referenceShapes = {
             },
         ],
     },
+    LinxioDeviceListParams: {
+        typeName: "LinxioDeviceListParams",
+        description: "Parameters for client.devices.list().",
+        fields: listParamsFields({
+            enumValues: referenceEnumValues.DeviceField,
+            fieldDescription:
+                "Device fields to include in the response projection.",
+            fieldType: "DeviceField[]",
+        }),
+    },
     LinxioDeviceCamera: {
         typeName: "LinxioDeviceCamera",
         description: "Camera record associated with a device.",
@@ -569,6 +682,24 @@ export const referenceShapes = {
                 name: "name",
                 type: "string",
                 description: "Vendor display name.",
+            },
+        ],
+    },
+    LinxioDriverListParams: {
+        typeName: "LinxioDriverListParams",
+        description: "Parameters for client.drivers.list().",
+        fields: [
+            ...listParamsFields({
+                enumValues: referenceEnumValues.DriverField,
+                fieldDescription:
+                    "Driver fields to include in the response projection.",
+                fieldType: "DriverField[]",
+            }),
+            {
+                name: "clientId",
+                type: "LinxioId",
+                description:
+                    "Client account identifier. When supplied, the SDK lists client users with role=driver.",
             },
         ],
     },
@@ -734,7 +865,12 @@ export const referenceShapes = {
     LinxioFuelListParams: {
         typeName: "LinxioFuelListParams",
         description: "Parameters for fuel list and summary endpoints.",
-        fields: listParamsFields,
+        fields: listParamsFields({
+            enumValues: referenceEnumValues.FuelRecordField,
+            fieldDescription:
+                "Fuel transaction fields to include in the response projection.",
+            fieldType: "FuelRecordField[]",
+        }),
     },
     LinxioFuelSummaryRecord: {
         typeName: "LinxioFuelSummaryRecord",
@@ -810,6 +946,15 @@ export const referenceShapes = {
                 description: "Geofence shape type.",
             },
         ],
+    },
+    LinxioGeofenceListParams: {
+        typeName: "LinxioGeofenceListParams",
+        description: "Parameters for client.geofences.list().",
+        fields: listParamsFields({
+            fieldDescription:
+                "Optional geofence field projection accepted by Linxio.",
+            fieldType: "string[]",
+        }),
     },
     LinxioGeofencePayload: {
         typeName: "LinxioGeofencePayload",
@@ -1157,7 +1302,7 @@ export const referenceShapes = {
         typeName: "LinxioReportParams",
         description: "Common parameters for report endpoints.",
         fields: [
-            ...listParamsFields,
+            ...listParamsFields(),
             {
                 name: "format",
                 type: "LinxioFileFormat",
@@ -1338,7 +1483,7 @@ export const referenceShapes = {
         typeName: "LinxioSensorReportParams",
         description: "Parameters for temperature/humidity sensor reports.",
         fields: [
-            ...listParamsFields,
+            ...listParamsFields(),
             {
                 name: "sensorId",
                 type: "LinxioId",
@@ -1519,7 +1664,12 @@ export const referenceShapes = {
         typeName: "LinxioUserListParams",
         description: "Parameters for client.users.list().",
         fields: [
-            ...listParamsFields,
+            ...listParamsFields({
+                enumValues: referenceEnumValues.UserField,
+                fieldDescription:
+                    "User fields to include in the response projection.",
+                fieldType: "UserField[]",
+            }),
             {
                 name: "role",
                 type: "string",
@@ -1617,7 +1767,12 @@ export const referenceShapes = {
     LinxioVehicleListParams: {
         typeName: "LinxioVehicleListParams",
         description: "Parameters for client.vehicles.list().",
-        fields: listParamsFields,
+        fields: listParamsFields({
+            enumValues: referenceEnumValues.VehicleField,
+            fieldDescription:
+                "Vehicle fields to include in the response projection.",
+            fieldType: "VehicleField[]",
+        }),
     },
     LinxioVehiclePayload: {
         typeName: "LinxioVehiclePayload",
@@ -1874,6 +2029,16 @@ export function getReferenceTypeHref(typeName: string): string | undefined {
 export function getReferenceTypeNames(type: string): string[] {
     const names = type.match(/\b[A-Z][A-Za-z0-9]*/g) ?? [];
     return [...new Set(names.filter((name) => getReferenceTypeHref(name)))];
+}
+
+export function getReferenceEnumValues(
+    type: string,
+): readonly ReferenceEnumValue[] | undefined {
+    const names = type.match(/\b[A-Z][A-Za-z0-9]*/g) ?? [];
+
+    return names
+        .map((name) => referenceEnumValuesByName[name])
+        .find((values) => values?.length);
 }
 
 export function tokenizeReferenceType(type: string): ReferenceTypeToken[] {

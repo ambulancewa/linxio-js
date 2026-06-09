@@ -20,7 +20,7 @@ client account, and driver assignment endpoints for vehicle-driver links.
     <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
-      { name: "fields[]", type: "string[]", description: "Optional field projection such as id, email, fullName, role, or status." },
+      { name: "fields[]", type: "UserField[]", description: "User fields to include in the response projection." },
       { name: "role", type: "string", description: "Optional role filter." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
@@ -202,7 +202,7 @@ curl -X PATCH https://api.linxio.com/api/users/123/restore \
     <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
-      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+      { name: "fields[]", type: "string[]", description: "Optional client-account field projection." },
       { name: "[filter]", type: "QueryValue", description: "Dashboard-derived filters." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
@@ -264,7 +264,7 @@ curl "https://api.linxio.com/api/clients/10" \
       { name: "role", type: "string", description: "Optional role filter, such as driver." },
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
-      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+      { name: "fields[]", type: "UserField[]", description: "User fields to include in the response projection." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "data", type: "LinxioUser[]", description: "Client users for the current page." },
@@ -397,7 +397,7 @@ curl -X POST https://api.linxio.com/api/clients/10/users/123 \
     <FieldTable title="Request query parameters" iconName="forward"  fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
-      { name: "fields[]", type: "string[]", description: "Optional field projection." },
+      { name: "fields[]", type: "DriverField[]", description: "Driver fields to include in the response projection." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver records for the current page." }]} />
   </div>
@@ -427,6 +427,7 @@ curl "https://api.linxio.com/api/drivers?limit=100" \
       { name: "role", type: "driver", required: true, description: "Driver role filter." },
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "DriverField[]", description: "Driver fields to include in the response projection." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data", type: "LinxioDriver[]", description: "Driver user records." }]} />
   </div>

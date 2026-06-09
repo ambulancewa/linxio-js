@@ -27,8 +27,10 @@ import {
 import {
     buildReferenceExample,
     findReferenceShape,
+    getReferenceEnumValues,
     getReferenceShape,
     groupDottedReferenceFields,
+    type ReferenceEnumValue,
     type ReferenceShapeField,
     tokenizeReferenceType,
 } from "@/lib/reference-types";
@@ -38,6 +40,7 @@ type ReferenceField = {
     children?: ReferenceField[];
     defaultValue?: string;
     description: ReactNode;
+    enumValues?: readonly ReferenceEnumValue[];
     name: string;
     required?: boolean;
     type: string;
@@ -473,6 +476,7 @@ function FieldRows({
 }) {
     return fields.map((field, index) => {
         const childShape = findReferenceShape(field.type);
+        const enumValues = getFieldEnumValues(field);
         const childFields =
             depth >= maxFieldExpansionDepth
                 ? undefined
@@ -533,17 +537,8 @@ function FieldRows({
                         </div>
                     ) : null}
 
-                    {field.allowedValues?.length ? (
-                        <div className="mt-0.5 flex flex-wrap gap-1.5">
-                            {field.allowedValues.map((v) => (
-                                <code
-                                    key={v}
-                                    className="rounded-md border border-fd-border bg-fd-muted/60 px-2 py-1 font-mono text-[11.5px]"
-                                >
-                                    {v}
-                                </code>
-                            ))}
-                        </div>
+                    {enumValues.length ? (
+                        <EnumValueList values={enumValues} />
                     ) : null}
 
                     {childFields?.length ? (
@@ -569,6 +564,44 @@ function FieldRows({
             </div>
         );
     });
+}
+
+function EnumValueList({ values }: { values: readonly ReferenceEnumValue[] }) {
+    return (
+        <div className="mt-3 overflow-hidden rounded-lg border border-fd-border bg-fd-background">
+            <div className="border-fd-border border-b px-3 py-2 font-semibold text-[12px] text-fd-foreground">
+                Possible enum values
+            </div>
+            <div className="divide-y divide-fd-border">
+                {values.map((item) => (
+                    <div className="px-3 py-2.5" key={item.value}>
+                        <code className="rounded-md border border-fd-border bg-fd-muted/60 px-1.5 py-0.75 font-mono text-[11.5px] text-fd-foreground">
+                            {item.value}
+                        </code>
+                        {item.description ? (
+                            <p className="mt-2 mb-0 text-[13px] text-fd-muted-foreground leading-relaxed">
+                                {item.description}
+                            </p>
+                        ) : null}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function getFieldEnumValues(
+    field: ReferenceField,
+): readonly ReferenceEnumValue[] {
+    if (field.enumValues?.length) {
+        return field.enumValues;
+    }
+
+    if (field.allowedValues?.length) {
+        return field.allowedValues.map((value) => ({ value }));
+    }
+
+    return getReferenceEnumValues(field.type) ?? [];
 }
 
 function TypeText({ type }: { type: string }) {
@@ -695,7 +728,7 @@ function ExampleResponse({ value }: { value: Record<string, unknown> }) {
         <figure className="shiki not-prose relative my-4 overflow-hidden rounded-xl border border-gray-200! bg-white! text-sm shadow-sm dark:border-gray-900! dark:bg-black!">
             <div className="flex h-9.5 items-center gap-2 border-fd-border border-b bg-inherit! px-4 py-2 font-semibold! text-[#737373]! text-sm! uppercase tracking-normal! dark:text-fd-muted-foreground">
                 <div className="[&_svg]:size-3.5">
-                    <svg viewBox="0 0 24 24">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
                         <path
                             d="M 6,1 C 4.354992,1 3,2.354992 3,4 v 16 c 0,1.645008 1.354992,3 3,3 h 12 c 1.645008,0 3,-1.354992 3,-3 V 8 7 A 1.0001,1.0001 0 0 0 20.707031,6.2929687 l -5,-5 A 1.0001,1.0001 0 0 0 15,1 h -1 z m 0,2 h 7 v 3 c 0,1.645008 1.354992,3 3,3 h 3 v 11 c 0,0.564129 -0.435871,1 -1,1 H 6 C 5.4358712,21 5,20.564129 5,20 V 4 C 5,3.4358712 5.4358712,3 6,3 Z M 15,3.4140625 18.585937,7 H 16 C 15.435871,7 15,6.5641288 15,6 Z"
                             fill="currentColor"

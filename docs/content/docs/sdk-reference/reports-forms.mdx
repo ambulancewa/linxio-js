@@ -30,7 +30,7 @@ for common fields and preserve any tenant-specific fields returned by Linxio.
         },
         {
           name: "params.format",
-          type: "csv | pdf | xlsx",
+          type: "LinxioFileFormat",
           description: "Optional file format filter when Linxio accepts it.",
         },
         {
@@ -203,7 +203,7 @@ if (report.error) {
         },
         {
           name: "payload.format",
-          type: "csv | pdf | xlsx",
+          type: "LinxioFileFormat",
           required: true,
           description: "Output format.",
         },

@@ -53,7 +53,7 @@ curl "https://api.linxio.com/api/areas?limit=100&page=1" \
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Geofence area identifier." },
       { name: "name", type: "string", description: "Geofence display name." },
-      { name: "type", type: "circle | polygon | polyline | rectangle", description: "Geometry type." },
+      { name: "type", type: "GeofenceType", description: "Geometry type." },
       { name: "coordinates", type: "LatLng[]", description: "Geometry coordinates when supplied." },
       { name: "radius", type: "number", description: "Circle radius in metres when supplied." },
     ]} />
@@ -81,7 +81,7 @@ curl "https://api.linxio.com/api/areas/21" \
 
     <FieldTable title="Request body parameters" iconName="urlParams" fields={[
       { name: "name", type: "string", required: true, description: "Display name." },
-      { name: "type", type: "circle | polygon | polyline | rectangle", required: true, description: "Geometry type." },
+      { name: "type", type: "GeofenceType", required: true, description: "Geometry type." },
       { name: "coordinates", type: "LatLng[]", description: "Geometry coordinates. Circles typically use one centre point." },
       { name: "radius", type: "number", description: "Circle radius in metres." },
       { name: "color", type: "string", description: "Display colour accepted by Linxio." },

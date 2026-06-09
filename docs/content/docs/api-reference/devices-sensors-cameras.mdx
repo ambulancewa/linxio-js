@@ -21,7 +21,7 @@ camera endpoints are a mix of publicly documented and dashboard-derived paths.
       fields={[
         { name: "limit", type: "number", description: "Number of records per page." },
         { name: "page", type: "number", description: "Page number to read.", defaultValue: "1" },
-        { name: "fields[]", type: "string[]", description: "Device fields to include, such as id, imei, serial, status, vehicle, usage, or vendor." },
+        { name: "fields[]", type: "DeviceField[]", description: "Device fields to include in the response projection." },
         { name: "sort", type: "string", description: "Sort expression accepted by Linxio." },
       ]}
     />

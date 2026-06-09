@@ -31,7 +31,7 @@ description: User management, client account users, driver assignment, and resel
         {
           name: "params.fields",
           type: "UserField[]",
-          description: "Optional fields such as id, email, fullName, role, or status.",
+          description: "User fields to include in the response projection.",
         },
         {
           name: "params.role",
@@ -603,6 +603,11 @@ if (client.error) {
           description: "Page number to request.",
           defaultValue: "1",
         },
+        {
+          name: "params.fields",
+          type: "UserField[]",
+          description: "User fields to include in the response projection.",
+        },
       ]}
     />
 
@@ -960,7 +965,7 @@ if (updated.error) {
         {
           name: "params.fields",
           type: "DriverField[]",
-          description: "Optional fields such as id, fullName, email, phone, or role.",
+          description: "Driver fields to include in the response projection.",
         },
       ]}
     />
