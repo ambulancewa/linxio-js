@@ -13,6 +13,8 @@ description: Install linxio-js and make your first authenticated Linxio request.
     </ReferenceHeader>
   </div>
 
+  <MultiPackageManager packageName="@ambulancewa/linxio-js" />
+
   <CodeRail>
 
 ```bash title="pnpm"
@@ -161,7 +163,7 @@ for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="Full example">
+    <ReferenceHeader title="Full example" hideTitle={true}>
       Here's a full example of how to initialise, authenticate, and use the Linxio SDK to list all vehicles in your fleet. 
       
       This example assumes you have a `.env` file with your Linxio credentials.

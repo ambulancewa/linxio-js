@@ -2,6 +2,7 @@ import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps, ReactNode } from "react";
+import { MultiPackageManager } from "@/components/package-manager-install";
 import { cn } from "@/lib/cn";
 import {
     buildReferenceExample,
@@ -189,15 +190,21 @@ export function FieldTable({
 
 function FieldRows({
     depth = 0,
+    expandedTypes = new Set<string>(),
     fields,
     tableTitle,
 }: {
     depth?: number;
+    expandedTypes?: ReadonlySet<string>;
     fields: ReferenceField[];
     tableTitle: string;
 }) {
     return fields.map((field) => {
-        const childFields = getChildFields(field);
+        const childShape = findReferenceShape(field.type);
+        const childFields = getChildFields(field, expandedTypes, childShape);
+        const nextExpandedTypes = childShape
+            ? new Set([...expandedTypes, childShape.typeName])
+            : expandedTypes;
 
         return (
             <div
@@ -264,6 +271,7 @@ function FieldRows({
                             <div className="divide-y divide-fd-border border-fd-border border-t">
                                 <FieldRows
                                     depth={depth + 1}
+                                    expandedTypes={nextExpandedTypes}
                                     fields={childFields}
                                     tableTitle={tableTitle}
                                 />
@@ -297,12 +305,24 @@ function TypeText({ type }: { type: string }) {
     });
 }
 
-function getChildFields(field: ReferenceField): ReferenceField[] | undefined {
-    if (field.children?.length) {
+function getChildFields(
+    field: ReferenceField,
+    expandedTypes: ReadonlySet<string>,
+    shape = findReferenceShape(field.type),
+): ReferenceField[] | undefined {
+    if (field.children?.length && !isReferencePlaceholderList(field.children)) {
         return field.children;
     }
 
-    return shapeFieldsToReferenceFields(findReferenceShape(field.type)?.fields);
+    if (!shape || expandedTypes.has(shape.typeName)) {
+        return undefined;
+    }
+
+    return shapeFieldsToReferenceFields(shape.fields);
+}
+
+function isReferencePlaceholderList(fields: ReferenceField[]) {
+    return fields.length === 1 && fields[0]?.name === "__reference";
 }
 
 function shapeFieldsToReferenceFields(
@@ -539,6 +559,7 @@ export function getMDXComponents(components?: MDXComponents) {
         MethodTable,
         ReferenceGrid,
         ReferenceHeader,
+        MultiPackageManager,
         RequiredHeaders,
         ServiceTable,
         TypeShape,
