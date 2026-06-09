@@ -10,7 +10,7 @@ interface MultiPackageManagerProps {
     isDev?: boolean;
 }
 
-const NpmIcon = () => (
+const NpmIcon = ({ className }: { className?: string }) => (
     <svg
         viewBox="0 0 512 512"
         xmlns="http://www.w3.org/2000/svg"
@@ -18,6 +18,7 @@ const NpmIcon = () => (
         clip-rule="evenodd"
         stroke-linejoin="round"
         stroke-miterlimit="2"
+        className={className}
     >
         <g fill-rule="nonzero">
             <path d="M10.999 500.999v-490h490v490h-490z" fill="#c12127" />
@@ -29,7 +30,7 @@ const NpmIcon = () => (
     </svg>
 );
 
-const PnpmIcon = () => (
+const PnpmIcon = ({ className }: { className?: string }) => (
     <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -38,6 +39,7 @@ const PnpmIcon = () => (
         viewBox="76.58987244897958 44 164.00775510204068 164"
         width="160.01"
         height="160"
+        className={className}
     >
         <defs>
             <path
@@ -142,8 +144,9 @@ const PnpmIcon = () => (
     </svg>
 );
 
-const YarnIcon = () => (
+const YarnIcon = ({ className }: { className?: string }) => (
     <svg
+        className={className}
         viewBox="0 0 512 512"
         xmlns="http://www.w3.org/2000/svg"
         fill-rule="evenodd"
@@ -164,8 +167,12 @@ const YarnIcon = () => (
     </svg>
 );
 
-const BunIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+const BunIcon = ({ className }: { className?: string }) => (
+    <svg
+        className={className}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 128 128"
+    >
         <path d="M113.744 41.999a18.558 18.558 0 0 0-.8-.772c-.272-.246-.528-.524-.8-.771s-.528-.525-.8-.771c-.272-.247-.528-.525-.8-.772s-.528-.524-.8-.771-.528-.525-.8-.772-.528-.524-.8-.771c7.936 7.52 12.483 17.752 12.656 28.481 0 25.565-26.912 46.363-60 46.363-18.528 0-35.104-6.526-46.128-16.756l.8.772.8.771.8.772.8.771.8.772.8.771.8.771c11.008 10.662 27.952 17.527 46.928 17.527 33.088 0 60-20.797 60-46.285 0-10.893-4.864-21.215-13.456-29.33z" />
         <path
             fill="#fbf0df"
@@ -206,7 +213,10 @@ const BunIcon = () => (
     </svg>
 );
 
-const packageManagerIcons: Record<PackageManager, React.FC> = {
+const packageManagerIcons: Record<
+    PackageManager,
+    React.FC<{ className?: string }>
+> = {
     npm: NpmIcon,
     yarn: YarnIcon,
     pnpm: PnpmIcon,
@@ -247,13 +257,13 @@ export const MultiPackageManager: React.FC<MultiPackageManagerProps> = ({
                             key={manager}
                             onClick={() => setActiveManager(manager)}
                             type="button"
-                            className={`flex-1 py-3 font-semibold text-sm capitalize transition-colors duration-200 ${
+                            className={`flex flex-1 items-center justify-center gap-1 px-1 py-2 font-semibold text-sm capitalize transition-colors duration-200 ${
                                 activeManager === manager
                                     ? "border-indigo-500 border-b-2 bg-gray-900 text-indigo-400"
                                     : "text-gray-400 hover:bg-gray-750 hover:text-gray-200"
                             }`}
                         >
-                            <Icon />
+                            <Icon className="size-4" />
                             {manager}
                         </button>
                     );
