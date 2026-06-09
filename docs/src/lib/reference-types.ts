@@ -1864,6 +1864,7 @@ export function tokenizeReferenceType(type: string): ReferenceTypeToken[] {
     const href = getReferenceTypeHref(text);
 
     if (!href) {
+      match = matcher.exec(type);
       continue;
     }
 

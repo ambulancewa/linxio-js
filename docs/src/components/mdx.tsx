@@ -1,9 +1,20 @@
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
-import type { ComponentProps, ReactNode } from "react";
+import {
+  Children,
+  type ComponentProps,
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { MultiPackageManager } from "@/components/package-manager-install";
 import { cn } from "@/lib/cn";
+import {
+  type JsonHighlightToken,
+  tokenizeJsonForHighlight,
+} from "@/lib/json-highlight";
 import {
   buildReferenceExample,
   findReferenceShape,
@@ -35,13 +46,45 @@ type ServiceRow = {
   service: string;
 };
 
+type FieldTableProps = {
+  examplePlacement?: "inline" | "none";
+  fields: ReferenceField[];
+  title?: string;
+};
+
+type ReferenceExample = {
+  key: string;
+  title: string;
+  value: Record<string, unknown>;
+};
+
 const maxFieldExpansionDepth = 1;
+
+const jsonTokenClassName: Record<JsonHighlightToken["kind"], string> = {
+  boolean: "text-violet-600 dark:text-violet-300",
+  key: "text-sky-700 dark:text-sky-300",
+  null: "text-rose-600 dark:text-rose-300",
+  number: "text-amber-700 dark:text-amber-300",
+  plain: "",
+  punctuation: "text-fd-muted-foreground/80",
+  string: "text-emerald-700 dark:text-emerald-300",
+};
 
 function slugify(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+function hashString(value: string): string {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = Math.imul(31, hash) + value.charCodeAt(index);
+  }
+
+  return Math.abs(hash).toString(36);
 }
 
 function MethodBadge({ method }: { method: string }) {
@@ -128,9 +171,17 @@ export function ReferenceHeader({
 }
 
 export function ReferenceGrid({ children }: { children: ReactNode }) {
+  const examples = collectReferenceExamples(children);
+  const railExamples = examples.map((example) => (
+    <ExampleResponse key={example.key} value={example.value} />
+  ));
+  const displayChildren = railExamples.length
+    ? withRailExamples(children, railExamples)
+    : children;
+
   return (
     <div className="not-prose mx-auto my-12 grid w-full gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-12 xl:[&:has(section[data-hide-title=true])>aside]:-mt-12 [&>*]:min-w-0">
-      {children}
+      {displayChildren}
     </div>
   );
 }
@@ -169,13 +220,129 @@ export function CodeRail({ children }: { children: ReactNode }) {
   );
 }
 
+function collectReferenceExamples(children: ReactNode): ReferenceExample[] {
+  const examples: ReferenceExample[] = [];
+
+  visitReactElements(children, (element) => {
+    if (!isComponentElement<FieldTableProps>(element, FieldTable)) {
+      return;
+    }
+
+    const title = element.props.title ?? "Parameters";
+    const normalizedFields = normalizeReferenceFields(
+      element.props.fields,
+      title,
+    );
+    const value = getReferenceExample(normalizedFields, title);
+
+    if (value) {
+      examples.push({
+        key: `reference-example-${slugify(title)}-${hashString(
+          JSON.stringify(value),
+        )}`,
+        title,
+        value,
+      });
+    }
+  });
+
+  return examples;
+}
+
+function withRailExamples(
+  children: ReactNode,
+  railExamples: ReactNode[],
+): ReactNode {
+  if (!containsComponent(children, CodeRail)) {
+    return children;
+  }
+
+  return mapReactElements(children, (element) => {
+    if (isComponentElement<{ children?: ReactNode }>(element, CodeRail)) {
+      return cloneElement(element, {
+        children: (
+          <>
+            {element.props.children}
+            {railExamples}
+          </>
+        ),
+      });
+    }
+
+    if (isComponentElement<FieldTableProps>(element, FieldTable)) {
+      return cloneElement(element, { examplePlacement: "none" });
+    }
+
+    return element;
+  });
+}
+
+function containsComponent(children: ReactNode, component: unknown): boolean {
+  let found = false;
+
+  visitReactElements(children, (element) => {
+    if (element.type === component) {
+      found = true;
+    }
+  });
+
+  return found;
+}
+
+function visitReactElements(
+  node: ReactNode,
+  visitor: (element: ReactElement) => void,
+) {
+  Children.forEach(node, (child) => {
+    if (!isValidElement(child)) {
+      return;
+    }
+
+    visitor(child);
+    visitReactElements(getElementChildren(child), visitor);
+  });
+}
+
+function mapReactElements(
+  node: ReactNode,
+  visitor: (element: ReactElement) => ReactElement,
+): ReactNode {
+  return Children.map(node, (child) => {
+    if (!isValidElement(child)) {
+      return child;
+    }
+
+    const children = getElementChildren(child);
+    const mappedChildren = children
+      ? mapReactElements(children, visitor)
+      : children;
+    const element =
+      mappedChildren && mappedChildren !== children
+        ? cloneElement(child as ReactElement<{ children?: ReactNode }>, {
+            children: mappedChildren,
+          })
+        : child;
+
+    return visitor(element);
+  });
+}
+
+function isComponentElement<Props>(
+  element: ReactElement,
+  component: unknown,
+): element is ReactElement<Props> {
+  return element.type === component;
+}
+
+function getElementChildren(element: ReactElement): ReactNode | undefined {
+  return (element.props as { children?: ReactNode }).children;
+}
+
 export function FieldTable({
+  examplePlacement = "inline",
   fields,
   title = "Parameters",
-}: {
-  fields: ReferenceField[];
-  title?: string;
-}) {
+}: FieldTableProps) {
   const normalizedFields = normalizeReferenceFields(fields, title);
   const example = getReferenceExample(normalizedFields, title);
 
@@ -185,7 +352,11 @@ export function FieldTable({
       <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
         <FieldRows fields={normalizedFields} tableTitle={title} />
       </div>
-      {example ? <ExampleResponse value={example} /> : null}
+      {example && examplePlacement === "inline" ? (
+        <div className="mt-4">
+          <ExampleResponse value={example} />
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -402,15 +573,30 @@ function referenceFieldsToShapeFields(
 }
 
 function ExampleResponse({ value }: { value: Record<string, unknown> }) {
+  const json = JSON.stringify(value, null, 2);
+  const tokens = tokenizeJsonForHighlight(json);
+  let tokenOffset = 0;
+
   return (
-    <div className="mt-4 overflow-hidden rounded-lg border border-fd-border bg-fd-muted/40">
-      <div className="border-fd-border border-b px-4 py-2 font-semibold text-[12px] text-fd-muted-foreground uppercase tracking-wide">
+    <figure className="overflow-hidden rounded-lg border border-fd-border bg-fd-muted/40">
+      <figcaption className="border-fd-border border-b px-4 py-2 font-semibold text-[12px] text-fd-muted-foreground uppercase tracking-wide">
         Example response
-      </div>
+      </figcaption>
       <pre className="m-0 overflow-x-auto bg-transparent p-4 font-mono text-[13px] text-fd-foreground leading-relaxed">
-        <code>{JSON.stringify(value, null, 2)}</code>
+        <code>
+          {tokens.map((token) => {
+            const key = `${tokenOffset}:${token.text}`;
+            tokenOffset += token.text.length;
+
+            return (
+              <span className={jsonTokenClassName[token.kind]} key={key}>
+                {token.text}
+              </span>
+            );
+          })}
+        </code>
       </pre>
-    </div>
+    </figure>
   );
 }
 

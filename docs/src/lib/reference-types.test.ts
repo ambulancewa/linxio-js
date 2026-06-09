@@ -51,6 +51,12 @@ describe("reference type helpers", () => {
     ]);
   });
 
+  it("preserves unlinked capitalized type names as plain text", () => {
+    expect(tokenizeReferenceType("ISODateString | null")).toEqual([
+      { text: "ISODateString | null" },
+    ]);
+  });
+
   it("builds nested JSON examples from return field metadata", () => {
     const fields: ReferenceShapeField[] = [
       {
