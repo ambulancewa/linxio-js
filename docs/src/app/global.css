@@ -186,7 +186,7 @@ aside.linxio-code-rail {
 }
 
 article h2.group\/heading {
-    @apply pt-12 mt-16 before:content-[''] before:w-[calc(100%+112px)] before:h-[1px] before:bg-fd-border before:absolute before:top-0 before:-left-[56px] relative lg:pt-24 lg:mt-30;
+    @apply pt-12 mt-16 before:content-[''] before:w-[calc(100%+112px)] before:h-px before:bg-fd-border before:absolute before:top-0 before:-left-14 relative lg:pt-24 lg:mt-30;
 }
 
 article h2.group\/heading:first-child {
@@ -297,7 +297,7 @@ html > body[data-scroll-locked] {
 }
 
 #nd-page {
-    @apply py-[40px] px-[56px] border-r border-fd-border;
+    @apply py-10 px-14 border-r border-fd-border;
     width: 100%;
     max-width: none;
 }

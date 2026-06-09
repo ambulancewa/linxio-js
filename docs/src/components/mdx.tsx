@@ -102,7 +102,7 @@ function MethodBadge({ method }: { method: string }) {
     return (
         <span
             className={cn(
-                "inline-flex h-[26px] shrink-0 items-center rounded px-[7px] font-bold font-mono text-sm uppercase leading-none tracking-wide",
+                "inline-flex h-6.5 shrink-0 items-center rounded px-1.75 font-bold font-mono text-sm uppercase leading-none tracking-wide",
                 normalized === "GET" &&
                     "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80 ring-inset dark:bg-emerald-950/30 dark:text-emerald-400 dark:ring-emerald-800/60",
                 normalized === "POST" &&
@@ -158,12 +158,12 @@ export function ReferenceHeader({
             {(path ?? sdk) ? (
                 <div className="mb-4 flex flex-wrap gap-2">
                     {path ? (
-                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-[7px] font-mono text-[12.5px] text-fd-muted-foreground leading-none">
+                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-1.75 font-mono text-[12.5px] text-fd-muted-foreground leading-none">
                             {path}
                         </code>
                     ) : null}
                     {sdk ? (
-                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-[7px] font-mono text-[12.5px] text-fd-muted-foreground leading-none">
+                        <code className="inline-flex items-center rounded-md border border-fd-border bg-fd-muted/60 px-3 py-1.75 font-mono text-[12.5px] text-fd-muted-foreground leading-none">
                             {sdk}
                         </code>
                     ) : null}
@@ -171,7 +171,7 @@ export function ReferenceHeader({
             ) : null}
 
             {children ? (
-                <div className="m-0 max-w-[600px] text-[15px] text-fd-muted-foreground leading-[1.75]">
+                <div className="m-0 max-w-150 text-[15px] text-fd-muted-foreground leading-[1.75]">
                     {children}
                 </div>
             ) : null}
@@ -189,7 +189,7 @@ export function ReferenceGrid({ children }: { children: ReactNode }) {
         : children;
 
     return (
-        <div className="not-prose mx-auto my-12 grid w-full gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-12 xl:[&:has(section[data-hide-title=true])>aside]:-mt-12 [&>*]:min-w-0">
+        <div className="not-prose mx-auto my-12 grid w-full gap-8 *:min-w-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-12 xl:[&:has(section[data-hide-title=true])>aside]:-mt-12">
             {displayChildren}
         </div>
     );
@@ -214,7 +214,7 @@ export function Note({ children }: { children: ReactNode }) {
                 Note
             </p>
 
-            <div className="block! [&_p]:block! m-0! mt-1! space-y-1.5! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0">
+            <div className="block! [&_p]:block! m-0! mt-1! space-y-1.5! text-fd-muted-foreground text-sm leading-normal [&_p]:m-0">
                 {children}
             </div>
         </div>
@@ -240,7 +240,7 @@ export function ImportantNote({ children }: { children: ReactNode }) {
                 Important
             </p>
 
-            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0!">
+            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-normal [&_p]:m-0!">
                 {children}
             </p>
         </div>
@@ -266,7 +266,7 @@ export function CautionNote({ children }: { children: ReactNode }) {
                 Caution
             </p>
 
-            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-[1.5] [&_p]:m-0!">
+            <p className="block! [&_p]:block! m-0! mt-1! space-y-4! text-fd-muted-foreground text-sm leading-normal [&_p]:m-0!">
                 {children}
             </p>
         </div>
@@ -508,11 +508,11 @@ function FieldRows({
                         </div>
 
                         {field.required ? (
-                            <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-[3px] font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+                            <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-0.75 font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
                                 required
                             </span>
                         ) : (
-                            <span className="rounded border border-fd-border px-1.5 py-[3px] font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
+                            <span className="rounded border border-fd-border px-1.5 py-0.75 font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
                                 optional
                             </span>
                         )}
@@ -527,7 +527,7 @@ function FieldRows({
                             <span className="text-fd-muted-foreground/70">
                                 Default:
                             </span>{" "}
-                            <code className="rounded bg-fd-muted px-1.5 py-[3px] font-mono text-[12px]">
+                            <code className="rounded bg-fd-muted px-1.5 py-0.75 font-mono text-[12px]">
                                 {field.defaultValue}
                             </code>
                         </div>
@@ -708,7 +708,7 @@ function ExampleResponse({ value }: { value: Record<string, unknown> }) {
             </div>
 
             <pre className="m-0 p-0">
-                <CodeBlock className="shiki shiki-themes github-light github-dark m-0 overflow-x-auto rounded-none! bg-transparent! bg-white! px-6 font-mono text-[13px] text-fd-foreground leading-relaxed dark:bg-black! [&>[role=region]]:bg-white! dark:[&>[role=region]]:bg-black!">
+                <CodeBlock className="shiki shiki-themes github-light github-dark m-0 overflow-x-auto rounded-none! bg-transparent! bg-white! px-6 font-mono text-[13px] text-fd-foreground leading-relaxed dark:bg-black! *:[[role=region]]:bg-white! dark:*:[[role=region]]:bg-black!">
                     {tokens.map((token) => {
                         const key = `${tokenOffset}:${token.text}`;
                         tokenOffset += token.text.length;
@@ -743,7 +743,7 @@ export function TypeShape({ typeName }: { typeName: string }) {
             <h2 className="mb-2 font-bold text-2xl text-fd-foreground leading-snug tracking-tight">
                 {typeName}
             </h2>
-            <p className="m-0 max-w-[680px] text-[15px] text-fd-muted-foreground leading-[1.75]">
+            <p className="m-0 max-w-170 text-[15px] text-fd-muted-foreground leading-[1.75]">
                 {shape.description}
             </p>
             <FieldTable
@@ -853,7 +853,7 @@ export function ServiceTable({ rows }: { rows: ServiceRow[] }) {
                         key={row.service}
                         className="flex flex-wrap items-start gap-x-6 gap-y-3 px-4 py-4"
                     >
-                        <code className="min-w-[160px] shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
+                        <code className="min-w-40 shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
                             {row.service}
                         </code>
                         <div className="flex flex-wrap gap-1.5">

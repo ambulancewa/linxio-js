@@ -1,16 +1,16 @@
 {
-  "title": "linxio-js",
-  "pages": [
-    "index",
-    "getting-started",
-    "authentication",
-    "sdk-reference",
-    "api-reference",
-    "services",
-    "realtime",
-    "errors",
-    "live-validation",
-    "dashboard-source-analysis",
-    "endpoint-catalogue"
-  ]
+    "title": "linxio-js",
+    "pages": [
+        "index",
+        "getting-started",
+        "authentication",
+        "sdk-reference",
+        "api-reference",
+        "services",
+        "realtime",
+        "errors",
+        "live-validation",
+        "dashboard-source-analysis",
+        "endpoint-catalogue"
+    ]
 }

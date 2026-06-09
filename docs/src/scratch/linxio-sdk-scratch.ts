@@ -1,17 +1,17 @@
 import type {
-  LinxioClient,
-  LinxioLoginResponse,
-  LinxioVehicle,
+    LinxioClient,
+    LinxioLoginResponse,
+    LinxioVehicle,
 } from "../../../src";
 
 export type LinxioSdkScratchContext = {
-  linxio: LinxioClient;
-  requestBody?: unknown;
-  session: LinxioLoginResponse;
+    linxio: LinxioClient;
+    requestBody?: unknown;
+    session: LinxioLoginResponse;
 };
 
 export type LinxioSdkScratchResult = {
-  vehicles: Awaited<ReturnType<LinxioClient["vehicles"]["list"]>>;
+    vehicles: Awaited<ReturnType<LinxioClient["vehicles"]["list"]>>;
 };
 
 /**
@@ -21,19 +21,19 @@ export type LinxioSdkScratchResult = {
  * The default example is read-only and intentionally requests a small field set.
  */
 export async function runLinxioSdkScratch({
-  linxio,
+    linxio,
 }: LinxioSdkScratchContext): Promise<LinxioSdkScratchResult> {
-  const vehicles = await linxio.vehicles.list({
-    fields: [
-      "id",
-      "regNo",
-      "defaultLabel",
-      "status",
-      "lastLoggedAt",
-    ] satisfies (keyof LinxioVehicle | string)[],
-    limit: 5,
-    page: 1,
-  });
+    const vehicles = await linxio.vehicles.list({
+        fields: [
+            "id",
+            "regNo",
+            "defaultLabel",
+            "status",
+            "lastLoggedAt",
+        ] satisfies (keyof LinxioVehicle | string)[],
+        limit: 5,
+        page: 1,
+    });
 
-  return { vehicles };
+    return { vehicles };
 }
