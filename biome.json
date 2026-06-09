@@ -108,6 +108,8 @@
             "!**/dist",
             "!**/build",
             "!**/.next",
+            "!**/_next",
+            "!**/_out",
             "!**/.basehub",
             "!**/.vercel",
             "!**/.pnpm",
