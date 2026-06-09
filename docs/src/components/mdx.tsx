@@ -389,7 +389,7 @@ function FieldRows({
             <div
                 key={`${depth}-${field.name}`}
                 className={cn(
-                    "grid gap-x-8 gap-y-1 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40",
+                    "grid gap-x-8 gap-y-1 px-4 py-4",
                     depth > 0 && "bg-fd-muted/15 px-3 py-3",
                 )}
             >
@@ -443,11 +443,12 @@ function FieldRows({
                     ) : null}
 
                     {childFields?.length ? (
-                        <details className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background">
+                        <details className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background/80">
                             <summary className="cursor-pointer select-none px-3 py-2 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:text-fd-foreground">
                                 {getChildSummaryLabel(tableTitle)}
                             </summary>
-                            <div className="divide-y divide-fd-border border-fd-border border-t">
+
+                            <div className="divide-y divide-fd-border border-fd-border border-t bg-white dark:bg-black/30">
                                 <FieldRows
                                     depth={depth + 1}
                                     expandedTypes={nextExpandedTypes}
@@ -698,10 +699,7 @@ export function MethodTable({
             ) : null}
             <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
                 {rows.map((row) => (
-                    <div
-                        key={row.name}
-                        className="px-4 py-3.5 transition-colors duration-100 hover:bg-fd-muted/40"
-                    >
+                    <div key={row.name} className="px-4 py-3.5">
                         <div className="flex flex-wrap items-start gap-x-5 gap-y-1.5">
                             <code className="shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
                                 {row.name}
@@ -740,7 +738,7 @@ export function ServiceTable({ rows }: { rows: ServiceRow[] }) {
                 {rows.map((row) => (
                     <div
                         key={row.service}
-                        className="flex flex-wrap items-start gap-x-6 gap-y-3 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40"
+                        className="flex flex-wrap items-start gap-x-6 gap-y-3 px-4 py-4"
                     >
                         <code className="min-w-[160px] shrink-0 font-mono font-semibold text-[13.5px] text-fd-foreground">
                             {row.service}
