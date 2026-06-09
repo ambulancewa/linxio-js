@@ -126,7 +126,12 @@
             "!**/.cursor",
             "!**/.github",
             "!**/.turbo",
-            "!**/.deepsec"
+            "!**/.deepsec",
+            "!node_modules",
+            "!.next",
+            "!dist",
+            "!build",
+            "!.source"
         ]
     }
 }
