@@ -95,6 +95,29 @@ describe("reference type helpers", () => {
     });
   });
 
+  it("builds examples for linked auth response shapes", () => {
+    expect(
+      buildReferenceExample([
+        {
+          name: "data",
+          type: "LinxioLoginResponse",
+          description: "The same session shape returned by auth.login().",
+        },
+        {
+          name: "error",
+          type: "LinxioError | null",
+          description: "Typed SDK error.",
+        },
+      ]),
+    ).toMatchObject({
+      data: {
+        refreshToken: "refresh_token",
+        token: "jwt_token",
+      },
+      error: null,
+    });
+  });
+
   it("builds dotted response field examples as nested objects", () => {
     expect(
       buildReferenceExample([

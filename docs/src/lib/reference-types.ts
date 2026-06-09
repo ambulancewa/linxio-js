@@ -1838,6 +1838,8 @@ export type ReferenceTypeToken = {
   text: string;
 };
 
+const maxExampleDepth = 2;
+
 export function getReferenceTypeHref(typeName: string): string | undefined {
   if (!isReferenceTypeName(typeName)) {
     return undefined;
@@ -1904,6 +1906,16 @@ export function getReferenceShape(
 export function buildReferenceExample(
   fields: readonly ReferenceShapeField[],
 ): Record<string, unknown> | undefined {
+  return buildReferenceExampleInternal(fields, {
+    depth: 0,
+    seenTypes: new Set(),
+  });
+}
+
+function buildReferenceExampleInternal(
+  fields: readonly ReferenceShapeField[],
+  context: ExampleBuildContext,
+): Record<string, unknown> | undefined {
   const example: Record<string, unknown> = {};
 
   for (const field of groupDottedReferenceFields(fields)) {
@@ -1911,7 +1923,7 @@ export function buildReferenceExample(
       continue;
     }
 
-    const value = sampleValueForField(field);
+    const value = sampleValueForField(field, context);
 
     if (value === undefined) {
       continue;
@@ -2075,17 +2087,26 @@ function expandFieldName(name: string): string[] {
   return [name];
 }
 
-function sampleValueForField(field: ReferenceShapeField): unknown {
+type ExampleBuildContext = {
+  depth: number;
+  seenTypes: ReadonlySet<string>;
+};
+
+function sampleValueForField(
+  field: ReferenceShapeField,
+  context: ExampleBuildContext,
+): unknown {
   if (field.name === "error") {
     return null;
   }
 
-  return sampleValueForType(field.type, field);
+  return sampleValueForType(field.type, field, context);
 }
 
 function sampleValueForType(
   rawType: string,
   field?: ReferenceShapeField,
+  context: ExampleBuildContext = { depth: 0, seenTypes: new Set() },
 ): unknown {
   const type = rawType.trim();
 
@@ -2099,17 +2120,34 @@ function sampleValueForType(
 
   const arrayElementType = getArrayElementType(type);
   if (arrayElementType) {
-    const value = sampleValueForType(arrayElementType, field);
+    const value = sampleValueForType(arrayElementType, field, context);
     return value === undefined ? [] : [value];
   }
 
   if (field?.children?.length) {
-    return buildReferenceExample(field.children);
+    if (context.depth >= maxExampleDepth) {
+      return {};
+    }
+
+    return buildReferenceExampleInternal(field.children, {
+      ...context,
+      depth: context.depth + 1,
+    });
   }
 
   const shape = findReferenceShape(type);
   if (shape) {
-    return buildReferenceExample(shape.fields);
+    if (
+      context.depth >= maxExampleDepth ||
+      context.seenTypes.has(shape.typeName)
+    ) {
+      return {};
+    }
+
+    return buildReferenceExampleInternal(shape.fields, {
+      depth: context.depth + 1,
+      seenTypes: new Set([...context.seenTypes, shape.typeName]),
+    });
   }
 
   if (type.includes("LinxioId")) {
