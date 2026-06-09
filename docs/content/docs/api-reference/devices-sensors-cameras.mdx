@@ -14,6 +14,8 @@ camera endpoints are a mix of publicly documented and dashboard-derived paths.
       Returns a paginated list of devices.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable
       title="Query parameters"
       fields={[
@@ -53,6 +55,8 @@ curl "https://api.linxio.com/api/devices/json?fields[]=id&fields[]=imei&limit=10
       Returns one device by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Device identifier." },
@@ -79,6 +83,8 @@ curl "https://api.linxio.com/api/devices/545" \
     <ReferenceHeader title="Create a device" method="POST" path="/devices" sdk="linxio.devices.create(payload)">
       Creates a device record.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable
       title="Body parameters"
@@ -117,6 +123,8 @@ curl -X POST https://api.linxio.com/api/devices \
       Updates a device record.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path and body parameters" fields={[
       { name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." },
       { name: "body", type: "LinxioDevicePayload", required: true, description: "Fields to update." },
@@ -145,6 +153,8 @@ curl -X PATCH https://api.linxio.com/api/devices/545 \
     <ReferenceHeader title="Install a device" method="POST" path="/devices/{deviceId}/install" sdk="linxio.devices.install(deviceId, payload)">
       Installs a device into a vehicle.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable
       title="Path and body parameters"
@@ -183,6 +193,8 @@ curl -X POST https://api.linxio.com/api/devices/545/install \
       Removes a device from its current vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable
       title="Path and body parameters"
       fields={[
@@ -217,6 +229,8 @@ curl -X POST https://api.linxio.com/api/devices/545/uninstall \
       Soft-archives a device.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
@@ -241,6 +255,8 @@ curl -X PATCH https://api.linxio.com/api/devices/545/archive \
       Restores a previously archived device.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Archived device identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
@@ -264,6 +280,8 @@ curl -X PATCH https://api.linxio.com/api/devices/545/restore \
     <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId)">
       Returns recent coordinates for a device.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response fields" fields={[
@@ -291,6 +309,8 @@ curl "https://api.linxio.com/api/devices/545/coordinates" \
       Lists sensors paired with a device.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
@@ -317,6 +337,8 @@ curl "https://api.linxio.com/api/devices/545/sensors" \
       Lists dashboard-derived history entries for a device.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "History records. Shape can vary by device type." }]} />
   </div>
@@ -338,6 +360,8 @@ curl "https://api.linxio.com/api/devices/545/history" \
     <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors" sdk="linxio.devices.vendors()">
       Lists device vendors.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response fields" fields={[
@@ -363,6 +387,8 @@ curl "https://api.linxio.com/api/devices/vendors" \
     <ReferenceHeader title="List device installations" method="GET" path="/devices/installation" sdk="linxio.devices.installations(params)">
       Lists device installation rows.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
@@ -395,6 +421,8 @@ curl "https://api.linxio.com/api/devices/installation?limit=100&page=1" \
       Lists cameras attached to a device.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Camera identifier when supplied." },
@@ -422,6 +450,8 @@ curl "https://api.linxio.com/api/devices/545/cameras" \
       Lists sensors visible to the authenticated account.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
@@ -448,6 +478,8 @@ curl "https://api.linxio.com/api/sensors" \
       Returns one sensor by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "sensorId", type: "LinxioId", required: true, description: "Sensor identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Sensor identifier." },
@@ -473,6 +505,8 @@ curl "https://api.linxio.com/api/sensors/123" \
     <ReferenceHeader title="Install a sensor" method="POST" path="/sensors/{sensorId}/install" sdk="linxio.sensors.install(sensorId, deviceId)">
       Pairs a sensor with a device.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path and body parameters" fields={[
       { name: "sensorId", type: "LinxioId", required: true, description: "Sensor identifier." },
@@ -502,6 +536,8 @@ curl -X POST https://api.linxio.com/api/sensors/123/install \
     <ReferenceHeader title="List device temperature and humidity readings" method="GET" path="/devices/sensors/report/temp-and-humidity" sdk="linxio.sensors.deviceTemperatureHumidityReport(params)">
       Returns a paginated temperature/humidity report grouped by device sensor.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[
       { name: "startDate / endDate", type: "ISODateString", description: "Report date range." },
@@ -536,6 +572,8 @@ curl "https://api.linxio.com/api/devices/sensors/report/temp-and-humidity?startD
       Returns a paginated temperature/humidity report grouped by vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "startDate / endDate", type: "ISODateString", description: "Report date range." },
       { name: "sensorId", type: "LinxioId", description: "Optional sensor filter." },
@@ -569,6 +607,8 @@ curl "https://api.linxio.com/api/vehicles/report/sensors/temp-and-humidity?vehic
       Returns a paginated list of camera events.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
@@ -595,6 +635,8 @@ curl "https://api.linxio.com/api/devices/cameras/events?limit=100&page=1" \
     <ReferenceHeader title="List camera event types" method="GET" path="/devices/cameras/events/types" sdk="linxio.cameras.eventTypes()">
       Returns camera event types known to Linxio.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord[]", description: "Camera event type records." }]} />

@@ -14,6 +14,8 @@ fields can vary by enabled tenant features and form schemas.
       Returns a paginated list of scheduled reports.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
@@ -44,6 +46,8 @@ curl "https://api.linxio.com/api/scheduled-report?limit=50&page=1" \
       Returns scheduled-report template metadata used by the dashboard.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Template metadata. Shape can vary by tenant." }]} />
   </div>
@@ -65,6 +69,8 @@ curl "https://api.linxio.com/api/scheduled-report/template" \
     <ReferenceHeader title="Get a scheduled report" method="GET" path="/scheduled-report/{reportId}" sdk="linxio.reports.getScheduled(reportId)">
       Returns one scheduled report by ID.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
     <FieldTable title="Response fields" fields={[
@@ -92,6 +98,8 @@ curl "https://api.linxio.com/api/scheduled-report/123" \
     <ReferenceHeader title="Create a scheduled report" method="POST" path="/scheduled-report" sdk="linxio.reports.createScheduled(payload)">
       Creates a scheduled report.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Body parameters" fields={[
       { name: "name", type: "string", required: true, description: "Report display name." },
@@ -129,6 +137,8 @@ curl -X POST https://api.linxio.com/api/scheduled-report \
       Updates a scheduled report.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path and body parameters" fields={[
       { name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." },
       { name: "body", type: "Partial<LinxioScheduledReportPayload>", required: true, description: "Fields to update." },
@@ -158,6 +168,8 @@ curl -X PATCH https://api.linxio.com/api/scheduled-report/123 \
       Deletes a scheduled report.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
   </div>
@@ -180,6 +192,8 @@ curl -X DELETE https://api.linxio.com/api/scheduled-report/123 \
       Restores a scheduled report when the dashboard-derived endpoint is
       available.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path parameters" fields={[{ name: "reportId", type: "LinxioId", required: true, description: "Scheduled report identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
@@ -204,6 +218,8 @@ curl -X PATCH https://api.linxio.com/api/scheduled-report/123/restore \
     <ReferenceHeader title="List digital forms" method="GET" path="/digital-form/form" sdk="linxio.digitalForms.list()">
       Lists digital forms visible to the authenticated account.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response fields" fields={[
@@ -231,6 +247,8 @@ curl "https://api.linxio.com/api/digital-form/form" \
       Returns one digital form by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "formId", type: "LinxioId", required: true, description: "Digital form identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Digital form identifier." },
@@ -256,6 +274,8 @@ curl "https://api.linxio.com/api/digital-form/form/50" \
       Returns one digital form answer. Shape depends on the form schema.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "data", type: "LinxioRecord", description: "Answer payload. Shape varies by form schema." }]} />
   </div>
@@ -277,6 +297,8 @@ curl "https://api.linxio.com/api/digital-form/answer/9001" \
     <ReferenceHeader title="Download a form answer PDF" method="GET" path="/digital-form/answer/{answerId}/pdf" sdk="linxio.digitalForms.answerPdf(answerId)">
       Downloads a digital form answer as a PDF.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path parameters" fields={[{ name: "answerId", type: "LinxioId", required: true, description: "Digital form answer identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "body", type: "application/pdf", description: "PDF binary body." }]} />

@@ -15,6 +15,8 @@ permanently.
       Returns a paginated list of geofence areas.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
@@ -45,6 +47,8 @@ curl "https://api.linxio.com/api/areas?limit=100&page=1" \
       Returns one geofence area by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Geofence area identifier." },
@@ -72,6 +76,8 @@ curl "https://api.linxio.com/api/areas/21" \
     <ReferenceHeader title="Create a geofence" method="POST" path="/areas" sdk="linxio.geofences.create(payload)">
       Creates a geofence area.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Body parameters" fields={[
       { name: "name", type: "string", required: true, description: "Display name." },
@@ -108,6 +114,8 @@ curl -X POST https://api.linxio.com/api/areas \
       Updates a geofence area.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path and body parameters" fields={[
       { name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." },
       { name: "body", type: "Partial<LinxioGeofencePayload>", required: true, description: "Fields to update." },
@@ -137,6 +145,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21 \
       Soft-archives a geofence area.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
@@ -160,6 +170,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21/archive \
     <ReferenceHeader title="Restore a geofence" method="PATCH" path="/areas/{areaId}/restore" sdk="linxio.geofences.restore(areaId)">
       Restores a previously archived geofence area.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Archived geofence area identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
@@ -185,6 +197,8 @@ curl -X PATCH https://api.linxio.com/api/areas/21/restore \
       Permanently deletes a geofence area.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "areaId", type: "LinxioId", required: true, description: "Geofence area identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />
   </div>
@@ -206,6 +220,8 @@ curl -X DELETE https://api.linxio.com/api/areas/21 \
     <ReferenceHeader title="List geofence groups" method="GET" path="/area-groups" sdk="linxio.geofences.listGroups()">
       Lists area groups.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response fields" fields={[
@@ -232,6 +248,8 @@ curl "https://api.linxio.com/api/area-groups" \
       Returns one area group by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Area group identifier." },
@@ -256,6 +274,8 @@ curl "https://api.linxio.com/api/area-groups/5" \
     <ReferenceHeader title="Create a geofence group" method="POST" path="/area-groups" sdk="linxio.geofences.createGroup(payload)">
       Creates an area group.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Body parameters" fields={[{ name: "name", type: "string", required: true, description: "Area group display name." }]} />
     <FieldTable title="Response fields" fields={[{ name: "id", type: "LinxioId", description: "Created area group ID." }]} />
@@ -282,6 +302,8 @@ curl -X POST https://api.linxio.com/api/area-groups \
     <ReferenceHeader title="Update a geofence group" method="PATCH" path="/area-groups/{groupId}" sdk="linxio.geofences.updateGroup(groupId, payload)">
       Updates an area group.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path and body parameters" fields={[
       { name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." },
@@ -312,6 +334,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5 \
       Soft-archives an area group.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
@@ -336,6 +360,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5/archive \
       Restores a previously archived area group.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Archived area group identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
@@ -359,6 +385,8 @@ curl -X PATCH https://api.linxio.com/api/area-groups/5/restore \
     <ReferenceHeader title="Delete a geofence group" method="DELETE" path="/area-groups/{groupId}" sdk="linxio.geofences.deleteGroup(groupId)">
       Permanently deletes an area group.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path parameters" fields={[{ name: "groupId", type: "LinxioId", required: true, description: "Area group identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful delete response." }]} />

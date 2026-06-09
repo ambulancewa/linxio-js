@@ -3,9 +3,18 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import {
+    buildReferenceExample,
+    findReferenceShape,
+    getReferenceShape,
+    groupDottedReferenceFields,
+    type ReferenceShapeField,
+    tokenizeReferenceType,
+} from "@/lib/reference-types";
 
 type ReferenceField = {
     allowedValues?: string[];
+    children?: ReferenceField[];
     defaultValue?: string;
     description: ReactNode;
     name: string;
@@ -107,7 +116,7 @@ export function ReferenceHeader({
             ) : null}
 
             {children ? (
-                <p className="m-0 max-w-[600px] text-[15px] text-fd-muted-foreground leading-[1.75]">
+                <p className="m-0 max-w-[600px] space-y-4 text-[15px] text-fd-muted-foreground leading-[1.75]">
                     {children}
                 </p>
             ) : null}
@@ -119,6 +128,32 @@ export function ReferenceGrid({ children }: { children: ReactNode }) {
     return (
         <div className="not-prose mx-auto my-12 grid w-full gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start xl:gap-12 xl:[&:has(section[data-hide-title=true])>aside]:-mt-12 [&>*]:min-w-0">
             {children}
+        </div>
+    );
+}
+
+export function Note({ children }: { children: ReactNode }) {
+    return (
+        <div className="mb-4 border-l-4 border-l-blue-700 px-4 pt-1.5 pb-3 pl-5">
+            <p className="flex flex-row items-center font-semibold text-blue-700">
+                <svg
+                    data-component="Octicon"
+                    className="mr-2 size-4"
+                    viewBox="0 0 16 16"
+                    version="1.1"
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    fill="currentColor"
+                >
+                    <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path>
+                </svg>
+                Note
+            </p>
+
+            <p className="m-0 mt-1 space-y-4 text-fd-muted-foreground text-sm leading-[1.5]">
+                {children}
+            </p>
         </div>
     );
 }
@@ -138,69 +173,280 @@ export function FieldTable({
     fields: ReferenceField[];
     title?: string;
 }) {
+    const normalizedFields = normalizeReferenceFields(fields, title);
+    const example = getReferenceExample(normalizedFields, title);
+
     return (
         <section className="not-prose my-8">
             {title ? <h3 className="mb-3 font-bold text-lg">{title}</h3> : null}
             <div className="divide-y divide-fd-border overflow-hidden rounded-lg border border-fd-border">
-                {fields.map((field) => (
-                    <div
-                        key={field.name}
-                        className="grid gap-x-8 gap-y-1 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40"
-                    >
-                        <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                                <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
-                                    {field.name}
-                                </code>
-
-                                <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
-                                    {field.type}
-                                </div>
-
-                                {field.required ? (
-                                    <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-[3px] font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
-                                        required
-                                    </span>
-                                ) : (
-                                    <span className="rounded border border-fd-border px-1.5 py-[3px] font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
-                                        optional
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="text-[14px] text-fd-muted-foreground leading-relaxed">
-                            <div>{field.description}</div>
-
-                            {field.defaultValue ? (
-                                <div className="mt-0.5 text-[13px]">
-                                    <span className="text-fd-muted-foreground/70">
-                                        Default:
-                                    </span>{" "}
-                                    <code className="rounded bg-fd-muted px-1.5 py-[3px] font-mono text-[12px]">
-                                        {field.defaultValue}
-                                    </code>
-                                </div>
-                            ) : null}
-
-                            {field.allowedValues?.length ? (
-                                <div className="mt-0.5 flex flex-wrap gap-1.5">
-                                    {field.allowedValues.map((v) => (
-                                        <code
-                                            key={v}
-                                            className="rounded-md border border-fd-border bg-fd-muted/60 px-2 py-1 font-mono text-[11.5px]"
-                                        >
-                                            {v}
-                                        </code>
-                                    ))}
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
-                ))}
+                <FieldRows fields={normalizedFields} tableTitle={title} />
             </div>
+            {example ? <ExampleResponse value={example} /> : null}
         </section>
     );
+}
+
+function FieldRows({
+    depth = 0,
+    fields,
+    tableTitle,
+}: {
+    depth?: number;
+    fields: ReferenceField[];
+    tableTitle: string;
+}) {
+    return fields.map((field) => {
+        const childFields = getChildFields(field);
+
+        return (
+            <div
+                key={`${depth}-${field.name}`}
+                className={cn(
+                    "grid gap-x-8 gap-y-1 px-4 py-4 transition-colors duration-100 hover:bg-fd-muted/40",
+                    depth > 0 && "bg-fd-muted/15 px-3 py-3",
+                )}
+            >
+                <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
+                            {field.name}
+                        </code>
+
+                        <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
+                            <TypeText type={field.type} />
+                        </div>
+
+                        {field.required ? (
+                            <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-[3px] font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+                                required
+                            </span>
+                        ) : (
+                            <span className="rounded border border-fd-border px-1.5 py-[3px] font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
+                                optional
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="text-[14px] text-fd-muted-foreground leading-relaxed">
+                    <div>{field.description}</div>
+
+                    {field.defaultValue ? (
+                        <div className="mt-0.5 text-[13px]">
+                            <span className="text-fd-muted-foreground/70">
+                                Default:
+                            </span>{" "}
+                            <code className="rounded bg-fd-muted px-1.5 py-[3px] font-mono text-[12px]">
+                                {field.defaultValue}
+                            </code>
+                        </div>
+                    ) : null}
+
+                    {field.allowedValues?.length ? (
+                        <div className="mt-0.5 flex flex-wrap gap-1.5">
+                            {field.allowedValues.map((v) => (
+                                <code
+                                    key={v}
+                                    className="rounded-md border border-fd-border bg-fd-muted/60 px-2 py-1 font-mono text-[11.5px]"
+                                >
+                                    {v}
+                                </code>
+                            ))}
+                        </div>
+                    ) : null}
+
+                    {childFields?.length ? (
+                        <details className="mt-3 overflow-hidden rounded-md border border-fd-border bg-fd-background">
+                            <summary className="cursor-pointer select-none px-3 py-2 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:text-fd-foreground">
+                                {getChildSummaryLabel(tableTitle)}
+                            </summary>
+                            <div className="divide-y divide-fd-border border-fd-border border-t">
+                                <FieldRows
+                                    depth={depth + 1}
+                                    fields={childFields}
+                                    tableTitle={tableTitle}
+                                />
+                            </div>
+                        </details>
+                    ) : null}
+                </div>
+            </div>
+        );
+    });
+}
+
+function TypeText({ type }: { type: string }) {
+    let offset = 0;
+
+    return tokenizeReferenceType(type).map((token) => {
+        const key = `${offset}:${token.text}`;
+        offset += token.text.length;
+
+        return token.href ? (
+            <a
+                className="text-fd-foreground underline decoration-fd-muted-foreground/35 underline-offset-4 transition-colors hover:text-fd-primary hover:decoration-fd-primary/70"
+                href={token.href}
+                key={key}
+            >
+                {token.text}
+            </a>
+        ) : (
+            <span key={key}>{token.text}</span>
+        );
+    });
+}
+
+function getChildFields(field: ReferenceField): ReferenceField[] | undefined {
+    if (field.children?.length) {
+        return field.children;
+    }
+
+    return shapeFieldsToReferenceFields(findReferenceShape(field.type)?.fields);
+}
+
+function shapeFieldsToReferenceFields(
+    fields: ReferenceShapeField[] | undefined,
+): ReferenceField[] | undefined {
+    if (!fields) {
+        return undefined;
+    }
+
+    return fields.map((field) => ({
+        ...field,
+        children: shapeFieldsToReferenceFields(field.children),
+    }));
+}
+
+function getChildSummaryLabel(tableTitle: string) {
+    const normalized = tableTitle.toLowerCase();
+
+    if (
+        normalized.includes("input") ||
+        normalized.includes("parameter") ||
+        normalized.includes("header") ||
+        normalized.includes("body") ||
+        normalized.includes("query")
+    ) {
+        return "Show child parameters";
+    }
+
+    return "Show child fields";
+}
+
+function getReferenceExample(
+    fields: ReferenceField[],
+    title: string,
+): Record<string, unknown> | undefined {
+    if (!shouldShowReferenceExample(title)) {
+        return undefined;
+    }
+
+    return buildReferenceExample(referenceFieldsToShapeFields(fields));
+}
+
+function normalizeReferenceFields(
+    fields: ReferenceField[],
+    title: string,
+): ReferenceField[] {
+    return (
+        shapeFieldsToReferenceFields(
+            groupDottedReferenceFields(
+                referenceFieldsToShapeFields(fields),
+                shouldShowReferenceExample(title)
+                    ? "Object field. Expand to see child fields."
+                    : "Object parameter. Expand to see child parameters.",
+            ),
+        ) ?? fields
+    );
+}
+
+function shouldShowReferenceExample(title: string): boolean {
+    const normalized = title.toLowerCase();
+    return normalized.includes("returns") || normalized.includes("response");
+}
+
+function referenceFieldsToShapeFields(
+    fields: ReferenceField[],
+): ReferenceShapeField[] {
+    return fields.map((field) => ({
+        ...field,
+        description:
+            typeof field.description === "string" ? field.description : "",
+        children: field.children
+            ? referenceFieldsToShapeFields(field.children)
+            : undefined,
+    }));
+}
+
+function ExampleResponse({ value }: { value: Record<string, unknown> }) {
+    return (
+        <div className="mt-4 [&_figure]:my-0">
+            <CodeBlock title="Example response">
+                <Pre>{JSON.stringify(value, null, 2)}</Pre>
+            </CodeBlock>
+        </div>
+    );
+}
+
+export function TypeShape({ typeName }: { typeName: string }) {
+    const shape = getReferenceShape(typeName);
+
+    if (!shape) {
+        return null;
+    }
+
+    return (
+        <section
+            id={slugify(typeName)}
+            className="not-prose my-10 scroll-mt-24"
+        >
+            <h2 className="mb-2 font-bold text-2xl text-fd-foreground leading-snug tracking-tight">
+                {typeName}
+            </h2>
+            <p className="m-0 max-w-[680px] text-[15px] text-fd-muted-foreground leading-[1.75]">
+                {shape.description}
+            </p>
+            <FieldTable
+                title="Fields"
+                fields={shapeFieldsToReferenceFields(shape.fields) ?? []}
+            />
+        </section>
+    );
+}
+
+export function RequiredHeaders({
+    auth = true,
+    json = false,
+}: {
+    auth?: boolean;
+    json?: boolean;
+}) {
+    const fields: ReferenceField[] = [];
+
+    if (auth) {
+        fields.push({
+            name: "Authorization",
+            type: "Bearer token",
+            required: true,
+            description: "JWT bearer token returned by login or token refresh.",
+        });
+    }
+
+    if (json) {
+        fields.push({
+            name: "Content-Type",
+            type: "application/json",
+            required: true,
+            description: "Required when sending a JSON request body.",
+        });
+    }
+
+    if (!fields.length) {
+        return null;
+    }
+
+    return <FieldTable title="Required headers" fields={fields} />;
 }
 
 export function MethodTable({
@@ -293,7 +539,10 @@ export function getMDXComponents(components?: MDXComponents) {
         MethodTable,
         ReferenceGrid,
         ReferenceHeader,
+        RequiredHeaders,
         ServiceTable,
+        TypeShape,
+        Note,
         pre: ({ ref: _ref, ...props }: ComponentProps<"pre">) => (
             <CodeBlock {...props}>
                 <Pre>{props.children}</Pre>

@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Install linxio-js and make your first authenticated Linxio request.
+description: Install linxio-js and make your first authenticated Linxio request. This guide will walk you through the process of installing the package, creating a client, and making your first authenticated request.
 ---
 
 ## Install
@@ -31,85 +31,95 @@ npm install linxio-js
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Create a client" sdk="createClient(options)" hideTitle={true}>
-      Instantiate a client once per process. Pass optional configuration for
-      timeout, retry behaviour, and a custom fetch implementation.
+      Clients are reusable once you've created one, so they can be instantiated once in a configuration file, service, or other location and imported as needed. You can optionally pass options to configure 
+      timeout, retry behaviour, and a custom fetch implementation. See the [`createClient` Reference](./sdk-reference#create-a-client) for more details.
     </ReferenceHeader>
-
-    <FieldTable
-      fields={[
-        {
-          name: "timeoutMs",
-          type: "number",
-          description: "Per-request timeout. Throws LinxioTimeoutError when exceeded.",
-          defaultValue: "30000",
-        },
-        {
-          name: "retry",
-          type: "{ retries?: number; delayMs?: number }",
-          description: "Retry policy for transient failures on idempotent requests.",
-        },
-      ]}
-    />
   </div>
 
   <CodeRail>
 
-```ts title="Client setup"
+```ts title="Basic client setup"
 import { createClient } from "linxio-js";
 
-const linxio = createClient({
-  timeoutMs: 30_000,
-  retry: {
-    retries: 3,
-    delayMs: 1_000,
-  },
-});
+const linxio = createClient();
 ```
 
   </CodeRail>
 </ReferenceGrid>
 
-## Authenticate
+## Authenticate the client
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="Authenticate" method="POST" path="/login" sdk="linxio.auth.login(payload)">
-      Login stores the session in memory. Subsequent service calls include the
-      bearer token automatically. Store the session yourself if your process
-      needs to survive restarts.
+    <ReferenceHeader title="Authenticate" method="POST" path="/login" sdk="linxio.auth.login(payload)" hideTitle={true}>
+      Authenticating the client is required before you can make any requests to the Linxio API. Use your Linxio dashboard credentials to authenticate.
     </ReferenceHeader>
   </div>
 
   <CodeRail>
 
 ```ts title="Login"
+import { createClient } from "linxio-js";
+
+// The client you created in the previous step
+const linxio = createClient();
+
+// Authenticate with your Linxio dashboard credentials
 const login = await linxio.auth.login({
-  email: process.env.LINXIO_EMAIL!,
-  password: process.env.LINXIO_PASSWORD!,
+    email: process.env.LINXIO_EMAIL,
+    password: process.env.LINXIO_PASSWORD,
 });
-
-if (login.error) {
-  throw login.error;
-}
-
-// Persist tokens across restarts
-const session = linxio.session();
-await saveSession(session);
-
-// Restore on next startup
-const linxio2 = createClient(await loadSession());
 ```
 
   </CodeRail>
 </ReferenceGrid>
 
-## Read vehicles
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Persisting sessions (optional)" sdk="createClient(options)">
+      <Note>Persisting sessions is optional, but recommended for long-running processes or services.</Note>
+
+      [`login()`](./getting-started#authenticate) stores the session in memory, so subsequent service calls include the
+      bearer token automatically. 
+      
+      However, you can choose to store the session yourself if your process
+      needs to survive restarts. See the [`createClient` Reference](./sdk-reference#create-a-client) for more details.
+
+      You can then pass the stored session tokens directly into `createClient` to restore the session.
+    </ReferenceHeader>
+  </div>
+
+  <CodeRail>
+
+```ts title="Persisting sessions example"
+import { linxio } from "path/where/you/created/the/client";
+
+// Retrieve the session from the Linxio client
+const session = linxio.session();
+
+// TODO: (Replace with your own, real callback) Save the session
+// to whatever storage medium you prefer - cookies, database, file, etc. 
+await mySaveSessionCallback(session);
+
+// On next startup/client restart, load the session from your storage into the client
+const linxio2 = createClient(
+    await myLoadSessionCallback() // TODO: Replace with your own, real callback
+);
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+## You're good to go! 🎉
 
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Read vehicles" sdk="linxio.vehicles.list(params)">
-      Paginated list with field projection. Use `iterate()` to auto-page
-      everything into one array, or `stream()` for lazy async iteration.
+      Using your newly authenticated client, you can now make requests to the Linxio API.
+
+      For example, you can list all vehicles in your fleet using the [`vehicles.list()` method](./sdk-reference#vehicleslist). 
+      
+      This will return a paginated list of vehicles, with a maximum of 100 vehicles per page. You can also use the [`vehicles.iterate()` method](./sdk-reference#vehiclesiterate) to auto-page everything into one array, or the [`vehicles.stream()` method](./sdk-reference#vehiclesstream) for lazy async iteration.
     </ReferenceHeader>
   </div>
 
@@ -141,6 +151,48 @@ for (const v of all) console.log(v.id, v.regNo);
 for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
   console.log(vehicle.id, vehicle.regNo);
 }
+```
+
+  </CodeRail>
+</ReferenceGrid>
+
+
+## Full example
+
+<ReferenceGrid>
+  <div>
+    <ReferenceHeader title="Full example">
+      Here's a full example of how to initialise, authenticate, and use the Linxio SDK to list all vehicles in your fleet. 
+      
+      This example assumes you have a `.env` file with your Linxio credentials.
+    </ReferenceHeader>
+  </div>
+
+  <CodeRail>
+
+```ts title="Full example"
+import { createClient } from "linxio-js";
+
+// The client you created in the previous step
+const linxio = createClient();
+
+// Authenticate with your Linxio dashboard credentials
+const login = await linxio.auth.login({
+    email: process.env.LINXIO_EMAIL,
+    password: process.env.LINXIO_PASSWORD,
+});
+
+// If authentication fails, throw the error
+if (login.error) throw login.error;
+
+// List all vehicles in your fleet, retrieving the id, registration number, and last logged at timestamp for each
+const { data: vehicles, error, meta } = await linxio.vehicles.list({
+  fields: ["id", "regNo", "lastLoggedAt"],
+  limit: 100,
+  page: 1,
+  sort: "regNo",
+});
+
 ```
 
   </CodeRail>

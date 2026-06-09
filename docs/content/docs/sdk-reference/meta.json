@@ -13,6 +13,7 @@
     "metadata",
     "realtime",
     "http",
+    "types",
     "utilities"
   ]
 }

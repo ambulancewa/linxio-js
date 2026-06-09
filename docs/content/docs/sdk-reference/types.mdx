@@ -1,0 +1,92 @@
+---
+title: Type shapes
+description: SDK response, payload, parameter, and shared object shapes used across the reference.
+---
+
+This page collects the bespoke TypeScript shapes used by SDK and API reference
+tables. Open any object row in the method reference for the inline shape, or
+follow the linked type name here when you want the full contract in one place.
+
+## Result envelopes
+
+<TypeShape typeName="LinxioResult" />
+<TypeShape typeName="LinxioPageResult" />
+<TypeShape typeName="LinxioPaginationMeta" />
+<TypeShape typeName="LinxioError" />
+<TypeShape typeName="LinxioApiError" />
+
+## Authentication
+
+<TypeShape typeName="LinxioLoginRequest" />
+<TypeShape typeName="LinxioLoginResponse" />
+<TypeShape typeName="LinxioRefreshTokenResponse" />
+<TypeShape typeName="LinxioSession" />
+<TypeShape typeName="LinxioCurrentUser" />
+
+## Vehicles and routes
+
+<TypeShape typeName="LinxioVehicle" />
+<TypeShape typeName="LinxioVehiclePayload" />
+<TypeShape typeName="LinxioVehicleListParams" />
+<TypeShape typeName="LinxioVehicleType" />
+<TypeShape typeName="LinxioVehicleTypeParams" />
+<TypeShape typeName="LinxioCount" />
+<TypeShape typeName="LinxioOdometer" />
+<TypeShape typeName="LinxioOdometerParams" />
+<TypeShape typeName="LinxioOdometerRecalibration" />
+<TypeShape typeName="LinxioEngineHours" />
+<TypeShape typeName="LinxioVehicleRoute" />
+<TypeShape typeName="LinxioVehicleRoutesGroup" />
+<TypeShape typeName="LinxioVehicleRoutesParams" />
+<TypeShape typeName="LinxioRoutePoint" />
+<TypeShape typeName="LinxioRouteCoordinate" />
+
+## Devices, sensors, and realtime
+
+<TypeShape typeName="LinxioDevice" />
+<TypeShape typeName="LinxioDevicePayload" />
+<TypeShape typeName="LinxioDeviceInstallationPayload" />
+<TypeShape typeName="LinxioDeviceUninstallPayload" />
+<TypeShape typeName="LinxioDeviceCoordinate" />
+<TypeShape typeName="LinxioDeviceVendor" />
+<TypeShape typeName="LinxioDeviceInstallation" />
+<TypeShape typeName="LinxioDeviceCamera" />
+<TypeShape typeName="LinxioSensor" />
+<TypeShape typeName="LinxioSensorReportParams" />
+<TypeShape typeName="LinxioTemperatureHumidityReading" />
+<TypeShape typeName="LinxioTrackingPosition" />
+
+## Accounts, users, and drivers
+
+<TypeShape typeName="LinxioUser" />
+<TypeShape typeName="LinxioUserPayload" />
+<TypeShape typeName="LinxioUserListParams" />
+<TypeShape typeName="LinxioClientAccount" />
+<TypeShape typeName="LinxioClientUserListParams" />
+<TypeShape typeName="LinxioReseller" />
+
+## Geofences
+
+<TypeShape typeName="LinxioGeofence" />
+<TypeShape typeName="LinxioGeofencePayload" />
+<TypeShape typeName="LinxioAreaGroup" />
+<TypeShape typeName="LinxioAreaGroupPayload" />
+
+## Fuel and reports
+
+<TypeShape typeName="LinxioFuelRecord" />
+<TypeShape typeName="LinxioFuelSummaryRecord" />
+<TypeShape typeName="LinxioFuelListParams" />
+<TypeShape typeName="LinxioFuelCard" />
+<TypeShape typeName="LinxioReportParams" />
+<TypeShape typeName="LinxioScheduledReport" />
+<TypeShape typeName="LinxioScheduledReportPayload" />
+<TypeShape typeName="LinxioDigitalForm" />
+
+## Metadata and shared shapes
+
+<TypeShape typeName="LinxioMetadataRecord" />
+<TypeShape typeName="LinxioCurrentPlan" />
+<TypeShape typeName="DateRangeParams" />
+<TypeShape typeName="LatLng" />
+<TypeShape typeName="LinxioHttpRequestOptions" />

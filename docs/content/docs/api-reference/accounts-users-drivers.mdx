@@ -15,6 +15,8 @@ client account, and driver assignment endpoints for vehicle-driver links.
       Returns a paginated list of users visible to the authenticated account.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
@@ -45,6 +47,8 @@ curl "https://api.linxio.com/api/users?fields[]=id&fields[]=email&limit=100" \
       Returns one user by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "User identifier." },
@@ -71,6 +75,8 @@ curl "https://api.linxio.com/api/users/123" \
     <ReferenceHeader title="Create a user" method="POST" path="/users" sdk="linxio.users.create(payload)">
       Creates a user.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Body parameters" fields={[
       { name: "email", type: "string", description: "User email address." },
@@ -108,6 +114,8 @@ curl -X POST https://api.linxio.com/api/users \
       Updates a user.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path and body parameters" fields={[
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
       { name: "body", type: "LinxioUserPayload", required: true, description: "Fields to update." },
@@ -137,6 +145,8 @@ curl -X PATCH https://api.linxio.com/api/users/123 \
       Soft-archives a user.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "User identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
@@ -161,6 +171,8 @@ curl -X PATCH https://api.linxio.com/api/users/123/archive \
       Restores a previously archived user.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "userId", type: "LinxioId", required: true, description: "Archived user identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
@@ -184,6 +196,8 @@ curl -X PATCH https://api.linxio.com/api/users/123/restore \
     <ReferenceHeader title="List client accounts" method="GET" path="/clients/json" sdk="linxio.clients.list(params)">
       Returns a paginated list of client accounts.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
@@ -216,6 +230,8 @@ curl "https://api.linxio.com/api/clients/json?limit=100&page=1" \
       Returns one client account by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Client account identifier." },
@@ -240,6 +256,8 @@ curl "https://api.linxio.com/api/clients/10" \
     <ReferenceHeader title="List client users" method="GET" path="/clients/{clientId}/users" sdk="linxio.clients.listUsers(clientId, params)">
       Returns a paginated list of users for a client account.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path and query parameters" fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
@@ -272,6 +290,8 @@ curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
       Returns one user within a client account.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
@@ -300,6 +320,8 @@ curl "https://api.linxio.com/api/clients/10/users/123" \
     <ReferenceHeader title="Create a client user" method="POST" path="/clients/{clientId}/users" sdk="linxio.clients.createUser(clientId, payload)">
       Creates a user inside a client account.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path and body parameters" fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
@@ -337,6 +359,8 @@ curl -X POST https://api.linxio.com/api/clients/10/users \
       Updates a user inside a client account.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path and body parameters" fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
       { name: "userId", type: "LinxioId", required: true, description: "User identifier." },
@@ -368,6 +392,8 @@ curl -X POST https://api.linxio.com/api/clients/10/users/123 \
       when `clientId` is not supplied to the SDK.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Number of records per page." },
       { name: "page", type: "number", description: "Page number to read." },
@@ -393,6 +419,8 @@ curl "https://api.linxio.com/api/drivers?limit=100" \
     <ReferenceHeader title="List client drivers" method="GET" path="/clients/{clientId}/users?role=driver" sdk="linxio.drivers.list({ clientId })">
       Lists drivers through the documented client-users endpoint.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path and query parameters" fields={[
       { name: "clientId", type: "LinxioId", required: true, description: "Client account identifier." },
@@ -421,6 +449,8 @@ curl "https://api.linxio.com/api/clients/10/users?role=driver&limit=100" \
       Assigns a driver to a vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[
       { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
       { name: "driverId", type: "LinxioId", required: true, description: "Driver user identifier." },
@@ -447,6 +477,8 @@ curl -X POST https://api.linxio.com/api/vehicle/304/set-driver/123 \
     <ReferenceHeader title="Unassign driver from vehicle" method="POST" path="/vehicle/{vehicleId}/unset-driver/{driverId}" sdk="linxio.drivers.unassignFromVehicle(vehicleId, driverId)">
       Removes a driver assignment from a vehicle.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable title="Path parameters" fields={[
       { name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." },
@@ -475,6 +507,8 @@ curl -X POST https://api.linxio.com/api/vehicle/304/unset-driver/123 \
       Lists reseller accounts visible to the authenticated account.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "id", type: "LinxioId", description: "Reseller identifier." },
@@ -499,6 +533,8 @@ curl "https://api.linxio.com/api/reseller" \
     <ReferenceHeader title="Get a reseller account" method="GET" path="/reseller/{resellerId}" sdk="linxio.resellers.get(resellerId)">
       Returns one reseller account by ID.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Path parameters" fields={[{ name: "resellerId", type: "LinxioId", required: true, description: "Reseller identifier." }]} />
     <FieldTable title="Response fields" fields={[

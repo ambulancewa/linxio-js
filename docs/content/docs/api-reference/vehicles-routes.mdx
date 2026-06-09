@@ -15,6 +15,8 @@ are requested.
       Returns a paginated list of vehicles.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable
       title="Query parameters"
       fields={[
@@ -68,6 +70,8 @@ curl "https://api.linxio.com/api/vehicles/fields/json?fields[]=id&fields[]=regNo
       Returns one vehicle by ID.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable
       title="Path parameters"
       fields={[
@@ -103,6 +107,8 @@ curl "https://api.linxio.com/api/vehicles/304" \
     <ReferenceHeader title="Create a vehicle" method="POST" path="/vehicles" sdk="linxio.vehicles.create(payload)">
       Creates a vehicle record.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable
       title="Body parameters"
@@ -149,6 +155,8 @@ curl -X POST https://api.linxio.com/api/vehicles \
       Updates an existing vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable
       title="Path and body parameters"
       fields={[
@@ -188,6 +196,8 @@ curl -X POST https://api.linxio.com/api/vehicles/304 \
       Soft-archives a vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful archive response." }]} />
   </div>
@@ -212,6 +222,8 @@ curl -X PATCH https://api.linxio.com/api/vehicles/304/archive \
       Restores a previously archived vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders json />
+
     <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Archived vehicle identifier." }]} />
     <FieldTable title="Response" fields={[{ name: "status", type: "204 or JSON", description: "Successful restore response." }]} />
   </div>
@@ -235,6 +247,8 @@ curl -X POST https://api.linxio.com/api/vehicles/304/restore \
     <ReferenceHeader title="Get vehicle odometer" method="GET" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.getOdometer(vehicleId, params)">
       Returns a vehicle odometer reading.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable
       title="Path and query parameters"
@@ -271,6 +285,8 @@ curl "https://api.linxio.com/api/vehicles/304/odometer" \
     <ReferenceHeader title="Recalibrate vehicle odometer" method="POST" path="/vehicles/{vehicleId}/odometer" sdk="linxio.vehicles.recalibrateOdometer(vehicleId, payload)">
       Recalibrates a vehicle odometer.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable
       title="Path and body parameters"
@@ -313,6 +329,8 @@ curl -X POST https://api.linxio.com/api/vehicles/304/odometer \
       Returns the current engine-hours reading for a vehicle.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Path parameters" fields={[{ name: "vehicleId", type: "LinxioId", required: true, description: "Vehicle identifier." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "engineHours", type: "number", description: "Current engine-hours reading." },
@@ -339,6 +357,8 @@ curl "https://api.linxio.com/api/vehicles/304/engine-hours/current" \
       Returns a vehicle count without fetching records.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable title="Query parameters" fields={[{ name: "[filter]", type: "QueryValue", description: "Optional dashboard-derived filters." }]} />
     <FieldTable title="Response fields" fields={[
       { name: "count", type: "number", description: "Vehicle count when returned by Linxio." },
@@ -363,6 +383,8 @@ curl "https://api.linxio.com/api/vehicles/count?status=active" \
     <ReferenceHeader title="List vehicle types" method="GET" path="/vehicles/types" sdk="linxio.vehicles.types(params)">
       Lists vehicle type categories.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable title="Query parameters" fields={[
       { name: "limit", type: "number", description: "Maximum type records.", defaultValue: "1000" },
@@ -392,6 +414,8 @@ curl "https://api.linxio.com/api/vehicles/types?limit=1000&sort=order" \
     <ReferenceHeader title="Get vehicle route history" method="GET" path="/vehicles/{vehicleId}/routes" sdk="linxio.routes.getVehicleRoutes(vehicleId, params)">
       Returns trip and stop history for one vehicle over a date range.
     </ReferenceHeader>
+
+    <RequiredHeaders />
 
     <FieldTable
       title="Path and query parameters"

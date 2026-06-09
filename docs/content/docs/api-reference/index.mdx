@@ -55,19 +55,23 @@ are included together with dashboard-derived endpoints represented in the SDK.
 
 ## Request conventions
 
+<RequiredHeaders />
+
 <FieldTable
+  title="JSON body headers"
   fields={[
-    {
-      name: "Authorization",
-      type: "Bearer token",
-      required: true,
-      description: "Send the JWT token returned by /login or /token/refresh for every authenticated endpoint.",
-    },
     {
       name: "Content-Type",
       type: "application/json",
+      required: true,
       description: "Send for JSON request bodies.",
     },
+  ]}
+/>
+
+<FieldTable
+  title="Common query parameters"
+  fields={[
     {
       name: "fields[]",
       type: "string[]",

@@ -50,6 +50,14 @@ timeout, retry, and token-refresh behavior as service methods.
     />
 
     <FieldTable
+      title="Headers"
+      fields={[
+        { name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers for custom or newly discovered endpoints." },
+        { name: "options.idempotencyKey", type: "string", description: "Sets the Idempotency-Key header for caller-managed retry safety." },
+      ]}
+    />
+
+    <FieldTable
       title="Returns"
       fields={[
         { name: "data", type: "Promise<TResponse>", description: "Parsed response. Raw request methods throw typed SDK errors instead of returning LinxioResult." },
@@ -94,6 +102,8 @@ const vehicle = await linxio.request("POST", "/vehicles", {
       ]}
     />
 
+    <FieldTable title="Headers" fields={[{ name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers." }]} />
+
     <FieldTable
       title="Returns"
       fields={[
@@ -128,7 +138,14 @@ const me = await linxio.http.get("/me", {
       fields={[
         { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
         { name: "body", type: "unknown", description: "Request body." },
-        { name: "options.idempotencyKey", type: "string", description: "Optional caller-managed idempotency key for retry-safe operations." },
+      ]}
+    />
+
+    <FieldTable
+      title="Headers"
+      fields={[
+        { name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers." },
+        { name: "options.idempotencyKey", type: "string", description: "Sets the Idempotency-Key header for caller-managed retry safety." },
       ]}
     />
 
@@ -165,7 +182,16 @@ const created = await linxio.http.post("/vehicles", {
       fields={[
         { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
         { name: "body", type: "unknown", description: "Request body." },
-        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+        { name: "options.params", type: "QueryParams", description: "Query parameters appended to the URL." },
+        { name: "options.responseType", type: "ResponseType", description: "Parser override." },
+      ]}
+    />
+
+    <FieldTable
+      title="Headers"
+      fields={[
+        { name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers." },
+        { name: "options.idempotencyKey", type: "string", description: "Sets the Idempotency-Key header for caller-managed retry safety." },
       ]}
     />
 
@@ -202,7 +228,16 @@ await linxio.http.patch(`/devices/${deviceId}`, {
       fields={[
         { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
         { name: "body", type: "unknown", description: "Request body." },
-        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+        { name: "options.params", type: "QueryParams", description: "Query parameters appended to the URL." },
+        { name: "options.responseType", type: "ResponseType", description: "Parser override." },
+      ]}
+    />
+
+    <FieldTable
+      title="Headers"
+      fields={[
+        { name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers." },
+        { name: "options.idempotencyKey", type: "string", description: "Sets the Idempotency-Key header for caller-managed retry safety." },
       ]}
     />
 
@@ -236,9 +271,12 @@ const updated = await linxio.http.put("/custom-endpoint", payload);
       title="Input"
       fields={[
         { name: "path", type: "string", required: true, description: "Relative API path or absolute URL." },
-        { name: "options", type: "LinxioHttpRequestOptions", description: "Headers, params, timeout, signal, and response parser options." },
+        { name: "options.params", type: "QueryParams", description: "Query parameters appended to the URL." },
+        { name: "options.responseType", type: "ResponseType", description: "Parser override." },
       ]}
     />
+
+    <FieldTable title="Headers" fields={[{ name: "options.headers", type: "HeadersInit", description: "Additional HTTP headers." }]} />
 
     <FieldTable
       title="Returns"

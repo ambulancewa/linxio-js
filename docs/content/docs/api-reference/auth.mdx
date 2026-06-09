@@ -14,6 +14,8 @@ of the API.
       Authenticates a Linxio user and returns a JWT token plus refresh token.
     </ReferenceHeader>
 
+    <RequiredHeaders auth={false} json />
+
     <FieldTable
       title="Body parameters"
       fields={[
@@ -69,6 +71,8 @@ curl -X POST https://api.linxio.com/api/login \
       Completes OTP verification when Linxio requires it for the account.
     </ReferenceHeader>
 
+    <RequiredHeaders auth={false} json />
+
     <FieldTable
       title="Body parameters"
       fields={[
@@ -109,6 +113,8 @@ curl -X POST https://api.linxio.com/api/login/otp \
       Exchanges a refresh token for a new JWT token.
     </ReferenceHeader>
 
+    <RequiredHeaders auth={false} json />
+
     <FieldTable
       title="Body parameters"
       fields={[
@@ -147,6 +153,8 @@ curl -X POST https://api.linxio.com/api/token/refresh \
       Returns the current authenticated user.
     </ReferenceHeader>
 
+    <RequiredHeaders />
+
     <FieldTable
       title="Query parameters"
       fields={[
@@ -184,6 +192,8 @@ curl "https://api.linxio.com/api/me?fields[]=id&fields[]=email" \
     <ReferenceHeader title="Log out current session" method="POST" path="/logout" sdk="linxio.auth.logout()">
       Logs out the current session server-side.
     </ReferenceHeader>
+
+    <RequiredHeaders json />
 
     <FieldTable
       title="Body parameters"
