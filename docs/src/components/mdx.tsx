@@ -471,7 +471,7 @@ function FieldRows({
     tableTitle: string;
     className?: string;
 }) {
-    return fields.map((field) => {
+    return fields.map((field, index) => {
         const childShape = findReferenceShape(field.type);
         const childFields =
             depth >= maxFieldExpansionDepth
@@ -480,6 +480,11 @@ function FieldRows({
         const nextExpandedTypes = childShape
             ? new Set([...expandedTypes, childShape.typeName])
             : expandedTypes;
+        const shouldAutoExpandChildFields =
+            depth === 0 &&
+            index === 0 &&
+            field.name === "params" &&
+            tableTitle.toLowerCase().includes("input");
 
         return (
             <div
@@ -542,7 +547,10 @@ function FieldRows({
                     ) : null}
 
                     {childFields?.length ? (
-                        <details className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background/80">
+                        <details
+                            className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background/80"
+                            open={shouldAutoExpandChildFields}
+                        >
                             <summary className="cursor-pointer select-none px-3 py-2 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:text-fd-foreground">
                                 {getChildSummaryLabel(tableTitle)}
                             </summary>
