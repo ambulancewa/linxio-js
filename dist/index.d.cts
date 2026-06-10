@@ -493,14 +493,16 @@ type LinxioReseller = LinxioRecord & {
 };
 
 /** Common field names for user list responses. */
-type UserField = "id" | "email" | "fullName" | "role" | "status" | (string & {});
+type UserField = "id" | "email" | "fullName" | "name" | "surname" | "role" | "status" | (string & {});
 /** User record returned by Linxio user endpoints. */
 type LinxioUser = LinxioRecord & {
     email?: string | null;
     fullName?: string | null;
     id: LinxioId;
+    name?: string | null;
     role?: string | null;
     status?: string | null;
+    surname?: string | null;
 };
 /** Payload for creating or updating a user. */
 type LinxioUserPayload = LinxioRecord & {
@@ -508,8 +510,10 @@ type LinxioUserPayload = LinxioRecord & {
     firstName?: string;
     fullName?: string;
     lastName?: string;
+    name?: string;
     phone?: string;
     roleId?: LinxioId;
+    surname?: string;
 };
 /** Parameters for `client.users.list()`. */
 type LinxioUserListParams = ListParams<UserField> & {
@@ -544,19 +548,45 @@ declare class ResellersService extends BaseService {
 }
 
 /** Common field names for Linxio device list responses. */
-type DeviceField = "id" | "imei" | "serial" | "status" | "vehicle" | "usage" | "vendor" | (string & {});
+type DeviceField = "id" | "imei" | "serial" | "status" | "vehicle" | "usage" | "vendor" | "model" | "trackerData" | "deviceInstallation" | (string & {});
 /** Device record returned by Linxio device endpoints. */
 type LinxioDevice = LinxioRecord & {
+    createdAt?: ISODateString | null;
+    createdBy?: LinxioUserAuditSummary | null;
+    deviceInstallation?: LinxioDeviceInstallation | null;
+    hasCameras?: boolean;
+    hw?: string | null;
+    iccid?: string | null;
     id: LinxioId;
     imei?: string | null;
+    imsi?: string | null;
+    installDate?: ISODateString | null;
+    isDeactivated?: boolean;
+    isFixWithSpeed?: boolean;
+    isUnavailable?: boolean;
+    lastActiveTime?: ISODateString | null;
     lastCoordinates?: (LatLng & {
         ts?: ISODateString;
     }) | null;
+    lastDataReceivedAt?: ISODateString | null;
+    model?: LinxioDeviceModel | string | null;
+    phone?: string | null;
+    port?: number | null;
+    professionalInstall?: boolean | null;
     serial?: string | null;
+    sn?: string | null;
     status?: string | null;
+    statusExt?: string | null;
+    statusUpdatedAt?: ISODateString | null;
+    sw?: string | null;
+    team?: LinxioTeamSummary | null;
+    trackerData?: LinxioRecord | null;
+    uninstallDate?: ISODateString | null;
+    updatedAt?: ISODateString | null;
+    updatedBy?: LinxioUserAuditSummary | null;
     usage?: string | null;
     vehicleId?: LinxioId | null;
-    vendor?: string | null;
+    vendor?: LinxioDeviceVendor | string | null;
 };
 /** Parameters for `client.devices.list()`. */
 type LinxioDeviceListParams = ListParams<DeviceField>;
@@ -585,35 +615,89 @@ type LinxioDeviceCoordinate = LinxioRecord & LatLng & {
     id?: LinxioId;
     ts?: ISODateString;
 };
+/** Optional filters for recent device coordinates. */
+type LinxioDeviceCoordinateParams = DateRangeParams & QueryParams & {
+    filter?: string;
+    sameTimeEachDay?: boolean;
+};
+/** Lookup parameters for the live `/devices/installation/` endpoint. */
+type LinxioDeviceInstallationLookupParams = QueryParams & {
+    deviceImei?: string;
+    vehicleRegNo?: string;
+};
 /** Device vendor record from the dashboard-derived vendor endpoint. */
 type LinxioDeviceVendor = LinxioRecord & {
     id?: LinxioId;
+    models?: LinxioDeviceModel[];
     name?: string;
+};
+/** Device model nested under vendor and device responses. */
+type LinxioDeviceModel = LinxioRecord & {
+    id?: LinxioId;
+    name?: string;
+    vendorId?: LinxioId;
 };
 /** Device installation row from the dashboard-derived installation endpoint. */
 type LinxioDeviceInstallation = LinxioRecord & {
+    device?: LinxioRecord | null;
     deviceId?: LinxioId;
+    files?: LinxioRecord[];
     id?: LinxioId;
+    installDate?: ISODateString | null;
     installedAt?: ISODateString | null;
+    odometer?: number | null;
+    uninstallDate?: ISODateString | null;
     uninstalledAt?: ISODateString | null;
+    vehicle?: LinxioRecord | null;
     vehicleId?: LinxioId;
 };
 /** Camera record associated with a device. */
 type LinxioDeviceCamera = LinxioRecord & {
     deviceId?: LinxioId;
+    expiredAt?: ISODateString | null;
     id?: LinxioId;
+    isAvailable?: boolean;
     name?: string;
     status?: string;
+    type?: string;
+    url?: string;
+};
+type LinxioTeamSummary = LinxioRecord & {
+    clientId?: LinxioId | null;
+    clientName?: string | null;
+    id?: LinxioId;
+    resellerId?: LinxioId | null;
+    resellerName?: string | null;
+    type?: string;
+};
+type LinxioUserAuditSummary = LinxioRecord & {
+    email?: string | null;
+    fullName?: string | null;
+    id?: LinxioId;
+    teamType?: string | null;
 };
 
+/** Common field names for Linxio sensor list responses. */
+type SensorField = "id" | "label" | "sensorId" | "systemStatus" | "team" | "type" | (string & {});
 /** Sensor record returned by Linxio sensor endpoints. */
 type LinxioSensor = LinxioRecord & {
+    createdAt?: ISODateString | null;
+    createdBy?: LinxioRecord | null;
     deviceId?: LinxioId | null;
     id: LinxioId;
+    isAutoCreated?: boolean;
+    label?: string | null;
     name?: string | null;
+    sensorId?: string | null;
+    systemStatus?: string | null;
+    team?: LinxioRecord | null;
     type?: string | null;
+    updatedAt?: ISODateString | null;
+    updatedBy?: LinxioRecord | null;
     vehicleId?: LinxioId | null;
 };
+/** Parameters for `client.sensors.list()`. */
+type LinxioSensorListParams = ListParams<SensorField>;
 /** Temperature/humidity reading returned by sensor reports. */
 type LinxioTemperatureHumidityReading = LinxioRecord & {
     humidity?: number | null;
@@ -651,27 +735,31 @@ declare class DevicesService extends BaseService {
     /** Restore a previously archived device. */
     restore(deviceId: LinxioId): Promise<LinxioResult<void>>;
     /** Fetch recent coordinates for a device from the dashboard-derived endpoint. */
-    coordinates(deviceId: LinxioId): Promise<LinxioResult<LinxioDeviceCoordinate[]>>;
-    /** List sensors paired with a device. */
-    sensors(deviceId: LinxioId): Promise<LinxioResult<LinxioSensor[]>>;
+    coordinates(deviceId: LinxioId, params?: LinxioDeviceCoordinateParams): Promise<LinxioResult<LinxioDeviceCoordinate[]>>;
+    /** List sensor history rows for a device. */
+    sensors(deviceId: LinxioId, params?: LinxioSensorListParams): Promise<LinxioPageResult<LinxioSensor>>;
     /** Fetch device history entries from the dashboard-derived endpoint. */
     history(deviceId: LinxioId): Promise<LinxioResult<LinxioRecord[]>>;
     /** List device vendors from the dashboard-derived endpoint. */
     vendors(): Promise<LinxioResult<LinxioDeviceVendor[]>>;
-    /** List device installation rows from the dashboard-derived endpoint. */
-    installations(params?: LinxioDeviceListParams): Promise<LinxioPageResult<LinxioDeviceInstallation>>;
+    /** Look up a device installation by device IMEI or vehicle registration. */
+    installation(params?: LinxioDeviceInstallationLookupParams): Promise<LinxioResult<LinxioDeviceInstallation | null>>;
+    /** Backwards-compatible alias for `installation()`. */
+    installations(params?: LinxioDeviceInstallationLookupParams): Promise<LinxioResult<LinxioDeviceInstallation | null>>;
     /** List cameras attached to a device from the dashboard-derived endpoint. */
     cameras(deviceId: LinxioId): Promise<LinxioResult<LinxioDeviceCamera[]>>;
 }
 
 /** Common field names for driver list responses. */
-type DriverField = "id" | "fullName" | "email" | "phone" | "role" | (string & {});
+type DriverField = "id" | "fullName" | "name" | "surname" | "email" | "phone" | "role" | (string & {});
 /** Driver user record. */
 type LinxioDriver = LinxioRecord & {
     email?: string | null;
     fullName?: string | null;
     id: LinxioId;
+    name?: string | null;
     phone?: string | null;
+    surname?: string | null;
 };
 /** Parameters for `client.drivers.list()`. */
 type LinxioDriverListParams = ListParams<DriverField> & {
@@ -829,13 +917,10 @@ type LinxioMetadataRecord = LinxioRecord & {
     /** Machine-readable value used by dashboard dropdowns. */
     value?: string;
 };
-/** Country option returned by the dashboard country reference endpoint. */
-type LinxioCountry = LinxioMetadataRecord & {
-    /** ISO-style country code when supplied by Linxio. */
-    code?: string;
-    /** Country display name. */
-    name?: string;
-};
+/** Country map returned by the dashboard country reference endpoint. */
+type LinxioCountryMap = Record<string, string>;
+/** @deprecated Use `LinxioCountryMap`; Linxio returns a keyed map, not rows. */
+type LinxioCountry = LinxioCountryMap;
 /** Role option returned by the dashboard roles endpoint. */
 type LinxioRole = LinxioMetadataRecord & {
     /** Role display name. */
@@ -860,15 +945,8 @@ type LinxioTheme = LinxioMetadataRecord & {
     /** Theme display name. */
     name?: string;
 };
-/** Current-plan permission summary returned by Linxio. */
-type LinxioCurrentPlan = LinxioRecord & {
-    /** Enabled feature keys when Linxio returns a feature list. */
-    features?: string[];
-    /** Plan identifier when supplied by Linxio. */
-    planId?: LinxioId;
-    /** Permission flags keyed by feature or module name. */
-    permissions?: LinxioRecord;
-};
+/** Current-plan permission keys returned by Linxio. */
+type LinxioCurrentPlan = string[];
 /** Platform domain settings used by hosted Linxio tenants. */
 type LinxioPlatformDomain = LinxioRecord & {
     /** Tenant domain when supplied. */
@@ -883,21 +961,30 @@ type LinxioLanguage = LinxioMetadataRecord & {
     /** Language display name. */
     name?: string;
 };
+/** Tenant/user/role scoped setting returned by dashboard settings endpoints. */
+type LinxioSettingRecord = LinxioRecord & {
+    id?: LinxioId | string;
+    name?: string;
+    role?: LinxioRecord | null;
+    team?: LinxioRecord | null;
+    user?: LinxioRecord | null;
+    value?: unknown;
+};
 /** Map API provider option returned by Linxio settings. */
-type LinxioMapApiOption = LinxioMetadataRecord;
+type LinxioMapApiOption = LinxioSettingRecord;
 /** Provider setting returned by the dashboard provider endpoint. */
-type LinxioProviderSetting = LinxioMetadataRecord;
+type LinxioProviderSetting = LinxioSettingRecord;
 /** Digital-form feature settings returned by Linxio. */
-type LinxioDigitalFormSettings = LinxioRecord;
+type LinxioDigitalFormSettings = LinxioSettingRecord;
 /** Eco-speed feature settings returned by Linxio. */
-type LinxioEcoSpeedSettings = LinxioRecord;
+type LinxioEcoSpeedSettings = LinxioSettingRecord;
 /** Excessive-idling feature settings returned by Linxio. */
-type LinxioExcessiveIdlingSettings = LinxioRecord;
+type LinxioExcessiveIdlingSettings = LinxioSettingRecord;
 
 /** Read-only dashboard reference data and tenant settings. */
 declare class MetadataService extends BaseService {
-    /** List country options used by Linxio address and tenant forms. */
-    countries(): Promise<LinxioResult<LinxioCountry[]>>;
+    /** Fetch country options as a map keyed by country code. */
+    countries(): Promise<LinxioResult<LinxioCountryMap>>;
     /** List user roles available to the authenticated Linxio account. */
     roles(): Promise<LinxioResult<LinxioRole[]>>;
     /** List plan definitions visible to the authenticated Linxio account. */
@@ -908,16 +995,16 @@ declare class MetadataService extends BaseService {
     themes(): Promise<LinxioResult<LinxioTheme[]>>;
     /** Fetch the current user's active dashboard theme. */
     myTheme(): Promise<LinxioResult<LinxioTheme>>;
-    /** Fetch current-plan permission and feature information. */
+    /** Fetch current-plan permission keys. */
     currentPlan(): Promise<LinxioResult<LinxioCurrentPlan>>;
     /** Fetch the hosted-domain settings for the current platform. */
     platformDomain(): Promise<LinxioResult<LinxioPlatformDomain>>;
     /** List language options used by Linxio settings screens. */
     languages(): Promise<LinxioResult<LinxioLanguage[]>>;
-    /** List map API provider options available to the current tenant. */
-    mapApiOptions(): Promise<LinxioResult<LinxioMapApiOption[]>>;
+    /** Fetch the map API setting record for the current tenant. */
+    mapApiOptions(): Promise<LinxioResult<LinxioMapApiOption>>;
     /** Fetch dashboard provider settings visible to the current account. */
-    providers(): Promise<LinxioResult<LinxioProviderSetting[]>>;
+    providers(): Promise<LinxioResult<LinxioProviderSetting>>;
     /** Fetch tenant-level digital-form settings. */
     digitalFormSettings(): Promise<LinxioResult<LinxioDigitalFormSettings>>;
     /** Fetch tenant-level eco-speed settings. */
@@ -1039,7 +1126,11 @@ declare class RoutesService extends BaseService {
 /** Sensor inventory and temperature/humidity report endpoints. */
 declare class SensorsService extends BaseService {
     /** List sensors from the dashboard-derived endpoint. */
-    list(): Promise<LinxioResult<LinxioSensor[]>>;
+    list(params?: LinxioSensorListParams): Promise<LinxioPageResult<LinxioSensor>>;
+    /** Load every sensor page into a single result. */
+    iterate(params?: LinxioSensorListParams): Promise<LinxioResult<LinxioSensor[]>>;
+    /** Stream sensors without loading the whole inventory at once. */
+    stream(params?: LinxioSensorListParams): AsyncGenerator<LinxioSensor, void, undefined>;
     /** Fetch one sensor by internal Linxio sensor ID. */
     get(sensorId: LinxioId): Promise<LinxioResult<LinxioSensor>>;
     /** Install or pair a sensor with a device. */
@@ -1075,27 +1166,97 @@ declare class UsersService extends BaseService {
 }
 
 /** Common field names for Linxio vehicle list responses. */
-type VehicleField = "id" | "regNo" | "defaultLabel" | "model" | "depotName" | "groupsList" | "driver" | "status" | "lastLoggedAt" | "lastCoordinates" | "todayData" | (string & {});
+type VehicleField = "id" | "regNo" | "defaultLabel" | "model" | "depotName" | "depot" | "groupsList" | "groups" | "driver" | "type" | "typeId" | "typeName" | "make" | "makeModel" | "vin" | "deviceId" | "status" | "lastLoggedAt" | "lastCoordinates" | "todayData" | (string & {});
 /** Vehicle record returned by Linxio vehicle endpoints. */
 type LinxioVehicle = LinxioRecord & {
+    areas?: LinxioVehicleAreaAssignment[];
+    averageDailyMileage?: number | null;
+    averageFuel?: number | null;
+    co2Emissions?: number | null;
+    createdAt?: ISODateString | null;
+    createdBy?: LinxioUserAuditSummary | null;
     defaultLabel?: string | null;
+    depot?: LinxioVehicleDepot | null;
     depotName?: string | null;
-    driver?: string | null;
+    deviceId?: LinxioId | null;
+    driver?: LinxioVehicleDriver | string | null;
     driverId?: LinxioId | null;
+    ecoSpeed?: number | null;
+    emissionClass?: string | null;
+    engineCapacity?: number | null;
+    engineOnTime?: number | null;
+    enginePower?: number | null;
+    excessiveIdling?: number | null;
+    fuelTankCapacity?: number | null;
+    fuelType?: LinxioId | null;
+    grossWeight?: number | null;
+    groups?: LinxioVehicleGroup[];
     groupsList?: string | null;
     id: LinxioId;
     lastCoordinates?: (LatLng & {
         ts?: ISODateString;
     }) | null;
     lastLoggedAt?: ISODateString | null;
+    make?: string | null;
+    makeModel?: string | null;
     model?: string | null;
+    picture?: string | null;
+    regCertNo?: string | null;
+    regDate?: ISODateString | null;
     regNo?: string | null;
     status?: string | null;
+    team?: LinxioTeamSummary | null;
+    teamId?: LinxioId | null;
     todayData?: {
         avgSpeed?: number;
         distance?: number;
         duration?: number;
+        idleDuration?: number;
     } | null;
+    type?: string | null;
+    typeId?: LinxioId | null;
+    typeName?: string | null;
+    unavailableMessage?: string | null;
+    updatedAt?: ISODateString | null;
+    updatedBy?: LinxioUserAuditSummary | null;
+    vin?: string | null;
+    year?: number | null;
+};
+/** Depot object nested in vehicle responses. */
+type LinxioVehicleDepot = LinxioRecord & {
+    color?: string | null;
+    createdAt?: ISODateString | null;
+    id: LinxioId;
+    name?: string | null;
+    status?: LinxioId | string | null;
+};
+/** Vehicle group object nested in vehicle responses. */
+type LinxioVehicleGroup = LinxioRecord & {
+    color?: string | null;
+    id: LinxioId;
+    name?: string | null;
+};
+/** Current area assignment nested in vehicle responses. */
+type LinxioVehicleAreaAssignment = LinxioRecord & {
+    area?: LinxioRecord & {
+        color?: string | null;
+        id?: LinxioId;
+        name?: string | null;
+        status?: string | null;
+    };
+    arrived?: ISODateString | null;
+    departed?: ISODateString | null;
+    driverArrived?: ISODateString | null;
+    driverDeparted?: ISODateString | null;
+    id?: LinxioId;
+};
+/** Driver object nested in vehicle responses when a driver is assigned. */
+type LinxioVehicleDriver = LinxioUser & {
+    driverFOBId?: string | null;
+    driverSensorId?: string | null;
+    lastLoggedAt?: ISODateString | null;
+    name?: string | null;
+    surname?: string | null;
 };
 /** Parameters for `client.vehicles.list()`. */
 type LinxioVehicleListParams = ListParams<VehicleField>;
@@ -1134,7 +1295,9 @@ type LinxioOdometerRecalibration = {
 /** Current engine-hours reading for a vehicle. */
 type LinxioEngineHours = LinxioRecord & {
     engineHours: number;
+    id?: LinxioId;
     occurredAt?: ISODateString | null;
+    prevEngineHours?: number | null;
     vehicleId: LinxioId;
 };
 /** Count response returned by dashboard-derived count endpoints. */
@@ -1144,9 +1307,14 @@ type LinxioCount = LinxioRecord & {
 };
 /** Vehicle type record returned by the dashboard-derived vehicle types endpoint. */
 type LinxioVehicleType = LinxioRecord & {
+    default?: string | null;
+    driving?: string | null;
     id: LinxioId;
+    idling?: string | null;
     name?: string;
     order?: number;
+    status?: string | null;
+    stopped?: string | null;
 };
 /** Optional filters accepted by `client.vehicles.count()`. */
 type LinxioVehicleCountParams = QueryParams;
@@ -1183,7 +1351,7 @@ declare class VehiclesService extends BaseService {
     /** Count vehicles using the dashboard-derived count endpoint. */
     count(params?: LinxioVehicleCountParams): Promise<LinxioResult<LinxioCount>>;
     /** List vehicle types using the dashboard-derived vehicle type endpoint. */
-    types(params?: LinxioVehicleTypeParams): Promise<LinxioResult<LinxioVehicleType[]>>;
+    types(params?: LinxioVehicleTypeParams): Promise<LinxioPageResult<LinxioVehicleType>>;
 }
 
 /**
@@ -1428,13 +1596,13 @@ declare const linxioEndpoints: {
         };
         readonly installations: {
             readonly method: "GET";
-            readonly path: "/devices/installation";
+            readonly path: "/devices/installation/";
             readonly source: "dashboard";
         };
         readonly sensors: {
             readonly list: {
                 readonly method: "GET";
-                readonly path: "/devices/{deviceId}/sensors";
+                readonly path: "/devices/{deviceId}/sensors/history";
                 readonly source: "dashboard";
             };
         };
@@ -1450,7 +1618,7 @@ declare const linxioEndpoints: {
         };
         readonly vendors: {
             readonly method: "GET";
-            readonly path: "/devices/vendors";
+            readonly path: "/devices/vendors/";
             readonly source: "dashboard";
         };
     };
@@ -1768,7 +1936,7 @@ declare const linxioEndpoints: {
         };
         readonly types: {
             readonly method: "GET";
-            readonly path: "/vehicles/types?limit=1000&sort=order";
+            readonly path: "/vehicles/types";
             readonly source: "dashboard";
         };
     };
@@ -1829,4 +1997,4 @@ declare function collectPages<TData, TParams extends ListParams>(loadPage: (para
  */
 declare function streamPages<TData, TParams extends ListParams>(loadPage: (params: TParams) => Promise<LinxioPageResult<TData>>, params?: TParams): AsyncGenerator<TData, void, undefined>;
 
-export { AuthService, BaseService, CamerasService, ClientsService, type DashboardEndpointCoverage, type DashboardEndpointCoverageInput, type DashboardEndpointEvidence, type DashboardEndpointMethod, type DashboardSourceFile, type DateRangeParams, type DeviceField, DevicesService, DigitalFormsService, type DriverField, DriversService, type FetchLike, type FieldSelector, type FuelRecordField, FuelService, type GeofenceType, GeofencesService, HttpClient, type HttpMethod, type ISODateString, type JsonObject, type JsonPrimitive, type JsonValue, type LatLng, LinxioApiError, type LinxioApiErrorContext, type LinxioAreaGroup, type LinxioAreaGroupPayload, LinxioAuthenticationError, LinxioClient, type LinxioClientAccount, type LinxioClientOptions, type LinxioClientUserListParams, LinxioConfigurationError, type LinxioCount, type LinxioCountry, type LinxioCurrency, type LinxioCurrentPlan, type LinxioCurrentUser, type LinxioDevice, type LinxioDeviceCamera, type LinxioDeviceCoordinate, type LinxioDeviceInstallation, type LinxioDeviceInstallationPayload, type LinxioDeviceListParams, type LinxioDevicePayload, type LinxioDeviceUninstallPayload, type LinxioDeviceVendor, type LinxioDigitalForm, type LinxioDigitalFormSettings, type LinxioDriver, type LinxioDriverListParams, type LinxioEcoSpeedSettings, type LinxioEndpointDefinition, type LinxioEndpointSource, type LinxioEngineHours, LinxioError, type LinxioErrorContext, type LinxioExcessiveIdlingSettings, type LinxioFailure, type LinxioFileFormat, type LinxioFuelCard, type LinxioFuelListParams, type LinxioFuelRecord, type LinxioFuelSummaryRecord, type LinxioGeofence, type LinxioGeofenceListParams, type LinxioGeofencePayload, type LinxioHttpConfig, type LinxioHttpRequestOptions, type LinxioId, type LinxioLanguage, type LinxioLoginRequest, type LinxioLoginResponse, type LinxioMapApiOption, type LinxioMetadataRecord, LinxioNetworkError, type LinxioNotification, type LinxioOdometer, type LinxioOdometerParams, type LinxioOdometerRecalibration, type LinxioOtpVerificationRequest, type LinxioPage, type LinxioPageEnvelope, type LinxioPageFailure, type LinxioPageResult, type LinxioPageSuccess, type LinxioPaginationMeta, type LinxioPlan, type LinxioPlatformDomain, type LinxioProviderSetting, LinxioRealtimeError, type LinxioRealtimeNamespace, type LinxioRealtimeSubscribeAck, type LinxioRealtimeSubscription, type LinxioRecord, type LinxioRefreshTokenResponse, type LinxioReportParams, type LinxioReseller, type LinxioResourceStatus, type LinxioResult, type LinxioRole, type LinxioRouteCoordinate, type LinxioRoutePoint, type LinxioScheduledReport, type LinxioScheduledReportPayload, type LinxioSensor, type LinxioSensorReportParams, type LinxioSession, type LinxioSuccess, type LinxioTeamType, type LinxioTemperatureHumidityReading, type LinxioTheme, LinxioTimeoutError, type LinxioTimezone, type LinxioTrackingPosition, type LinxioUser, type LinxioUserListParams, type LinxioUserPayload, type LinxioUserSummary, LinxioValidationError, type LinxioVehicle, type LinxioVehicleCountParams, type LinxioVehicleListParams, type LinxioVehiclePayload, type LinxioVehicleRoute, type LinxioVehicleRoutesGroup, type LinxioVehicleRoutesParams, type LinxioVehicleType, type LinxioVehicleTypeParams, type ListParams, MetadataService, type QueryParams, type QueryPrimitive, type QueryValue, RealtimeClient, type RealtimeClientOptions, type RealtimeEventHandler, type RealtimeUnsubscribe, ReportsService, ResellersService, type ResponseType, type RetryOptions, type RouteField, RoutesService, SensorsService, type SortDirection, type UserField, UsersService, type VehicleField, VehiclesService, collectPages, compareDashboardEndpointCoverage, createClient, extractDashboardEndpoints, fail, flattenEndpointDefinitions, isLinxioFailure, linxioEndpoints, ok, pageFail, pageOk, streamPages, toLinxioError, toResult, unwrapLinxioPageResult, unwrapLinxioResult };
+export { AuthService, BaseService, CamerasService, ClientsService, type DashboardEndpointCoverage, type DashboardEndpointCoverageInput, type DashboardEndpointEvidence, type DashboardEndpointMethod, type DashboardSourceFile, type DateRangeParams, type DeviceField, DevicesService, DigitalFormsService, type DriverField, DriversService, type FetchLike, type FieldSelector, type FuelRecordField, FuelService, type GeofenceType, GeofencesService, HttpClient, type HttpMethod, type ISODateString, type JsonObject, type JsonPrimitive, type JsonValue, type LatLng, LinxioApiError, type LinxioApiErrorContext, type LinxioAreaGroup, type LinxioAreaGroupPayload, LinxioAuthenticationError, LinxioClient, type LinxioClientAccount, type LinxioClientOptions, type LinxioClientUserListParams, LinxioConfigurationError, type LinxioCount, type LinxioCountry, type LinxioCountryMap, type LinxioCurrency, type LinxioCurrentPlan, type LinxioCurrentUser, type LinxioDevice, type LinxioDeviceCamera, type LinxioDeviceCoordinate, type LinxioDeviceCoordinateParams, type LinxioDeviceInstallation, type LinxioDeviceInstallationLookupParams, type LinxioDeviceInstallationPayload, type LinxioDeviceListParams, type LinxioDeviceModel, type LinxioDevicePayload, type LinxioDeviceUninstallPayload, type LinxioDeviceVendor, type LinxioDigitalForm, type LinxioDigitalFormSettings, type LinxioDriver, type LinxioDriverListParams, type LinxioEcoSpeedSettings, type LinxioEndpointDefinition, type LinxioEndpointSource, type LinxioEngineHours, LinxioError, type LinxioErrorContext, type LinxioExcessiveIdlingSettings, type LinxioFailure, type LinxioFileFormat, type LinxioFuelCard, type LinxioFuelListParams, type LinxioFuelRecord, type LinxioFuelSummaryRecord, type LinxioGeofence, type LinxioGeofenceListParams, type LinxioGeofencePayload, type LinxioHttpConfig, type LinxioHttpRequestOptions, type LinxioId, type LinxioLanguage, type LinxioLoginRequest, type LinxioLoginResponse, type LinxioMapApiOption, type LinxioMetadataRecord, LinxioNetworkError, type LinxioNotification, type LinxioOdometer, type LinxioOdometerParams, type LinxioOdometerRecalibration, type LinxioOtpVerificationRequest, type LinxioPage, type LinxioPageEnvelope, type LinxioPageFailure, type LinxioPageResult, type LinxioPageSuccess, type LinxioPaginationMeta, type LinxioPlan, type LinxioPlatformDomain, type LinxioProviderSetting, LinxioRealtimeError, type LinxioRealtimeNamespace, type LinxioRealtimeSubscribeAck, type LinxioRealtimeSubscription, type LinxioRecord, type LinxioRefreshTokenResponse, type LinxioReportParams, type LinxioReseller, type LinxioResourceStatus, type LinxioResult, type LinxioRole, type LinxioRouteCoordinate, type LinxioRoutePoint, type LinxioScheduledReport, type LinxioScheduledReportPayload, type LinxioSensor, type LinxioSensorListParams, type LinxioSensorReportParams, type LinxioSession, type LinxioSettingRecord, type LinxioSuccess, type LinxioTeamSummary, type LinxioTeamType, type LinxioTemperatureHumidityReading, type LinxioTheme, LinxioTimeoutError, type LinxioTimezone, type LinxioTrackingPosition, type LinxioUser, type LinxioUserAuditSummary, type LinxioUserListParams, type LinxioUserPayload, type LinxioUserSummary, LinxioValidationError, type LinxioVehicle, type LinxioVehicleAreaAssignment, type LinxioVehicleCountParams, type LinxioVehicleDepot, type LinxioVehicleDriver, type LinxioVehicleGroup, type LinxioVehicleListParams, type LinxioVehiclePayload, type LinxioVehicleRoute, type LinxioVehicleRoutesGroup, type LinxioVehicleRoutesParams, type LinxioVehicleType, type LinxioVehicleTypeParams, type ListParams, MetadataService, type QueryParams, type QueryPrimitive, type QueryValue, RealtimeClient, type RealtimeClientOptions, type RealtimeEventHandler, type RealtimeUnsubscribe, ReportsService, ResellersService, type ResponseType, type RetryOptions, type RouteField, RoutesService, type SensorField, SensorsService, type SortDirection, type UserField, UsersService, type VehicleField, VehiclesService, collectPages, compareDashboardEndpointCoverage, createClient, extractDashboardEndpoints, fail, flattenEndpointDefinitions, isLinxioFailure, linxioEndpoints, ok, pageFail, pageOk, streamPages, toLinxioError, toResult, unwrapLinxioPageResult, unwrapLinxioResult };

@@ -3,7 +3,7 @@ title: Overview
 description: A TypeScript SDK for Linxio fleet, device, driver, geofence, route, sensor, fuel, and realtime APIs.
 ---
 
-`linxio-js` is a TypeScript SDK for Linxio's REST and realtime APIs.
+`linxio-js` is a Node.js SDK for interacting with Linxio's REST and realtime APIs, built by [Ambulance Western Australia](https://ambulancewa.com.au) and released as open source software under our *Open Source Software Projects (OSSP)* program, which seeks to share our solutions with the community.
 
 The SDK is designed for Node.js projects, operational scripts, and backend services:
 
@@ -44,9 +44,3 @@ for (const vehicle of vehicles) {
   console.log(vehicle.id, vehicle.regNo, vehicle.lastLoggedAt);
 }
 ```
-
-## Evidence model
-
-The public API methods are based on Linxio's published API page. Additional service helpers were inferred from JavaScript bundles captured from the Linxio dashboard and are documented as dashboard-derived where appropriate.
-
-When a response schema is only partially known, exported types include the confirmed fields plus an open record shape so production scripts can keep working as Linxio adds fields.

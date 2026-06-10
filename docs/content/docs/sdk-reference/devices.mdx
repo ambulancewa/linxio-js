@@ -592,8 +592,10 @@ if (restored.error) {
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId)">
-      Fetches recent coordinates for a device.
+    <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId, params)">
+      Fetches coordinates for a device. In the live tenant this endpoint expects
+      a date range; call it with `dateFrom` and `dateTo` rather than relying on
+      server defaults.
     </ReferenceHeader>
 
     <FieldTable
@@ -604,6 +606,21 @@ if (restored.error) {
           type: "LinxioId",
           required: true,
           description: "Device identifier.",
+        },
+        {
+          name: "params.dateFrom",
+          type: "ISODateString",
+          description: "Start of the coordinate window.",
+        },
+        {
+          name: "params.dateTo",
+          type: "ISODateString",
+          description: "End of the coordinate window.",
+        },
+        {
+          name: "params.filter",
+          type: "string",
+          description: "Optional dashboard-derived coordinate filter.",
         },
       ]}
     />
@@ -628,7 +645,10 @@ if (restored.error) {
   <CodeRail>
 
 ```ts title="Device coordinates" lineNumbers
-const coordinates = await linxio.devices.coordinates(deviceId);
+const coordinates = await linxio.devices.coordinates(deviceId, {
+  dateFrom: "2026-06-01T00:00:00+08:00",
+  dateTo: "2026-06-02T00:00:00+08:00",
+});
 
 if (coordinates.error) {
   throw coordinates.error;
@@ -642,8 +662,8 @@ if (coordinates.error) {
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device sensors" method="GET" path="/devices/{deviceId}/sensors" sdk="linxio.devices.sensors(deviceId)">
-      Lists sensors paired with a device.
+    <ReferenceHeader title="List device sensors" method="GET" path="/devices/{deviceId}/sensors/history" sdk="linxio.devices.sensors(deviceId, params)">
+      Lists historical sensor rows associated with a device.
     </ReferenceHeader>
 
     <FieldTable
@@ -655,6 +675,22 @@ if (coordinates.error) {
           required: true,
           description: "Device identifier.",
         },
+        {
+          name: "params.limit",
+          type: "number",
+          description: "Number of sensor rows to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "SensorField[]",
+          description: "Sensor fields to include in the response projection.",
+        },
       ]}
     />
 
@@ -664,7 +700,12 @@ if (coordinates.error) {
         {
           name: "data",
           type: "LinxioSensor[] | null",
-          description: "Sensors associated with the device.",
+          description: "Sensor rows associated with the device.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
         },
         {
           name: "error",
@@ -678,7 +719,10 @@ if (coordinates.error) {
   <CodeRail>
 
 ```ts title="Device sensors" lineNumbers
-const sensors = await linxio.devices.sensors(deviceId);
+const sensors = await linxio.devices.sensors(deviceId, {
+  limit: 25,
+  page: 1,
+});
 
 if (sensors.error) {
   throw sensors.error;
@@ -742,7 +786,7 @@ if (history.error) {
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors" sdk="linxio.devices.vendors()">
+    <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors/" sdk="linxio.devices.vendors()">
       Lists device vendors available to the authenticated account.
     </ReferenceHeader>
 
@@ -763,7 +807,7 @@ if (history.error) {
         {
           name: "data",
           type: "LinxioDeviceVendor[] | null",
-          description: "Vendor records, usually including id and name.",
+          description: "Vendor records, usually including id, name, and supported models.",
         },
         {
           name: "error",
@@ -787,21 +831,28 @@ if (vendors.error) {
   </CodeRail>
 </ReferenceGrid>
 
-## devices.installations()
+## devices.installation()
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device installations" method="GET" path="/devices/installation" sdk="linxio.devices.installations(params)">
-      Lists device installation rows.
+    <ReferenceHeader title="Lookup device installation" method="GET" path="/devices/installation/" sdk="linxio.devices.installation(params)">
+      Looks up the current device installation by device IMEI or vehicle
+      registration number. `devices.installations(params)` remains available as
+      a backwards-compatible alias for this lookup.
     </ReferenceHeader>
 
     <FieldTable
       title="Input"
       fields={[
         {
-          name: "params",
-          type: "LinxioDeviceListParams",
-          description: "Pagination, sorting, fields, and dashboard-derived filters.",
+          name: "params.deviceImei",
+          type: "string",
+          description: "Device IMEI to look up.",
+        },
+        {
+          name: "params.vehicleRegNo",
+          type: "string",
+          description: "Vehicle registration number to look up.",
         },
       ]}
     />
@@ -811,18 +862,13 @@ if (vendors.error) {
       fields={[
         {
           name: "data",
-          type: "LinxioDeviceInstallation[] | null",
-          description: "Installation rows with deviceId, vehicleId, installedAt, and uninstalledAt when supplied.",
-        },
-        {
-          name: "meta",
-          type: "LinxioPaginationMeta | null",
-          description: "Pagination metadata.",
+          type: "LinxioDeviceInstallation | null",
+          description: "Matched installation record, or null when Linxio returns an empty object.",
         },
         {
           name: "error",
           type: "LinxioError | null",
-          description: "Typed SDK error when installations cannot be loaded.",
+          description: "Typed SDK error when the lookup cannot be loaded.",
         },
       ]}
     />
@@ -830,14 +876,13 @@ if (vendors.error) {
 
   <CodeRail>
 
-```ts title="Installation rows" lineNumbers
-const installations = await linxio.devices.installations({
-  limit: 100,
-  page: 1,
+```ts title="Installation lookup" lineNumbers
+const installation = await linxio.devices.installation({
+  vehicleRegNo: "1ABC234",
 });
 
-if (installations.error) {
-  throw installations.error;
+if (installation.error) {
+  throw installation.error;
 }
 ```
 

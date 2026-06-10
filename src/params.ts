@@ -1,7 +1,9 @@
+import { extractPageData, extractPageEnvelopeSource } from "./response";
 import type {
     FieldSelector,
     LinxioPage,
     LinxioPageEnvelope,
+    LinxioPaginationMeta,
     QueryParams,
     QueryValue,
 } from "./types/common";
@@ -62,19 +64,48 @@ function appendQueryParam(url: URL, key: string, value: QueryValue): void {
 export function toPage<TData>(
     envelope: LinxioPageEnvelope<TData>,
 ): LinxioPage<TData> {
+    const source = extractPageEnvelopeSource(envelope);
+    const sourceMeta = toPaginationMeta(source.meta);
+    const rootMeta = toPaginationMeta(envelope.meta);
     const meta = {
-        limit: Number(envelope.limit ?? envelope.meta?.limit ?? 0),
-        page: Number(envelope.page ?? envelope.meta?.page ?? 1),
-        total: Number(envelope.total ?? envelope.meta?.total ?? 0),
+        limit: Number(
+            source.limit ??
+                sourceMeta.limit ??
+                envelope.limit ??
+                rootMeta.limit ??
+                0,
+        ),
+        page: Number(
+            source.page ??
+                sourceMeta.page ??
+                envelope.page ??
+                rootMeta.page ??
+                1,
+        ),
+        total: Number(
+            source.total ??
+                sourceMeta.total ??
+                envelope.total ??
+                rootMeta.total ??
+                0,
+        ),
     };
 
     return {
-        additionalFields: envelope.additionalFields,
-        aggregations: envelope.aggregations,
-        data: Array.isArray(envelope.data) ? envelope.data : [],
+        additionalFields:
+            (source.additionalFields as Record<string, unknown> | undefined) ??
+            envelope.additionalFields,
+        aggregations: source.aggregations ?? envelope.aggregations,
+        data: extractPageData<TData>(source),
         ...meta,
         meta,
     };
+}
+
+function toPaginationMeta(value: unknown): Partial<LinxioPaginationMeta> {
+    return value && typeof value === "object" && !Array.isArray(value)
+        ? (value as Partial<LinxioPaginationMeta>)
+        : {};
 }
 
 export function stripUndefined<T extends Record<string, unknown>>(value: T): T {

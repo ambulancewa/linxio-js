@@ -92,6 +92,12 @@ export const referenceEnumValues = {
         { value: "vehicle", description: "Assigned vehicle summary." },
         { value: "usage", description: "Usage label when supplied." },
         { value: "vendor", description: "Device vendor label." },
+        { value: "model", description: "Device model object." },
+        { value: "trackerData", description: "Last tracker data object." },
+        {
+            value: "deviceInstallation",
+            description: "Current installation details when assigned.",
+        },
     ],
     DriverField: [
         { value: "id", description: "Driver user identifier." },
@@ -138,10 +144,20 @@ export const referenceEnumValues = {
         { value: "vehicle", description: "Vehicle summary for each route." },
         { value: "address", description: "Resolved start/finish addresses." },
     ],
+    SensorField: [
+        { value: "id", description: "Sensor identifier." },
+        { value: "label", description: "Sensor display label." },
+        { value: "sensorId", description: "Hardware sensor identifier." },
+        { value: "systemStatus", description: "Sensor system status." },
+        { value: "team", description: "Owning team summary." },
+        { value: "type", description: "Sensor type." },
+    ],
     UserField: [
         { value: "id", description: "User identifier." },
         { value: "email", description: "User email address." },
-        { value: "fullName", description: "User display name." },
+        { value: "fullName", description: "User display name when supplied." },
+        { value: "name", description: "User given name." },
+        { value: "surname", description: "User surname." },
         { value: "role", description: "User role label." },
         { value: "status", description: "User status." },
     ],
@@ -150,9 +166,16 @@ export const referenceEnumValues = {
         { value: "regNo", description: "Registration number or fleet code." },
         { value: "defaultLabel", description: "Default display label." },
         { value: "model", description: "Vehicle model text." },
-        { value: "depotName", description: "Depot display name." },
-        { value: "groupsList", description: "Vehicle group labels." },
-        { value: "driver", description: "Assigned driver display name." },
+        { value: "depot", description: "Depot object." },
+        { value: "groups", description: "Vehicle group objects." },
+        { value: "driver", description: "Assigned driver object." },
+        { value: "type", description: "Vehicle type key." },
+        { value: "typeId", description: "Vehicle type identifier." },
+        { value: "typeName", description: "Vehicle type display name." },
+        { value: "make", description: "Vehicle make." },
+        { value: "makeModel", description: "Vehicle make/model label." },
+        { value: "vin", description: "Vehicle identification number." },
+        { value: "deviceId", description: "Installed device identifier." },
         { value: "status", description: "Vehicle status." },
         { value: "lastLoggedAt", description: "Last telemetry timestamp." },
         {
@@ -377,26 +400,29 @@ export const referenceShapes = {
             },
         ],
     },
-    LinxioCurrentPlan: {
-        typeName: "LinxioCurrentPlan",
-        description: "Current-plan permission summary returned by Linxio.",
+    LinxioCountryMap: {
+        typeName: "LinxioCountryMap",
+        description:
+            "Country map returned by Linxio, keyed by country code with display names as values.",
         fields: [
             {
-                name: "features",
-                type: "string[]",
+                name: "[countryCode]",
+                type: "string",
                 description:
-                    "Enabled feature keys when Linxio returns a feature list.",
+                    "Country display name keyed by an ISO-style country code such as AU.",
             },
+        ],
+    },
+    LinxioCurrentPlan: {
+        typeName: "LinxioCurrentPlan",
+        description:
+            "Current-plan permission keys returned by Linxio as a string array.",
+        fields: [
             {
-                name: "planId",
-                type: "LinxioId",
-                description: "Plan identifier when supplied.",
-            },
-            {
-                name: "permissions",
-                type: "LinxioRecord",
+                name: "data[]",
+                type: "string",
                 description:
-                    "Permission flags keyed by feature or module name.",
+                    "Permission or feature key enabled for the current plan.",
             },
         ],
     },
@@ -482,6 +508,48 @@ export const referenceShapes = {
                 description: "Device IMEI when supplied.",
             },
             {
+                name: "vendor",
+                type: "LinxioDeviceVendor | string | null",
+                description: "Device vendor object when expanded.",
+                children: referencePlaceholder("LinxioDeviceVendor"),
+            },
+            {
+                name: "model",
+                type: "LinxioRecord | string | null",
+                description: "Device model object when expanded.",
+            },
+            {
+                name: "phone",
+                type: "string | null",
+                description: "SIM phone number when supplied.",
+            },
+            {
+                name: "imsi",
+                type: "string | null",
+                description: "SIM IMSI when supplied.",
+            },
+            {
+                name: "iccid",
+                type: "string | null",
+                description: "SIM ICCID when supplied.",
+            },
+            {
+                name: "installDate",
+                type: "ISODateString | null",
+                description: "Current install date when assigned.",
+            },
+            {
+                name: "uninstallDate",
+                type: "ISODateString | null",
+                description: "Uninstall date when no longer assigned.",
+            },
+            {
+                name: "deviceInstallation",
+                type: "LinxioDeviceInstallation | null",
+                description: "Current installation object.",
+                children: referencePlaceholder("LinxioDeviceInstallation"),
+            },
+            {
                 name: "lastCoordinates",
                 type: "LatLng & { ts?: ISODateString } | null",
                 description: "Last known device coordinates.",
@@ -498,6 +566,26 @@ export const referenceShapes = {
                 description: "Device status.",
             },
             {
+                name: "statusExt",
+                type: "string | null",
+                description: "Extended device status.",
+            },
+            {
+                name: "lastActiveTime",
+                type: "ISODateString | null",
+                description: "Last active timestamp.",
+            },
+            {
+                name: "lastDataReceivedAt",
+                type: "ISODateString | null",
+                description: "Last tracker data timestamp.",
+            },
+            {
+                name: "trackerData",
+                type: "LinxioRecord | null",
+                description: "Last tracker payload when supplied.",
+            },
+            {
                 name: "usage",
                 type: "string | null",
                 description: "Usage label when supplied.",
@@ -508,9 +596,19 @@ export const referenceShapes = {
                 description: "Assigned vehicle identifier.",
             },
             {
-                name: "vendor",
-                type: "string | null",
-                description: "Device vendor label.",
+                name: "hasCameras",
+                type: "boolean",
+                description: "Whether Linxio reports cameras on this device.",
+            },
+            {
+                name: "isDeactivated",
+                type: "boolean",
+                description: "Whether the device is deactivated.",
+            },
+            {
+                name: "isUnavailable",
+                type: "boolean",
+                description: "Whether the device is unavailable.",
             },
         ],
     },
@@ -567,15 +665,52 @@ export const referenceShapes = {
             },
         ],
     },
+    LinxioDeviceCoordinateParams: {
+        typeName: "LinxioDeviceCoordinateParams",
+        description: "Optional filters for recent device coordinates.",
+        fields: [
+            {
+                name: "dateFrom",
+                type: "ISODateString",
+                description: "Start date/time for coordinate history.",
+            },
+            {
+                name: "dateTo",
+                type: "ISODateString",
+                description: "End date/time for coordinate history.",
+            },
+            {
+                name: "sameTimeEachDay",
+                type: "boolean",
+                description:
+                    "Whether to compare the same time across each day when supported.",
+            },
+            {
+                name: "filter",
+                type: "string",
+                description: "Dashboard filter value when supported.",
+            },
+        ],
+    },
     LinxioDeviceInstallation: {
         typeName: "LinxioDeviceInstallation",
         description:
-            "Device installation row from the dashboard-derived installation endpoint.",
+            "Device installation lookup returned by `/devices/installation/`.",
         fields: [
+            {
+                name: "device",
+                type: "LinxioRecord | null",
+                description: "Device object when supplied.",
+            },
             {
                 name: "deviceId",
                 type: "LinxioId",
                 description: "Device identifier.",
+            },
+            {
+                name: "files",
+                type: "LinxioRecord[]",
+                description: "Installation files when supplied.",
             },
             {
                 name: "id",
@@ -583,19 +718,46 @@ export const referenceShapes = {
                 description: "Installation record identifier.",
             },
             {
-                name: "installedAt",
+                name: "installDate",
                 type: "ISODateString | null",
                 description: "Install timestamp.",
             },
             {
-                name: "uninstalledAt",
+                name: "odometer",
+                type: "number | null",
+                description: "Odometer captured at installation.",
+            },
+            {
+                name: "uninstallDate",
                 type: "ISODateString | null",
                 description: "Uninstall timestamp when supplied.",
+            },
+            {
+                name: "vehicle",
+                type: "LinxioRecord | null",
+                description: "Vehicle object when supplied.",
             },
             {
                 name: "vehicleId",
                 type: "LinxioId",
                 description: "Vehicle identifier.",
+            },
+        ],
+    },
+    LinxioDeviceInstallationLookupParams: {
+        typeName: "LinxioDeviceInstallationLookupParams",
+        description:
+            "Lookup parameters for the live `/devices/installation/` endpoint.",
+        fields: [
+            {
+                name: "deviceImei",
+                type: "string",
+                description: "Device IMEI to look up.",
+            },
+            {
+                name: "vehicleRegNo",
+                type: "string",
+                description: "Vehicle registration number to look up.",
             },
         ],
     },
@@ -682,6 +844,11 @@ export const referenceShapes = {
                 name: "name",
                 type: "string",
                 description: "Vendor display name.",
+            },
+            {
+                name: "models",
+                type: "LinxioRecord[]",
+                description: "Device models returned under this vendor.",
             },
         ],
     },
@@ -1452,6 +1619,11 @@ export const referenceShapes = {
         description: "Sensor record returned by Linxio sensor endpoints.",
         fields: [
             {
+                name: "createdAt",
+                type: "ISODateString | null",
+                description: "Sensor creation timestamp.",
+            },
+            {
                 name: "deviceId",
                 type: "LinxioId | null",
                 description: "Device identifier.",
@@ -1463,9 +1635,24 @@ export const referenceShapes = {
                 description: "Sensor identifier.",
             },
             {
-                name: "name",
+                name: "label",
                 type: "string | null",
-                description: "Sensor display name.",
+                description: "Sensor display label.",
+            },
+            {
+                name: "sensorId",
+                type: "string | null",
+                description: "Hardware sensor identifier.",
+            },
+            {
+                name: "systemStatus",
+                type: "string | null",
+                description: "Sensor system status.",
+            },
+            {
+                name: "team",
+                type: "LinxioRecord | null",
+                description: "Owning team summary.",
             },
             {
                 name: "type",
@@ -1473,9 +1660,62 @@ export const referenceShapes = {
                 description: "Sensor type.",
             },
             {
+                name: "updatedAt",
+                type: "ISODateString | null",
+                description: "Last update timestamp.",
+            },
+            {
                 name: "vehicleId",
                 type: "LinxioId | null",
                 description: "Vehicle identifier.",
+            },
+        ],
+    },
+    LinxioSensorListParams: {
+        typeName: "LinxioSensorListParams",
+        description: "Parameters for client.sensors.list().",
+        fields: listParamsFields({
+            enumValues: referenceEnumValues.SensorField,
+            fieldDescription:
+                "Sensor fields to include in the response projection.",
+            fieldType: "SensorField[]",
+        }),
+    },
+    LinxioSettingRecord: {
+        typeName: "LinxioSettingRecord",
+        description:
+            "Tenant, role, or user scoped setting record returned by dashboard settings endpoints.",
+        fields: [
+            {
+                name: "id",
+                type: "LinxioId | string",
+                description: "Setting identifier.",
+            },
+            {
+                name: "name",
+                type: "string",
+                description: "Setting key.",
+            },
+            {
+                name: "role",
+                type: "LinxioRecord | null",
+                description: "Role scope when supplied.",
+            },
+            {
+                name: "team",
+                type: "LinxioRecord | null",
+                description: "Team scope when supplied.",
+            },
+            {
+                name: "user",
+                type: "LinxioRecord | null",
+                description: "User scope when supplied.",
+            },
+            {
+                name: "value",
+                type: "unknown",
+                description:
+                    "Setting value. Type varies by setting and tenant configuration.",
             },
         ],
     },
@@ -1682,36 +1922,153 @@ export const referenceShapes = {
         description: "Vehicle record returned by Linxio vehicle endpoints.",
         fields: [
             {
+                name: "id",
+                type: "LinxioId",
+                required: true,
+                description: "Vehicle identifier.",
+            },
+            {
+                name: "teamId",
+                type: "LinxioId | null",
+                description: "Owning team identifier.",
+            },
+            {
+                name: "team",
+                type: "LinxioRecord | null",
+                description: "Owning team object.",
+            },
+            {
+                name: "depot",
+                type: "LinxioRecord | null",
+                description:
+                    "Depot object, typically including id, name, status, createdAt, and color.",
+            },
+            {
+                name: "type",
+                type: "string | null",
+                description: "Vehicle type key.",
+            },
+            {
+                name: "typeId",
+                type: "LinxioId | null",
+                description: "Vehicle type identifier.",
+            },
+            {
+                name: "typeName",
+                type: "string | null",
+                description: "Vehicle type display name.",
+            },
+            {
+                name: "make",
+                type: "string | null",
+                description: "Vehicle manufacturer.",
+            },
+            {
+                name: "makeModel",
+                type: "string | null",
+                description: "Manufacturer model label returned by Linxio.",
+            },
+            {
+                name: "model",
+                type: "string | null",
+                description: "Vehicle model text.",
+            },
+            {
+                name: "regNo",
+                type: "string | null",
+                description: "Registration number or fleet identifier.",
+            },
+            {
                 name: "defaultLabel",
                 type: "string | null",
                 description: "Default display label.",
             },
             {
-                name: "depotName",
+                name: "vin",
                 type: "string | null",
-                description: "Depot display name.",
+                description: "Vehicle identification number.",
+            },
+            {
+                name: "regDate",
+                type: "ISODateString | null",
+                description: "Vehicle registration date when supplied.",
+            },
+            {
+                name: "regCertNo",
+                type: "string | null",
+                description: "Registration certificate number when supplied.",
+            },
+            {
+                name: "year",
+                type: "number | null",
+                description: "Vehicle model year when supplied.",
+            },
+            {
+                name: "enginePower",
+                type: "number | null",
+                description: "Engine power rating when supplied.",
+            },
+            {
+                name: "engineCapacity",
+                type: "number | null",
+                description: "Engine capacity when supplied.",
+            },
+            {
+                name: "engineOnTime",
+                type: "number | null",
+                description: "Accumulated engine-on time.",
+            },
+            {
+                name: "fuelType",
+                type: "LinxioId | null",
+                description: "Fuel type identifier.",
+            },
+            {
+                name: "fuelTankCapacity",
+                type: "number | null",
+                description: "Fuel tank capacity.",
+            },
+            {
+                name: "averageFuel",
+                type: "number | null",
+                description: "Average fuel value returned by Linxio.",
+            },
+            {
+                name: "emissionClass",
+                type: "string | null",
+                description: "Emission class when supplied.",
+            },
+            {
+                name: "co2Emissions",
+                type: "number | null",
+                description: "CO2 emissions value when supplied.",
+            },
+            {
+                name: "grossWeight",
+                type: "number | null",
+                description: "Gross vehicle weight when supplied.",
+            },
+            {
+                name: "groups",
+                type: "LinxioRecord[]",
+                description: "Vehicle group objects with id, name, and color.",
+            },
+            {
+                name: "areas",
+                type: "LinxioRecord[]",
+                description:
+                    "Current area assignments with arrival/departure timestamps.",
+            },
+            {
+                name: "status",
+                type: "string | null",
+                description: "Vehicle status, such as online or offline.",
             },
             {
                 name: "driver",
-                type: "string | null",
-                description: "Driver display name.",
-            },
-            {
-                name: "driverId",
-                type: "LinxioId | null",
-                description: "Assigned driver identifier.",
-            },
-            {
-                name: "groupsList",
-                type: "string | null",
+                type: "LinxioRecord | null",
                 description:
-                    "Comma-separated group display labels when supplied.",
-            },
-            {
-                name: "id",
-                type: "LinxioId",
-                required: true,
-                description: "Vehicle identifier.",
+                    "Assigned driver object. Optional extras such as driverSensorId and driverFOBId appear only when configured.",
             },
             {
                 name: "lastCoordinates",
@@ -1725,23 +2082,13 @@ export const referenceShapes = {
                 description: "Last telemetry timestamp.",
             },
             {
-                name: "model",
-                type: "string | null",
-                description: "Vehicle model text.",
-            },
-            {
-                name: "regNo",
-                type: "string | null",
-                description: "Registration number or fleet identifier.",
-            },
-            {
-                name: "status",
-                type: "string | null",
-                description: "Vehicle status.",
+                name: "deviceId",
+                type: "LinxioId | null",
+                description: "Installed device identifier.",
             },
             {
                 name: "todayData",
-                type: "{ avgSpeed?: number; distance?: number; duration?: number } | null",
+                type: "{ avgSpeed?: number; distance?: number; duration?: number; idleDuration?: number } | null",
                 description: "Current-day telemetry summary when selected.",
                 children: [
                     {
@@ -1760,7 +2107,60 @@ export const referenceShapes = {
                         type: "number",
                         description: "Duration for the current-day summary.",
                     },
+                    {
+                        name: "idleDuration",
+                        type: "number",
+                        description:
+                            "Idle duration for the current-day summary.",
+                    },
                 ],
+            },
+            {
+                name: "ecoSpeed",
+                type: "number | null",
+                description:
+                    "Tenant-configured economical speed threshold when supplied.",
+            },
+            {
+                name: "excessiveIdling",
+                type: "number | null",
+                description:
+                    "Tenant-configured excessive idling threshold when supplied.",
+            },
+            {
+                name: "averageDailyMileage",
+                type: "number | null",
+                description: "Average daily mileage value returned by Linxio.",
+            },
+            {
+                name: "createdAt",
+                type: "ISODateString | null",
+                description: "Vehicle creation timestamp.",
+            },
+            {
+                name: "createdBy",
+                type: "LinxioRecord | null",
+                description: "User object for the creator when supplied.",
+            },
+            {
+                name: "updatedAt",
+                type: "ISODateString | null",
+                description: "Vehicle update timestamp.",
+            },
+            {
+                name: "updatedBy",
+                type: "LinxioRecord | null",
+                description: "User object for the last updater when supplied.",
+            },
+            {
+                name: "picture",
+                type: "string | null",
+                description: "Vehicle picture URL when supplied.",
+            },
+            {
+                name: "unavailableMessage",
+                type: "string | null",
+                description: "Unavailable reason when supplied.",
             },
         ],
     },
@@ -1964,10 +2364,25 @@ export const referenceShapes = {
             "Vehicle type record returned by the dashboard-derived vehicle types endpoint.",
         fields: [
             {
+                name: "default",
+                type: "string | null",
+                description: "Default color for this vehicle type.",
+            },
+            {
+                name: "driving",
+                type: "string | null",
+                description: "Driving-state color for this vehicle type.",
+            },
+            {
                 name: "id",
                 type: "LinxioId",
                 required: true,
                 description: "Vehicle type identifier.",
+            },
+            {
+                name: "idling",
+                type: "string | null",
+                description: "Idling-state color for this vehicle type.",
             },
             {
                 name: "name",
@@ -1978,6 +2393,16 @@ export const referenceShapes = {
                 name: "order",
                 type: "number",
                 description: "Sort order when supplied.",
+            },
+            {
+                name: "status",
+                type: "string | null",
+                description: "Vehicle type status.",
+            },
+            {
+                name: "stopped",
+                type: "string | null",
+                description: "Stopped-state color for this vehicle type.",
             },
         ],
     },
@@ -2112,13 +2537,7 @@ function buildReferenceExampleInternal(
             continue;
         }
 
-        const value = sampleValueForField(field, context);
-
-        if (value === undefined) {
-            continue;
-        }
-
-        setExampleValue(example, field.name, value);
+        setExampleFieldValue(example, field, context);
     }
 
     return Object.keys(example).length ? example : undefined;
@@ -2244,27 +2663,42 @@ function setExampleValue(
     rawName: string,
     value: unknown,
 ) {
-    for (const name of expandFieldName(rawName)) {
-        const path = name.split(".").map((part) => part.trim());
-        let cursor = target;
+    const path = rawName.split(".").map((part) => part.trim());
+    let cursor = target;
 
-        for (const [index, segment] of path.entries()) {
-            if (!segment || segment.startsWith("[") || segment === "none") {
-                return;
-            }
-
-            if (index === path.length - 1) {
-                cursor[segment] = value;
-                continue;
-            }
-
-            const current = cursor[segment];
-            if (!isPlainRecord(current)) {
-                cursor[segment] = {};
-            }
-
-            cursor = cursor[segment] as Record<string, unknown>;
+    for (const [index, segment] of path.entries()) {
+        if (!segment || segment.startsWith("[") || segment === "none") {
+            return;
         }
+
+        if (index === path.length - 1) {
+            cursor[segment] = value;
+            continue;
+        }
+
+        const current = cursor[segment];
+        if (!isPlainRecord(current)) {
+            cursor[segment] = {};
+        }
+
+        cursor = cursor[segment] as Record<string, unknown>;
+    }
+}
+
+function setExampleFieldValue(
+    target: Record<string, unknown>,
+    field: ReferenceShapeField,
+    context: ExampleBuildContext,
+) {
+    for (const name of expandFieldName(field.name)) {
+        const concreteField = { ...field, name };
+        const value = sampleValueForField(concreteField, context);
+
+        if (value === undefined) {
+            continue;
+        }
+
+        setExampleValue(target, name, value);
     }
 }
 
@@ -2290,6 +2724,22 @@ function sampleValueForField(
 ): unknown {
     if (field.name === "error") {
         return null;
+    }
+
+    const namedValue = sampleLinxioValueForField(field.name);
+    if (namedValue !== undefined) {
+        return namedValue;
+    }
+
+    const normalizedName = normalizeExampleFieldName(field.name);
+    const knownNumber = sampleNumberForName(normalizedName);
+    if (knownNumber !== undefined) {
+        return knownNumber;
+    }
+
+    const knownString = sampleStringForName(normalizedName);
+    if (knownString !== undefined) {
+        return knownString;
     }
 
     return sampleValueForType(field.type, field, context);
@@ -2343,7 +2793,7 @@ function sampleValueForType(
     }
 
     if (type.includes("LinxioId")) {
-        return 304;
+        return sampleId(field?.name);
     }
 
     if (type.includes("ISODateString")) {
@@ -2385,6 +2835,11 @@ function getArrayElementType(type: string): string | undefined {
 
 function sampleNumber(name = ""): number {
     const normalized = name.toLowerCase();
+
+    const knownNumber = sampleNumberForName(normalized);
+    if (knownNumber !== undefined) {
+        return knownNumber;
+    }
 
     if (normalized.includes("avg")) {
         return 62;
@@ -2432,6 +2887,11 @@ function sampleNumber(name = ""): number {
 function sampleString(name = ""): string {
     const normalized = name.toLowerCase();
 
+    const knownString = sampleStringForName(normalized);
+    if (knownString !== undefined) {
+        return knownString;
+    }
+
     if (normalized.includes("email")) {
         return "user@example.com";
     }
@@ -2448,10 +2908,6 @@ function sampleString(name = ""): string {
         return "Example User";
     }
 
-    if (normalized.includes("label")) {
-        return "Temporary SDK Test Vehicle";
-    }
-
     if (normalized.includes("name")) {
         return "Example";
     }
@@ -2461,7 +2917,11 @@ function sampleString(name = ""): string {
     }
 
     if (normalized.includes("regno")) {
-        return "AMB-304";
+        return "1ABC234";
+    }
+
+    if (normalized.includes("label")) {
+        return "Example Label";
     }
 
     if (normalized.includes("status")) {
@@ -2473,6 +2933,205 @@ function sampleString(name = ""): string {
     }
 
     return "string";
+}
+
+function sampleLinxioValueForField(name: string): unknown {
+    const normalized = normalizeExampleFieldName(name);
+
+    switch (normalized) {
+        case "areas":
+            return [
+                {
+                    id: "23535401",
+                    area: {
+                        id: 100037,
+                        name: "Nollamara District",
+                        status: "active",
+                        color: "#2bb100",
+                    },
+                    driverArrived: null,
+                    driverDeparted: null,
+                    arrived: "2026-05-31T05:46:13+00:00",
+                    departed: null,
+                },
+            ];
+        case "createdby":
+        case "updatedby":
+            return {
+                id: "36421",
+                fullName: "Example User",
+                email: "user@example.com.au",
+                teamType: "client",
+            };
+        case "depot":
+            return {
+                id: 1128,
+                name: "Westminster Depot",
+                status: 1,
+                createdAt: "2026-01-15T03:59:25+00:00",
+                color: "#0065d1",
+            };
+        case "driver":
+            return {
+                id: "36541",
+                email: "driver@example.com.au",
+                name: "Example",
+                surname: "Driver",
+                role: {
+                    id: 6,
+                    name: "admin",
+                    displayName: "Admin",
+                },
+                phone: "+61401000123",
+                status: "active",
+                lastLoggedAt: "2026-05-24T08:31:46+00:00",
+                driverSensorId: "F4CFB22527B2",
+                driverFOBId: "1",
+            };
+        case "groups":
+            return [
+                {
+                    id: 1391,
+                    name: "North Metropolitan",
+                    color: "#009221",
+                },
+            ];
+        case "lastcoordinates":
+            return {
+                lat: -31.9523,
+                lng: 115.8613,
+                ts: "2026-06-08T12:00:00+08:00",
+            };
+        case "picture":
+        case "regcertno":
+        case "unavailablemessage":
+            return null;
+        case "team":
+            return {
+                id: 5932,
+                type: "client",
+                clientId: 5598,
+                resellerId: null,
+                resellerName: null,
+                clientName: "EXAMPLE CLIENT",
+            };
+        case "todaydata":
+            return {
+                distance: 0,
+                duration: 0,
+                avgSpeed: 0,
+                idleDuration: 0,
+            };
+        default:
+            return undefined;
+    }
+}
+
+function sampleId(name = ""): number | string {
+    const normalized = normalizeExampleFieldName(name);
+
+    switch (normalized) {
+        case "areaid":
+            return 100037;
+        case "clientid":
+            return 5598;
+        case "deviceid":
+            return 124210;
+        case "driverid":
+            return "36541";
+        case "fueltype":
+            return 9;
+        case "groupid":
+            return 1391;
+        case "id":
+        case "vehicleid":
+            return 64553;
+        case "teamid":
+            return 5932;
+        case "typeid":
+            return 5;
+        default:
+            return 64553;
+    }
+}
+
+function sampleNumberForName(normalized: string): number | undefined {
+    switch (normalizeExampleFieldName(normalized)) {
+        case "averagedailymileage":
+            return 9047;
+        case "averagefuel":
+            return 0;
+        case "avgspeed":
+            return 0;
+        case "co2emissions":
+            return 229;
+        case "distance":
+            return 0;
+        case "duration":
+            return 0;
+        case "ecosinglespeed":
+        case "ecospeed":
+            return 85;
+        case "enginecapacity":
+            return 3198;
+        case "engineontime":
+            return 95330;
+        case "enginepower":
+            return 147;
+        case "excessiveidling":
+            return 120;
+        case "fueltankcapacity":
+            return 80;
+        case "grossweight":
+            return 3200;
+        case "idleduration":
+            return 0;
+        case "year":
+            return 2019;
+        default:
+            return undefined;
+    }
+}
+
+function sampleStringForName(normalized: string): string | undefined {
+    switch (normalizeExampleFieldName(normalized)) {
+        case "createdat":
+            return "2026-01-15T04:07:48+00:00";
+        case "defaultlabel":
+            return "NW201";
+        case "emissionclass":
+            return "5";
+        case "lastloggedat":
+            return "2026-06-08T12:00:00+00:00";
+        case "make":
+            return "Ford";
+        case "makemodel":
+            return "Ranger";
+        case "model":
+            return "Ford Ranger";
+        case "name":
+            return "Example";
+        case "regdate":
+            return "2019-01-02T00:00:00+00:00";
+        case "regno":
+            return "1ABC234";
+        case "status":
+            return "online";
+        case "type":
+            return "Truck";
+        case "typename":
+            return "Utility Vehicle";
+        case "updatedat":
+            return "2026-05-30T00:35:15+00:00";
+        case "vin":
+            return "MPBUMEF50KX208999";
+        default:
+            return undefined;
+    }
+}
+
+function normalizeExampleFieldName(name = ""): string {
+    return name.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {

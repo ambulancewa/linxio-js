@@ -78,8 +78,8 @@ console.log(countries);
 ```ts title="Raw POST" lineNumbers
 const vehicle = await linxio.request("POST", "/vehicles", {
   body: {
-    regNo: "TEST-001",
-    defaultLabel: "Temporary SDK Test Vehicle",
+    regNo: "1ABC234",
+    defaultLabel: "NW201",
   },
 });
 ```
@@ -168,7 +168,7 @@ const me = await linxio.http.get("/me", {
 
 ```ts title="HTTP POST" lineNumbers
 const created = await linxio.http.post("/vehicles", {
-  regNo: "TEST-001",
+  regNo: "1ABC234",
 });
 ```
 

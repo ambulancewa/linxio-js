@@ -19,13 +19,11 @@ export type LinxioMetadataRecord = LinxioRecord & {
     value?: string;
 };
 
-/** Country option returned by the dashboard country reference endpoint. */
-export type LinxioCountry = LinxioMetadataRecord & {
-    /** ISO-style country code when supplied by Linxio. */
-    code?: string;
-    /** Country display name. */
-    name?: string;
-};
+/** Country map returned by the dashboard country reference endpoint. */
+export type LinxioCountryMap = Record<string, string>;
+
+/** @deprecated Use `LinxioCountryMap`; Linxio returns a keyed map, not rows. */
+export type LinxioCountry = LinxioCountryMap;
 
 /** Role option returned by the dashboard roles endpoint. */
 export type LinxioRole = LinxioMetadataRecord & {
@@ -55,15 +53,8 @@ export type LinxioTheme = LinxioMetadataRecord & {
     name?: string;
 };
 
-/** Current-plan permission summary returned by Linxio. */
-export type LinxioCurrentPlan = LinxioRecord & {
-    /** Enabled feature keys when Linxio returns a feature list. */
-    features?: string[];
-    /** Plan identifier when supplied by Linxio. */
-    planId?: LinxioId;
-    /** Permission flags keyed by feature or module name. */
-    permissions?: LinxioRecord;
-};
+/** Current-plan permission keys returned by Linxio. */
+export type LinxioCurrentPlan = string[];
 
 /** Platform domain settings used by hosted Linxio tenants. */
 export type LinxioPlatformDomain = LinxioRecord & {
@@ -81,17 +72,27 @@ export type LinxioLanguage = LinxioMetadataRecord & {
     name?: string;
 };
 
+/** Tenant/user/role scoped setting returned by dashboard settings endpoints. */
+export type LinxioSettingRecord = LinxioRecord & {
+    id?: LinxioId | string;
+    name?: string;
+    role?: LinxioRecord | null;
+    team?: LinxioRecord | null;
+    user?: LinxioRecord | null;
+    value?: unknown;
+};
+
 /** Map API provider option returned by Linxio settings. */
-export type LinxioMapApiOption = LinxioMetadataRecord;
+export type LinxioMapApiOption = LinxioSettingRecord;
 
 /** Provider setting returned by the dashboard provider endpoint. */
-export type LinxioProviderSetting = LinxioMetadataRecord;
+export type LinxioProviderSetting = LinxioSettingRecord;
 
 /** Digital-form feature settings returned by Linxio. */
-export type LinxioDigitalFormSettings = LinxioRecord;
+export type LinxioDigitalFormSettings = LinxioSettingRecord;
 
 /** Eco-speed feature settings returned by Linxio. */
-export type LinxioEcoSpeedSettings = LinxioRecord;
+export type LinxioEcoSpeedSettings = LinxioSettingRecord;
 
 /** Excessive-idling feature settings returned by Linxio. */
-export type LinxioExcessiveIdlingSettings = LinxioRecord;
+export type LinxioExcessiveIdlingSettings = LinxioSettingRecord;

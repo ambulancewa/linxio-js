@@ -6,6 +6,8 @@ import {
     ForwardIcon,
     Link2Icon,
     type LucideIcon,
+    MinusIcon,
+    PlusIcon,
     ReplyIcon,
 } from "lucide-react";
 import type { MDXComponents } from "mdx/types";
@@ -71,6 +73,7 @@ type ReferenceExample = {
 };
 
 const maxFieldExpansionDepth = 1;
+const maxVisibleChildFields = 30;
 
 const jsonTokenClassName: Record<JsonHighlightToken["kind"], string> = {
     boolean: "text-violet-600 dark:text-violet-300",
@@ -462,108 +465,176 @@ export function FieldTable({
 }
 
 function FieldRows({
+    collapseLargeFieldSets = true,
     depth = 0,
     expandedTypes = new Set<string>(),
     fields,
     tableTitle,
     className,
 }: {
+    collapseLargeFieldSets?: boolean;
     depth?: number;
     expandedTypes?: ReadonlySet<string>;
     fields: ReferenceField[];
     tableTitle: string;
     className?: string;
 }) {
-    return fields.map((field, index) => {
-        const childShape = findReferenceShape(field.type);
-        const enumValues = getFieldEnumValues(field);
-        const childFields =
-            depth >= maxFieldExpansionDepth
-                ? undefined
-                : getChildFields(field, expandedTypes, childShape);
-        const nextExpandedTypes = childShape
-            ? new Set([...expandedTypes, childShape.typeName])
-            : expandedTypes;
-        const shouldAutoExpandChildFields =
-            depth === 0 &&
-            index === 0 &&
-            field.name === "params" &&
-            tableTitle.toLowerCase().includes("input");
+    const shouldCollapseFieldSet =
+        collapseLargeFieldSets &&
+        depth > 0 &&
+        fields.length > maxVisibleChildFields;
+    const visibleFields = shouldCollapseFieldSet
+        ? fields.slice(0, maxVisibleChildFields)
+        : fields;
+    const hiddenFields = shouldCollapseFieldSet
+        ? fields.slice(maxVisibleChildFields)
+        : [];
 
-        return (
-            <div
-                key={`${depth}-${field.name}`}
-                className={cn(
-                    "grid gap-x-8 gap-y-1 px-4 py-4",
-                    depth > 0 && "bg-fd-muted/15 px-3 py-3",
-                    className,
-                )}
-            >
-                <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <CopyTextInline text={field.name} className="flex">
-                            <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
-                                {field.name}
-                            </code>
-                        </CopyTextInline>
+    return (
+        <>
+            {visibleFields.map((field, index) => {
+                const childShape = findReferenceShape(field.type);
+                const enumValues = getFieldEnumValues(field);
+                const childFields =
+                    depth >= maxFieldExpansionDepth
+                        ? undefined
+                        : getChildFields(field, expandedTypes, childShape);
+                const nextExpandedTypes = childShape
+                    ? new Set([...expandedTypes, childShape.typeName])
+                    : expandedTypes;
+                const shouldAutoExpandChildFields =
+                    depth === 0 &&
+                    index === 0 &&
+                    field.name === "params" &&
+                    tableTitle.toLowerCase().includes("input");
 
-                        <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
-                            <TypeText type={field.type} />
-                        </div>
-
-                        {field.required ? (
-                            <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-0.75 font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
-                                required
-                            </span>
-                        ) : (
-                            <span className="rounded border border-fd-border px-1.5 py-0.75 font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
-                                optional
-                            </span>
+                return (
+                    <div
+                        key={`${depth}-${field.name}`}
+                        className={cn(
+                            "grid gap-x-8 gap-y-1 px-4 py-4",
+                            depth > 0 && "bg-fd-muted/15 px-3 py-3",
+                            className,
                         )}
-                    </div>
-                </div>
+                    >
+                        <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <CopyTextInline
+                                    text={field.name}
+                                    className="flex"
+                                >
+                                    <code className="p-0! font-mono font-semibold text-[13.5px] text-fd-foreground leading-none">
+                                        {field.name}
+                                    </code>
+                                </CopyTextInline>
 
-                <div className="text-[14px] text-fd-muted-foreground leading-relaxed">
-                    <div>{field.description}</div>
+                                <div className="break-all font-bold text-[11.5px] text-fd-muted-foreground/80 leading-none leading-relaxed">
+                                    <TypeText type={field.type} />
+                                </div>
 
-                    {field.defaultValue ? (
-                        <div className="mt-0.5 text-[13px]">
-                            <span className="text-fd-muted-foreground/70">
-                                Default:
-                            </span>{" "}
-                            <code className="rounded bg-fd-muted px-1.5 py-0.75 font-mono text-[12px]">
-                                {field.defaultValue}
-                            </code>
-                        </div>
-                    ) : null}
-
-                    {enumValues.length ? (
-                        <EnumValueList values={enumValues} />
-                    ) : null}
-
-                    {childFields?.length ? (
-                        <details
-                            className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background/80"
-                            open={shouldAutoExpandChildFields}
-                        >
-                            <summary className="cursor-pointer select-none px-3 py-2 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:text-fd-foreground">
-                                {getChildSummaryLabel(tableTitle)}
-                            </summary>
-
-                            <div className="divide-y divide-fd-border border-fd-border border-t bg-white dark:bg-black/30">
-                                <FieldRows
-                                    depth={depth + 1}
-                                    expandedTypes={nextExpandedTypes}
-                                    fields={childFields}
-                                    tableTitle={tableTitle}
-                                />
+                                {field.required ? (
+                                    <span className="rounded border border-red-200/80 bg-red-50 px-1.5 py-0.75 font-semibold text-[10px] text-red-600 uppercase leading-none tracking-wide dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+                                        required
+                                    </span>
+                                ) : (
+                                    <span className="rounded border border-fd-border px-1.5 py-0.75 font-semibold text-[10px] text-fd-muted-foreground uppercase leading-none tracking-wide">
+                                        optional
+                                    </span>
+                                )}
                             </div>
-                        </details>
-                    ) : null}
-                </div>
-            </div>
-        );
-    });
+                        </div>
+
+                        <div className="text-[14px] text-fd-muted-foreground leading-relaxed">
+                            <div>{field.description}</div>
+
+                            {field.defaultValue ? (
+                                <div className="mt-0.5 text-[13px]">
+                                    <span className="text-fd-muted-foreground/70">
+                                        Default:
+                                    </span>{" "}
+                                    <code className="rounded bg-fd-muted px-1.5 py-0.75 font-mono text-[12px]">
+                                        {field.defaultValue}
+                                    </code>
+                                </div>
+                            ) : null}
+
+                            {enumValues.length ? (
+                                <EnumValueList values={enumValues} />
+                            ) : null}
+
+                            {childFields?.length ? (
+                                <details
+                                    className="mt-3 overflow-hidden rounded-xl border border-fd-border bg-fd-background/80"
+                                    open={shouldAutoExpandChildFields}
+                                >
+                                    <summary className="cursor-pointer select-none px-3 py-2 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:text-fd-foreground">
+                                        {getChildSummaryLabel(tableTitle)}
+                                    </summary>
+
+                                    <div className="divide-y divide-fd-border border-fd-border border-t bg-white dark:bg-black/30">
+                                        <FieldRows
+                                            depth={depth + 1}
+                                            expandedTypes={nextExpandedTypes}
+                                            fields={childFields}
+                                            tableTitle={tableTitle}
+                                        />
+                                    </div>
+                                </details>
+                            ) : null}
+                        </div>
+                    </div>
+                );
+            })}
+
+            {hiddenFields.length ? (
+                <details
+                    key={`${depth}-show-more-fields`}
+                    className={cn(
+                        "bg-fd-muted/15 [&>summary>#summary-text-show]:hidden [&[open]>summary>#summary-text-hide]:hidden [&[open]>summary>#summary-text-hide]:hidden [&[open]>summary>#summary-text-show]:flex",
+                        className,
+                    )}
+                >
+                    <summary className="flex cursor-pointer list-none flex-row items-center justify-center gap-1 border-fd-border bg-blue-300/20 px-3 py-1.5 font-semibold text-[12px] text-blue-600 transition-colors hover:bg-blue-300/30 hover:text-blue-800 dark:bg-blue-950/20 dark:hover:bg-blue-900/20 [&::-webkit-details-marker]:hidden">
+                        <span className="sr-only">
+                            Show/hide {hiddenFields.length} more
+                        </span>
+                        <span
+                            id="summary-text-hide"
+                            className="flex flex-row items-center justify-center gap-1"
+                            aria-hidden={true}
+                        >
+                            <PlusIcon
+                                className="size-3.5 opacity-50"
+                                strokeWidth={2.5}
+                            />{" "}
+                            Show {hiddenFields.length} more
+                        </span>
+                        <span
+                            id="summary-text-show"
+                            className="flex-row items-center justify-center gap-1"
+                            aria-hidden={true}
+                        >
+                            <MinusIcon
+                                className="size-3.5 opacity-50"
+                                strokeWidth={2.5}
+                            />{" "}
+                            Hide additional fields
+                        </span>
+                    </summary>
+                    <div className="divide-y divide-fd-border border-fd-border border-t">
+                        <FieldRows
+                            collapseLargeFieldSets={false}
+                            depth={depth}
+                            expandedTypes={expandedTypes}
+                            fields={hiddenFields}
+                            tableTitle={tableTitle}
+                            className={className}
+                        />
+                    </div>
+                </details>
+            ) : null}
+        </>
+    );
 }
 
 function EnumValueList({ values }: { values: readonly ReferenceEnumValue[] }) {

@@ -301,7 +301,7 @@ async function readCustomThing() {
 import { collectPages } from "linxio-js";
 
 const result = await collectPages(
-  (params) => linxio.devices.installations(params),
+  (params) => linxio.sensors.list(params),
   { limit: 100 },
 );
 
@@ -361,11 +361,11 @@ if (result.error) {
 ```ts title="Stream custom endpoint pages" lineNumbers
 import { streamPages } from "linxio-js";
 
-for await (const installation of streamPages(
-  (params) => linxio.devices.installations(params),
+for await (const sensor of streamPages(
+  (params) => linxio.sensors.list(params),
   { limit: 100 },
 )) {
-  console.log(installation.deviceId, installation.vehicleId);
+  console.log(sensor.id, sensor.label);
 }
 ```
 

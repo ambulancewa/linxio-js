@@ -134,6 +134,11 @@ const linxio = createClient({
 Domain service methods return result objects so scripts can branch without
 wrapping every call in `try/catch`.
 
+Service methods normalize Linxio response envelopes, including `result`,
+`data`, and endpoint-key collection wrappers, so `result.data` contains the
+developer-facing payload. Use `client.request()` when you need the raw wire
+response for diagnostics.
+
 <FieldTable
   title="LinxioResult<T>"
   fields={[

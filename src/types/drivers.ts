@@ -4,6 +4,8 @@ import type { LinxioId, LinxioRecord, ListParams } from "./common";
 export type DriverField =
     | "id"
     | "fullName"
+    | "name"
+    | "surname"
     | "email"
     | "phone"
     | "role"
@@ -14,7 +16,9 @@ export type LinxioDriver = LinxioRecord & {
     email?: string | null;
     fullName?: string | null;
     id: LinxioId;
+    name?: string | null;
     phone?: string | null;
+    surname?: string | null;
 };
 
 /** Parameters for `client.drivers.list()`. */

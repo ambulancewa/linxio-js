@@ -68,7 +68,7 @@ async function executeScratch(requestBody?: unknown) {
             session: login.data,
         });
 
-        return NextResponse.json({ ok: true, result });
+        return NextResponse.json(formatScratchSuccessBody(result));
     } catch (error) {
         return NextResponse.json(
             {
@@ -79,6 +79,14 @@ async function executeScratch(requestBody?: unknown) {
             { status: 500 },
         );
     }
+}
+
+export function formatScratchSuccessBody(result: unknown) {
+    if (isPlainObject(result)) {
+        return { ...result, ok: true };
+    }
+
+    return { data: result, ok: true };
 }
 
 async function readOptionalJson(request: Request): Promise<unknown> {
@@ -110,4 +118,8 @@ function serializeScratchError(error: unknown) {
     }
 
     return { message: "Unknown scratch error." };
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
 }

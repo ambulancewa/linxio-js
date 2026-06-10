@@ -101,8 +101,10 @@ const installed = await linxio.devices.install(deviceId, {
 // Vendor catalogue
 const vendors = await linxio.devices.vendors();
 
-// Installation history
-const history = await linxio.devices.installations({ limit: 100 });
+// Installation lookup by registration or IMEI
+const installation = await linxio.devices.installation({
+  vehicleRegNo: "1ABC234",
+});
 
 // Camera assets
 const cameras = await linxio.devices.cameras(deviceId);

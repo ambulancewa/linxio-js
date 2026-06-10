@@ -114,15 +114,11 @@ export class VehiclesService extends BaseService {
     /** List vehicle types using the dashboard-derived vehicle type endpoint. */
     types(
         params: LinxioVehicleTypeParams = {},
-    ): Promise<LinxioResult<LinxioVehicleType[]>> {
-        return this.result(() =>
-            this.http.get("/vehicles/types", {
-                params: {
-                    limit: 1000,
-                    sort: "order",
-                    ...params,
-                },
-            }),
-        );
+    ): Promise<LinxioPageResult<LinxioVehicleType>> {
+        return this.getPage("/vehicles/types", {
+            limit: 1000,
+            sort: "order",
+            ...params,
+        });
     }
 }

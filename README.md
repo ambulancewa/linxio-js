@@ -1,9 +1,9 @@
-# linxio-js
+![@ambulancewa/linxio-js](https://raw.githubusercontent.com/ambulancewa/linxio-js/refs/heads/main/repo-header.png)
 
-A typed TypeScript client for the Linxio (https://linxio.com) Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!
+linxio-js is a secure, lightweight, high-performance Node.js SDK for interacting with the [`Linxio`](https://linxio.com/) API. The client is fully-typed for use in Typescript projects, and is available as ECMAScript and CommonJS modules for use pretty much anywhere you can run Javascript. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!
 
 ```ts
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 const linxio = createClient();
 
@@ -18,7 +18,7 @@ const { data, error } = await linxio.vehicles.iterate({
 });
 ```
 
-## Features
+## 👏 Key Features
 
 - Fully typed TypeScript API.
 - Available as both ESM and CommonJS packages.
@@ -31,19 +31,21 @@ const { data, error } = await linxio.vehicles.iterate({
 - Low-level `client.request()` escape hatch for tenant-specific endpoints.
 - Socket.IO realtime helpers for live coordinates and notifications.
 
-## Install
+## 📦 Installation
+
+Prerequisites for installation:
+- [Node.js](https://nodejs.org/en/download/) (v14 or higher)
+- [pnpm](https://pnpm.io/installation) or your preferred compatible package manager
+
+Installation is super straightforward. Simply install the package from npmjs:
 
 ```bash
-pnpm add linxio-js
-```
-
-```bash
-npm install linxio-js
+pnpm add @ambulancewa/linxio-js
 ```
 
 Full documentation is available at our Open Source Software Projects (OSSP) site: https://linxio-js.ambulancewa.dev
 
-## Authentication
+## ⚡ Usage
 
 ```ts
 const login = await linxio.auth.login({
@@ -59,16 +61,7 @@ if (login.error) {
 console.log(login.data.expireAt);
 ```
 
-The SDK stores tokens in memory. To hydrate a client from your own storage:
-
-```ts
-const linxio = createClient({
-    token: stored.token,
-    refreshToken: stored.refreshToken,
-});
-```
-
-## Vehicles
+Once initialised, you can use the client to query the Linxio API:
 
 ```ts
 const { data: vehicles, error, meta } = await linxio.vehicles.list({
@@ -83,13 +76,13 @@ if (error) {
 
 console.log(meta.total, vehicles);
 
-const routes = await linxio.routes.getVehicleRoutes(304, {
+const routes = await linxio.routes.getVehicleRoutes(vehicles[0].id, {
     dateFrom: "2026-06-01T00:00:00+08:00",
     dateTo: "2026-06-08T00:00:00+08:00",
 });
 ```
 
-## Advanced requests
+## ⚙️ Advanced requests
 
 Use domain services for normal workflows. For tenant-specific or newly
 discovered endpoints, `client.request()` keeps the same auth, retry, timeout,
@@ -99,7 +92,7 @@ and token-refresh behavior.
 const response = await linxio.request("GET", "/vehicles/count");
 ```
 
-## Realtime
+## 🔴 Realtime
 
 ```ts
 const unsubscribe = linxio.realtime.onPosition([304], (position) => {
@@ -109,7 +102,7 @@ const unsubscribe = linxio.realtime.onPosition([304], (position) => {
 unsubscribe();
 ```
 
-## Errors
+## ❌ Errors
 
 ```ts
 import { LinxioApiError } from "linxio-js";
@@ -122,15 +115,3 @@ if (error instanceof LinxioApiError) {
 ```
 
 Low-level `client.request()` calls throw typed SDK errors directly.
-
-## Development
-
-```bash
-pnpm install
-pnpm verify
-pnpm docs:build
-```
-
-## API evidence
-
-The public API surface is based on Linxio's published API documentation. Additional dashboard-derived helpers were inferred from JavaScript bundles captured from the Linxio dashboard and are typed conservatively where exact response schemas are not publicly documented.

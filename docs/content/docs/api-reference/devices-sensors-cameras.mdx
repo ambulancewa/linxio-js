@@ -277,13 +277,18 @@ curl -X PATCH https://api.linxio.com/api/devices/545/restore \
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId)">
-      Returns recent coordinates for a device.
+    <ReferenceHeader title="List device coordinates" method="GET" path="/devices/{deviceId}/coordinates" sdk="linxio.devices.coordinates(deviceId, params)">
+      Returns coordinates for a device. The live tenant expects a date range.
     </ReferenceHeader>
 
     <RequiredHeaders />
 
-    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Path and query parameters" iconName="urlParams" fields={[
+      { name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." },
+      { name: "dateFrom", type: "ISODateString", description: "Start of the coordinate window." },
+      { name: "dateTo", type: "ISODateString", description: "End of the coordinate window." },
+      { name: "filter", type: "string", description: "Optional dashboard-derived coordinate filter." },
+    ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "lat", type: "number", description: "Latitude." },
       { name: "lng", type: "number", description: "Longitude." },
@@ -294,35 +299,40 @@ curl -X PATCH https://api.linxio.com/api/devices/545/restore \
   <CodeRail>
 
 ```bash title="Request" lineNumbers
-curl "https://api.linxio.com/api/devices/545/coordinates" \
+curl "https://api.linxio.com/api/devices/545/coordinates?dateFrom=2026-06-01T00:00:00%2B08:00&dateTo=2026-06-02T00:00:00%2B08:00" \
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
   </CodeRail>
 </ReferenceGrid>
 
-## GET `/devices/{deviceId}/sensors`
+## GET `/devices/{deviceId}/sensors/history`
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device sensors" method="GET" path="/devices/{deviceId}/sensors" sdk="linxio.devices.sensors(deviceId)">
-      Lists sensors paired with a device.
+    <ReferenceHeader title="List device sensors" method="GET" path="/devices/{deviceId}/sensors/history" sdk="linxio.devices.sensors(deviceId, params)">
+      Lists historical sensor rows associated with a device.
     </ReferenceHeader>
 
     <RequiredHeaders />
 
-    <FieldTable title="Request url parameters" iconName="urlParams"  fields={[{ name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." }]} />
+    <FieldTable title="Path and query parameters" iconName="urlParams" fields={[
+      { name: "deviceId", type: "LinxioId", required: true, description: "Device identifier." },
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "SensorField[]", description: "Sensor fields to include in the response projection." },
+    ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
-      { name: "id", type: "LinxioId", description: "Sensor identifier." },
-      { name: "name", type: "string", description: "Sensor display name when supplied." },
-      { name: "type", type: "string", description: "Sensor type when supplied." },
+      { name: "data", type: "LinxioSensor[]", description: "Sensor rows for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+      { name: "aggregations", type: "object", description: "Aggregation data when Linxio supplies it." },
     ]} />
   </div>
 
   <CodeRail>
 
 ```bash title="Request" lineNumbers
-curl "https://api.linxio.com/api/devices/545/sensors" \
+curl "https://api.linxio.com/api/devices/545/sensors/history?limit=25&page=1" \
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
@@ -353,11 +363,11 @@ curl "https://api.linxio.com/api/devices/545/history" \
   </CodeRail>
 </ReferenceGrid>
 
-## GET /devices/vendors
+## GET /devices/vendors/
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors" sdk="linxio.devices.vendors()">
+    <ReferenceHeader title="List device vendors" method="GET" path="/devices/vendors/" sdk="linxio.devices.vendors()">
       Lists device vendors.
     </ReferenceHeader>
 
@@ -367,46 +377,52 @@ curl "https://api.linxio.com/api/devices/545/history" \
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "id", type: "LinxioId", description: "Vendor identifier when supplied." },
       { name: "name", type: "string", description: "Vendor display name." },
+      { name: "models", type: "LinxioDeviceModel[]", description: "Supported vendor models when supplied." },
     ]} />
   </div>
 
   <CodeRail>
 
 ```bash title="Request" lineNumbers
-curl "https://api.linxio.com/api/devices/vendors" \
+curl "https://api.linxio.com/api/devices/vendors/" \
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
   </CodeRail>
 </ReferenceGrid>
 
-## GET /devices/installation
+## GET /devices/installation/
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List device installations" method="GET" path="/devices/installation" sdk="linxio.devices.installations(params)">
-      Lists device installation rows.
+    <ReferenceHeader title="Lookup device installation" method="GET" path="/devices/installation/" sdk="linxio.devices.installation(params)">
+      Looks up the current device installation by device IMEI or vehicle
+      registration number. The SDK also exposes `devices.installations(params)`
+      as a backwards-compatible alias for this lookup.
     </ReferenceHeader>
 
     <RequiredHeaders />
 
     <FieldTable title="Request query parameters" iconName="forward"  fields={[
-      { name: "limit", type: "number", description: "Number of records per page." },
-      { name: "page", type: "number", description: "Page number to read." },
-      { name: "[filter]", type: "QueryValue", description: "Dashboard-derived installation filters." },
+      { name: "deviceImei", type: "string", description: "Device IMEI to look up." },
+      { name: "vehicleRegNo", type: "string", description: "Vehicle registration number to look up." },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
       { name: "deviceId", type: "LinxioId", description: "Device identifier." },
+      { name: "device", type: "LinxioDevice", description: "Device summary when supplied." },
       { name: "vehicleId", type: "LinxioId", description: "Vehicle identifier when supplied." },
-      { name: "installedAt", type: "ISODateString", description: "Installation timestamp when supplied." },
-      { name: "uninstalledAt", type: "ISODateString", description: "Uninstall timestamp when supplied." },
+      { name: "vehicle", type: "LinxioVehicle", description: "Vehicle summary when supplied." },
+      { name: "installDate", type: "ISODateString", description: "Installation timestamp when supplied." },
+      { name: "uninstallDate", type: "ISODateString", description: "Uninstall timestamp when supplied." },
+      { name: "odometer", type: "number", description: "Vehicle odometer at installation time when supplied." },
+      { name: "files", type: "LinxioFile[]", description: "Installation files when supplied." },
     ]} />
   </div>
 
   <CodeRail>
 
 ```bash title="Request" lineNumbers
-curl "https://api.linxio.com/api/devices/installation?limit=100&page=1" \
+curl "https://api.linxio.com/api/devices/installation/?vehicleRegNo=1ABC234" \
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
@@ -446,24 +462,28 @@ curl "https://api.linxio.com/api/devices/545/cameras" \
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List sensors" method="GET" path="/sensors" sdk="linxio.sensors.list()">
+    <ReferenceHeader title="List sensors" method="GET" path="/sensors" sdk="linxio.sensors.list(params)">
       Lists sensors visible to the authenticated account.
     </ReferenceHeader>
 
     <RequiredHeaders />
 
-    <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
+    <FieldTable title="Request query parameters" iconName="forward" fields={[
+      { name: "limit", type: "number", description: "Number of records per page." },
+      { name: "page", type: "number", description: "Page number to read." },
+      { name: "fields[]", type: "SensorField[]", description: "Sensor fields to include in the response projection." },
+    ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
-      { name: "id", type: "LinxioId", description: "Sensor identifier." },
-      { name: "name", type: "string", description: "Sensor display name when supplied." },
-      { name: "type", type: "string", description: "Sensor type when supplied." },
+      { name: "data", type: "LinxioSensor[]", description: "Sensor rows for the current page." },
+      { name: "page / limit / total", type: "number", description: "Pagination metadata." },
+      { name: "aggregations", type: "object", description: "Aggregation data when Linxio supplies it." },
     ]} />
   </div>
 
   <CodeRail>
 
 ```bash title="Request" lineNumbers
-curl "https://api.linxio.com/api/sensors" \
+curl "https://api.linxio.com/api/sensors?limit=25&page=1" \
   -H "Authorization: Bearer $LINXIO_TOKEN"
 ```
 
