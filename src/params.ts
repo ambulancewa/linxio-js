@@ -3,6 +3,7 @@ import type {
     FieldSelector,
     LinxioPage,
     LinxioPageEnvelope,
+    LinxioPaginationMeta,
     QueryParams,
     QueryValue,
 } from "./types/common";
@@ -64,10 +65,8 @@ export function toPage<TData>(
     envelope: LinxioPageEnvelope<TData>,
 ): LinxioPage<TData> {
     const source = extractPageEnvelopeSource(envelope);
-    const sourceMeta =
-        source.meta && typeof source.meta === "object" ? source.meta : {};
-    const rootMeta =
-        envelope.meta && typeof envelope.meta === "object" ? envelope.meta : {};
+    const sourceMeta = toPaginationMeta(source.meta);
+    const rootMeta = toPaginationMeta(envelope.meta);
     const meta = {
         limit: Number(
             source.limit ??
@@ -101,6 +100,12 @@ export function toPage<TData>(
         ...meta,
         meta,
     };
+}
+
+function toPaginationMeta(value: unknown): Partial<LinxioPaginationMeta> {
+    return value && typeof value === "object" && !Array.isArray(value)
+        ? (value as Partial<LinxioPaginationMeta>)
+        : {};
 }
 
 export function stripUndefined<T extends Record<string, unknown>>(value: T): T {
