@@ -75,6 +75,62 @@ var LinxioRealtimeError = class extends LinxioError {
   }
 };
 
+// src/response.ts
+var envelopeKeys = /* @__PURE__ */ new Set([
+  "additionalFields",
+  "aggregations",
+  "data",
+  "limit",
+  "links",
+  "meta",
+  "page",
+  "result",
+  "total"
+]);
+function unwrapLinxioServiceData(value) {
+  const payload = unwrapResultEnvelope(value);
+  if (!isRecord(payload)) {
+    return payload;
+  }
+  if (isDataEnvelope(payload)) {
+    return payload.data;
+  }
+  const singletonArray = getSingletonArrayPayload(payload);
+  if (singletonArray) {
+    return singletonArray;
+  }
+  return payload;
+}
+function extractPageEnvelopeSource(value) {
+  const root = isRecord(value) ? value : {};
+  const result = isRecord(root.result) ? root.result : void 0;
+  return result ?? root;
+}
+function extractPageData(source) {
+  if (Array.isArray(source.data)) {
+    return source.data;
+  }
+  return getSingletonArrayPayload(source) ?? [];
+}
+function unwrapResultEnvelope(value) {
+  if (!isRecord(value) || !Object.hasOwn(value, "result")) {
+    return value;
+  }
+  return value.result;
+}
+function isDataEnvelope(value) {
+  return Object.hasOwn(value, "data") && Object.keys(value).every((key) => envelopeKeys.has(key));
+}
+function getSingletonArrayPayload(value) {
+  const arrayEntries = Object.entries(value).filter(
+    ([key, entry]) => !envelopeKeys.has(key) && Array.isArray(entry)
+  );
+  return arrayEntries.length === 1 ? arrayEntries[0]?.[1] : void 0;
+}
+function isRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 // src/params.ts
 function normalisePath(path) {
   if (/^https?:\/\//i.test(path)) {
@@ -116,15 +172,24 @@ function appendQueryParam(url, key, value) {
   );
 }
 function toPage(envelope) {
+  const source = extractPageEnvelopeSource(envelope);
+  const sourceMeta = source.meta && typeof source.meta === "object" ? source.meta : {};
+  const rootMeta = envelope.meta && typeof envelope.meta === "object" ? envelope.meta : {};
   const meta = {
-    limit: Number(envelope.limit ?? envelope.meta?.limit ?? 0),
-    page: Number(envelope.page ?? envelope.meta?.page ?? 1),
-    total: Number(envelope.total ?? envelope.meta?.total ?? 0)
+    limit: Number(
+      source.limit ?? sourceMeta.limit ?? envelope.limit ?? rootMeta.limit ?? 0
+    ),
+    page: Number(
+      source.page ?? sourceMeta.page ?? envelope.page ?? rootMeta.page ?? 1
+    ),
+    total: Number(
+      source.total ?? sourceMeta.total ?? envelope.total ?? rootMeta.total ?? 0
+    )
   };
   return {
-    additionalFields: envelope.additionalFields,
-    aggregations: envelope.aggregations,
-    data: Array.isArray(envelope.data) ? envelope.data : [],
+    additionalFields: source.additionalFields ?? envelope.additionalFields,
+    aggregations: source.aggregations ?? envelope.aggregations,
+    data: extractPageData(source),
     ...meta,
     meta
   };
@@ -579,7 +644,7 @@ function fail(error) {
 }
 async function toResult(operation) {
   try {
-    return ok(await operation());
+    return ok(unwrapLinxioServiceData(await operation()));
   } catch (error) {
     return fail(error);
   }
@@ -1611,7 +1676,7 @@ function normalizeComparablePath(path) {
   return (pathWithoutQuery ?? path).replace(/\{[^}]+\}/g, "{param}");
 }
 function collectEndpointDefinitions(value, definitions) {
-  if (!isRecord(value)) {
+  if (!isRecord2(value)) {
     return;
   }
   if (isEndpointDefinition(value)) {
@@ -1628,7 +1693,7 @@ function isEndpointDefinition(value) {
 function isHttpMethod(value) {
   return value === "DELETE" || value === "GET" || value === "PATCH" || value === "POST" || value === "PUT";
 }
-function isRecord(value) {
+function isRecord2(value) {
   return typeof value === "object" && value !== null;
 }
 
