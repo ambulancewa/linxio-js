@@ -1,4 +1,4 @@
-![@ambulancewa/linxio-js](https://raw.githubusercontent.com/ambulancewa/linxio-js/refs/heads/main/repo-header.png)
+![@ambulancewa/linxio-js](https://github.com/ambulancewa/linxio-js/blob/master/repo-header.png)
 
 linxio-js is a secure, lightweight, high-performance Node.js SDK for interacting with the [`Linxio`](https://linxio.com/) API. The client is fully-typed for use in Typescript projects, and is available as ECMAScript and CommonJS modules for use pretty much anywhere you can run Javascript. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!
 

@@ -1,5 +1,5 @@
 {
-    "name": "linxio-js",
+    "name": "@ambulancewa/linxio-js",
     "version": "2.23.2",
     "packageManager": "pnpm@11.5.2",
     "private": false,
