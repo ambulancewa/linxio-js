@@ -173,8 +173,8 @@ function appendQueryParam(url, key, value) {
 }
 function toPage(envelope) {
   const source = extractPageEnvelopeSource(envelope);
-  const sourceMeta = source.meta && typeof source.meta === "object" ? source.meta : {};
-  const rootMeta = envelope.meta && typeof envelope.meta === "object" ? envelope.meta : {};
+  const sourceMeta = toPaginationMeta(source.meta);
+  const rootMeta = toPaginationMeta(envelope.meta);
   const meta = {
     limit: Number(
       source.limit ?? sourceMeta.limit ?? envelope.limit ?? rootMeta.limit ?? 0
@@ -193,6 +193,9 @@ function toPage(envelope) {
     ...meta,
     meta
   };
+}
+function toPaginationMeta(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
 
 // src/http.ts

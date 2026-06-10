@@ -1,6 +1,6 @@
 {
     "name": "linxio-js",
-    "version": "2.23.1",
+    "version": "2.23.2",
     "packageManager": "pnpm@11.5.2",
     "private": false,
     "description": "linxio-js is a secure, lightweight, high-performance Node.js SDK for interacting with the Linxio Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!",
@@ -58,7 +58,7 @@
     "bugs": {
         "url": "https://github.com/ambulancewa/linxio-js/issues"
     },
-    "homepage": "https://github.com/ambulancewa/linxio-js#readme",
+    "homepage": "https://linxio-js.ambulancewa.dev",
     "engines": {
         "node": ">=20.11"
     },
