@@ -91,6 +91,29 @@ describe("reference type helpers", () => {
         );
     });
 
+    it("documents live vehicle response keys as separate fields", () => {
+        const shape = findReferenceShape("LinxioVehicle");
+        const fieldNames = shape?.fields.map((field) => field.name) ?? [];
+
+        expect(fieldNames.filter((name) => name.includes("/"))).toEqual([]);
+        expect(fieldNames).toEqual(
+            expect.arrayContaining([
+                "type",
+                "typeId",
+                "typeName",
+                "make",
+                "makeModel",
+                "model",
+                "regNo",
+                "defaultLabel",
+                "vin",
+                "fuelTankCapacity",
+                "createdBy",
+                "updatedBy",
+            ]),
+        );
+    });
+
     it("preserves unlinked capitalized type names as plain text", () => {
         expect(tokenizeReferenceType("ISODateString | null")).toEqual([
             { text: "ISODateString | null" },

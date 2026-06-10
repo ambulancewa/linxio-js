@@ -1944,41 +1944,109 @@ export const referenceShapes = {
                     "Depot object, typically including id, name, status, createdAt, and color.",
             },
             {
-                name: "type/typeId/typeName",
-                type: "string | number | null",
-                description: "Vehicle type key, identifier, and display name.",
-            },
-            {
-                name: "make/makeModel/model",
+                name: "type",
                 type: "string | null",
-                description: "Vehicle make and model labels.",
+                description: "Vehicle type key.",
             },
             {
-                name: "regNo/defaultLabel/vin",
+                name: "typeId",
+                type: "LinxioId | null",
+                description: "Vehicle type identifier.",
+            },
+            {
+                name: "typeName",
                 type: "string | null",
-                description:
-                    "Registration number, fleet label, and vehicle identification number.",
+                description: "Vehicle type display name.",
             },
             {
-                name: "regDate/regCertNo/year",
-                type: "ISODateString | string | number | null",
-                description: "Registration metadata when supplied.",
+                name: "make",
+                type: "string | null",
+                description: "Vehicle manufacturer.",
             },
             {
-                name: "enginePower/engineCapacity/engineOnTime",
+                name: "makeModel",
+                type: "string | null",
+                description: "Manufacturer model label returned by Linxio.",
+            },
+            {
+                name: "model",
+                type: "string | null",
+                description: "Vehicle model text.",
+            },
+            {
+                name: "regNo",
+                type: "string | null",
+                description: "Registration number or fleet identifier.",
+            },
+            {
+                name: "defaultLabel",
+                type: "string | null",
+                description: "Default display label.",
+            },
+            {
+                name: "vin",
+                type: "string | null",
+                description: "Vehicle identification number.",
+            },
+            {
+                name: "regDate",
+                type: "ISODateString | null",
+                description: "Vehicle registration date when supplied.",
+            },
+            {
+                name: "regCertNo",
+                type: "string | null",
+                description: "Registration certificate number when supplied.",
+            },
+            {
+                name: "year",
                 type: "number | null",
-                description:
-                    "Engine specification and accumulated engine time.",
+                description: "Vehicle model year when supplied.",
             },
             {
-                name: "fuelType/fuelTankCapacity/averageFuel",
-                type: "number | LinxioId | null",
-                description: "Fuel configuration and average fuel value.",
+                name: "enginePower",
+                type: "number | null",
+                description: "Engine power rating when supplied.",
             },
             {
-                name: "emissionClass/co2Emissions/grossWeight",
-                type: "string | number | null",
-                description: "Emissions and gross-weight metadata.",
+                name: "engineCapacity",
+                type: "number | null",
+                description: "Engine capacity when supplied.",
+            },
+            {
+                name: "engineOnTime",
+                type: "number | null",
+                description: "Accumulated engine-on time.",
+            },
+            {
+                name: "fuelType",
+                type: "LinxioId | null",
+                description: "Fuel type identifier.",
+            },
+            {
+                name: "fuelTankCapacity",
+                type: "number | null",
+                description: "Fuel tank capacity.",
+            },
+            {
+                name: "averageFuel",
+                type: "number | null",
+                description: "Average fuel value returned by Linxio.",
+            },
+            {
+                name: "emissionClass",
+                type: "string | null",
+                description: "Emission class when supplied.",
+            },
+            {
+                name: "co2Emissions",
+                type: "number | null",
+                description: "CO2 emissions value when supplied.",
+            },
+            {
+                name: "grossWeight",
+                type: "number | null",
+                description: "Gross vehicle weight when supplied.",
             },
             {
                 name: "groups",
@@ -2048,20 +2116,51 @@ export const referenceShapes = {
                 ],
             },
             {
-                name: "ecoSpeed/excessiveIdling/averageDailyMileage",
+                name: "ecoSpeed",
                 type: "number | null",
                 description:
-                    "Tenant-configured driving behaviour and mileage settings.",
+                    "Tenant-configured economical speed threshold when supplied.",
             },
             {
-                name: "createdAt/createdBy/updatedAt/updatedBy",
-                type: "ISODateString | LinxioRecord | null",
-                description: "Audit fields returned by Linxio.",
+                name: "excessiveIdling",
+                type: "number | null",
+                description:
+                    "Tenant-configured excessive idling threshold when supplied.",
             },
             {
-                name: "picture/unavailableMessage",
+                name: "averageDailyMileage",
+                type: "number | null",
+                description: "Average daily mileage value returned by Linxio.",
+            },
+            {
+                name: "createdAt",
+                type: "ISODateString | null",
+                description: "Vehicle creation timestamp.",
+            },
+            {
+                name: "createdBy",
+                type: "LinxioRecord | null",
+                description: "User object for the creator when supplied.",
+            },
+            {
+                name: "updatedAt",
+                type: "ISODateString | null",
+                description: "Vehicle update timestamp.",
+            },
+            {
+                name: "updatedBy",
+                type: "LinxioRecord | null",
+                description: "User object for the last updater when supplied.",
+            },
+            {
+                name: "picture",
                 type: "string | null",
-                description: "Vehicle picture URL or unavailable reason.",
+                description: "Vehicle picture URL when supplied.",
+            },
+            {
+                name: "unavailableMessage",
+                type: "string | null",
+                description: "Unavailable reason when supplied.",
             },
         ],
     },
