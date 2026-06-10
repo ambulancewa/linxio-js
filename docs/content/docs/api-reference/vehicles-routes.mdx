@@ -378,9 +378,15 @@ curl "https://api.linxio.com/api/vehicles/count?status=active" \
       { name: "sort", type: "string", description: "Sort expression.", defaultValue: "order" },
     ]} />
     <FieldTable title="Response body fields" iconName="bodyParams" fields={[
-      { name: "id", type: "LinxioId", description: "Vehicle type identifier." },
-      { name: "name", type: "string", description: "Vehicle type display name." },
-      { name: "order", type: "number", description: "Sort order when supplied." },
+      { name: "data", type: "LinxioVehicleType[]", description: "Vehicle type rows for the current page." },
+      { name: "data[].id", type: "LinxioId", description: "Vehicle type identifier." },
+      { name: "data[].name", type: "string", description: "Vehicle type display name." },
+      { name: "data[].default/driving/idling/stopped", type: "string | null", description: "Dashboard color values for type states." },
+      { name: "data[].status", type: "string | null", description: "Vehicle type status." },
+      { name: "data[].order", type: "number", description: "Sort order when supplied." },
+      { name: "page", type: "number", description: "Current page number." },
+      { name: "limit", type: "number", description: "Page size." },
+      { name: "total", type: "number", description: "Total matching type count." },
     ]} />
   </div>
 

@@ -33,7 +33,7 @@ Most shapes are tenant-configurable, so the SDK preserves unknown fields.
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "code", type: "string", description: "Country code when supplied." }, { name: "name", type: "string", description: "Country display name." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "[countryCode]", type: "string", description: "Country display name keyed by country code." }]} />
   </div>
   <CodeRail>
 
@@ -160,12 +160,12 @@ curl "https://api.linxio.com/api/themes/my" \
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Get current plan permissions" method="GET" path="/permissions/current-plan" sdk="linxio.metadata.currentPlan()">
-      Returns current-plan permission and feature information.
+      Returns current-plan permission keys for the authenticated tenant.
     </ReferenceHeader>
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "features", type: "string[]", description: "Enabled feature keys when supplied." }, { name: "permissions", type: "object", description: "Permission flags keyed by feature or module." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[{ name: "data[]", type: "string", description: "Enabled permission or feature key." }]} />
   </div>
   <CodeRail>
 
@@ -225,13 +225,20 @@ curl "https://api.linxio.com/api/settings/language/list" \
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List map API options" method="GET" path="/settings/mapApiOptions" sdk="linxio.metadata.mapApiOptions()">
-      Lists map API provider options.
+    <ReferenceHeader title="Get map API options" method="GET" path="/settings/mapApiOptions" sdk="linxio.metadata.mapApiOptions()">
+      Returns the map API option setting record.
     </ReferenceHeader>
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioMapApiOption[]", description: "Map API option records." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
+      { name: "id", type: "LinxioId", description: "Setting identifier." },
+      { name: "name", type: "string", description: "Setting name." },
+      { name: "value", type: "unknown", description: "Tenant-specific setting value." },
+      { name: "role", type: "unknown", description: "Role scope when supplied." },
+      { name: "team", type: "unknown", description: "Team scope when supplied." },
+      { name: "user", type: "unknown", description: "User scope when supplied." },
+    ]} />
   </div>
   <CodeRail>
 
@@ -253,7 +260,14 @@ curl "https://api.linxio.com/api/settings/mapApiOptions" \
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioProviderSetting[]", description: "Provider setting records." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
+      { name: "id", type: "LinxioId", description: "Setting identifier." },
+      { name: "name", type: "string", description: "Setting name." },
+      { name: "value", type: "unknown", description: "Tenant-specific provider value." },
+      { name: "role", type: "unknown", description: "Role scope when supplied." },
+      { name: "team", type: "unknown", description: "Team scope when supplied." },
+      { name: "user", type: "unknown", description: "User scope when supplied." },
+    ]} />
   </div>
   <CodeRail>
 
@@ -275,7 +289,12 @@ curl "https://api.linxio.com/api/settings/provider" \
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioDigitalFormSettings", description: "Digital-form feature settings." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
+      { name: "id", type: "LinxioId", description: "Setting identifier." },
+      { name: "name", type: "string", description: "Setting name." },
+      { name: "value", type: "unknown", description: "Tenant-specific digital-form value." },
+      { name: "role / team / user", type: "unknown", description: "Optional setting scope fields." },
+    ]} />
   </div>
   <CodeRail>
 
@@ -297,7 +316,12 @@ curl "https://api.linxio.com/api/settings/digitalForm" \
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioEcoSpeedSettings", description: "Eco-speed feature settings." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
+      { name: "id", type: "LinxioId", description: "Setting identifier." },
+      { name: "name", type: "string", description: "Setting name." },
+      { name: "value", type: "unknown", description: "Tenant-specific eco-speed value." },
+      { name: "role / team / user", type: "unknown", description: "Optional setting scope fields." },
+    ]} />
   </div>
   <CodeRail>
 
@@ -319,7 +343,12 @@ curl "https://api.linxio.com/api/settings/ecoSpeed" \
 
     <RequiredHeaders />
     <FieldTable title="Request query parameters" iconName="forward"  fields={[{ name: "none", type: "void", description: "No query parameters are required." }]} />
-    <FieldTable title="Response" fields={[{ name: "data", type: "LinxioExcessiveIdlingSettings", description: "Excessive-idling feature settings." }]} />
+    <FieldTable title="Response body fields" iconName="bodyParams" fields={[
+      { name: "id", type: "LinxioId", description: "Setting identifier." },
+      { name: "name", type: "string", description: "Setting name." },
+      { name: "value", type: "unknown", description: "Tenant-specific excessive-idling value." },
+      { name: "role / team / user", type: "unknown", description: "Optional setting scope fields." },
+    ]} />
   </div>
   <CodeRail>
 

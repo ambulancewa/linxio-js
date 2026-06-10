@@ -20,7 +20,7 @@ when Linxio supplies one, plus tenant-specific fields.
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioCountry[] | null", description: "Country records, usually including code and name." },
+        { name: "data", type: "LinxioCountryMap | null", description: "Object keyed by country code, with country display names as values." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when countries cannot be loaded." },
       ]}
     />
@@ -206,7 +206,7 @@ if (theme.error) {
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="Get current plan permissions" method="GET" path="/permissions/current-plan" sdk="linxio.metadata.currentPlan()">
-      Fetches current-plan permission and feature information.
+      Fetches current-plan permission keys for the authenticated tenant.
     </ReferenceHeader>
 
     <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "currentPlan() does not take parameters." }]} />
@@ -214,7 +214,7 @@ if (theme.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioCurrentPlan | null", description: "Current plan details, enabled features, and permission flags when supplied." },
+        { name: "data", type: "LinxioCurrentPlan | null", description: "Enabled permission or feature keys." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when current plan data cannot be loaded." },
       ]}
     />
@@ -302,7 +302,7 @@ if (languages.error) {
 <ReferenceGrid>
   <div>
     <ReferenceHeader title="List map API options" method="GET" path="/settings/mapApiOptions" sdk="linxio.metadata.mapApiOptions()">
-      Lists map API provider options available to the current tenant.
+      Fetches the map API option setting record for the current tenant.
     </ReferenceHeader>
 
     <FieldTable title="Input" fields={[{ name: "none", type: "void", description: "mapApiOptions() does not take parameters." }]} />
@@ -310,7 +310,7 @@ if (languages.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioMapApiOption[] | null", description: "Map API option records." },
+        { name: "data", type: "LinxioMapApiOption | null", description: "Setting record including id, name, value, role, team, and user when supplied." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when map options cannot be loaded." },
       ]}
     />
@@ -342,7 +342,7 @@ if (options.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioProviderSetting[] | null", description: "Provider setting records." },
+        { name: "data", type: "LinxioProviderSetting | null", description: "Setting record including id, name, value, role, team, and user when supplied." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when provider settings cannot be loaded." },
       ]}
     />
@@ -374,7 +374,7 @@ if (providers.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioDigitalFormSettings | null", description: "Digital-form feature settings. Shape can vary by tenant." },
+        { name: "data", type: "LinxioDigitalFormSettings | null", description: "Setting record including id, name, value, role, team, and user when supplied." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
       ]}
     />
@@ -406,7 +406,7 @@ if (settings.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioEcoSpeedSettings | null", description: "Eco-speed settings. Shape can vary by tenant." },
+        { name: "data", type: "LinxioEcoSpeedSettings | null", description: "Setting record including id, name, value, role, team, and user when supplied." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
       ]}
     />
@@ -438,7 +438,7 @@ if (settings.error) {
     <FieldTable
       title="Returns"
       fields={[
-        { name: "data", type: "LinxioExcessiveIdlingSettings | null", description: "Excessive-idling settings. Shape can vary by tenant." },
+        { name: "data", type: "LinxioExcessiveIdlingSettings | null", description: "Setting record including id, name, value, role, team, and user when supplied." },
         { name: "error", type: "LinxioError | null", description: "Typed SDK error when settings cannot be loaded." },
       ]}
     />

@@ -97,7 +97,7 @@ const routesWithPoints = await linxio.routes.getVehicleRoutes(vehicleId, {
 
 <ReferenceGrid>
   <div>
-    <ReferenceHeader title="List sensors" method="GET" path="/sensors" sdk="linxio.sensors.list()">
+    <ReferenceHeader title="List sensors" method="GET" path="/sensors" sdk="linxio.sensors.list(params)">
       Lists sensors visible to the authenticated account.
     </ReferenceHeader>
 
@@ -105,9 +105,20 @@ const routesWithPoints = await linxio.routes.getVehicleRoutes(vehicleId, {
       title="Input"
       fields={[
         {
-          name: "none",
-          type: "void",
-          description: "list() does not take parameters.",
+          name: "params.limit",
+          type: "number",
+          description: "Number of sensors to request.",
+        },
+        {
+          name: "params.page",
+          type: "number",
+          description: "Page number to request.",
+          defaultValue: "1",
+        },
+        {
+          name: "params.fields",
+          type: "SensorField[]",
+          description: "Sensor fields to include in the response projection.",
         },
       ]}
     />
@@ -118,7 +129,12 @@ const routesWithPoints = await linxio.routes.getVehicleRoutes(vehicleId, {
         {
           name: "data",
           type: "LinxioSensor[] | null",
-          description: "Sensor records.",
+          description: "Sensor records for the requested page.",
+        },
+        {
+          name: "meta",
+          type: "LinxioPaginationMeta | null",
+          description: "Pagination metadata.",
         },
         {
           name: "error",
@@ -132,7 +148,10 @@ const routesWithPoints = await linxio.routes.getVehicleRoutes(vehicleId, {
   <CodeRail>
 
 ```ts title="List sensors" lineNumbers
-const sensors = await linxio.sensors.list();
+const sensors = await linxio.sensors.list({
+  limit: 25,
+  page: 1,
+});
 
 if (sensors.error) {
   throw sensors.error;

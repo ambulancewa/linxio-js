@@ -39,7 +39,7 @@ describe("reference type helpers", () => {
             shape?.fields
                 .find((field) => field.name === "todayData")
                 ?.children?.map((field) => field.name),
-        ).toEqual(["avgSpeed", "distance", "duration"]);
+        ).toEqual(["avgSpeed", "distance", "duration", "idleDuration"]);
     });
 
     it("tokenizes type text without losing punctuation around linked types", () => {
@@ -60,9 +60,16 @@ describe("reference type helpers", () => {
             "regNo",
             "defaultLabel",
             "model",
-            "depotName",
-            "groupsList",
+            "depot",
+            "groups",
             "driver",
+            "type",
+            "typeId",
+            "typeName",
+            "make",
+            "makeModel",
+            "vin",
+            "deviceId",
             "status",
             "lastLoggedAt",
             "lastCoordinates",

@@ -6,6 +6,8 @@ description: User management, client account users, driver assignment, and resel
 
 <ImportantNote>These services are related but not interchangeable. `linxio.users` works at the account user endpoint, `linxio.clients` works with client accounts and their users, `linxio.drivers` focuses on driver workflows, and `linxio.resellers` exposes reseller account lookup.</ImportantNote>
 
+<ImportantNote>Account and reseller endpoints are tenant-permission sensitive. In the live validation tenant, `/clients/{clientId}/users` was available for client-scoped users, while `/users`, `/clients/json`, and `/reseller` were unavailable or permission-gated for the supplied account.</ImportantNote>
+
 ## users.list()
 
 <ReferenceGrid>

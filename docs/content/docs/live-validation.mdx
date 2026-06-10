@@ -3,9 +3,9 @@ title: Live Validation
 description: Redacted read-only validation notes from a production Linxio tenant.
 ---
 
-The SDK was exercised against a production Linxio tenant on June 8, 2026 using
+The SDK was exercised against a production Linxio tenant on June 10, 2026 using
 read-only operations. No create, update, delete, archive, restore, install, or
-assignment calls were made during this validation run.
+assignment calls were made during the default validation run.
 
 The shapes below are intentionally redacted. They do not include real
 registration numbers, IMEIs, coordinates, names, identifiers, tenant totals, or
@@ -20,13 +20,32 @@ LINXIO_EMAIL="..." LINXIO_PASSWORD="..." pnpm live:smoke
 The smoke script imports the compiled package from `dist`, authenticates with
 `auth.login()`, then samples list/stream endpoints through the public SDK.
 
+## Read-only contract audit
+
+```bash
+LINXIO_SDK_SCRATCH_EMAIL="..." LINXIO_SDK_SCRATCH_PASSWORD="..." pnpm live:contract
+```
+
+The contract audit imports the compiled package from `dist`, authenticates, and
+samples redacted response structures across vehicles, devices, sensors, fuel,
+reports, digital forms, metadata, and tenant-gated account helpers. Output is
+limited to structural summaries such as object keys, array lengths, and scalar
+types.
+
 ## Observed shapes
 
 | SDK call | Result |
 | --- | --- |
-| `vehicles.list({ fields: ["id", "regNo", "lastLoggedAt"], limit: 3 })` | `data` array with `id: number`, `regNo: string` in the sampled record. Requested fields may be omitted by Linxio when a value is not present. |
+| `vehicles.list({ limit: 2, page: 1 })` | Paginated `data` array of full vehicle records. Sampled vehicles included nested `team`, `depot`, `groups`, `driver`, `createdBy`, `updatedBy`, `areas`, and `todayData` objects when configured for the tenant. |
 | `vehicles.stream({ fields: ["id", "regNo", "lastLoggedAt"], limit: 3 })` | Streamed vehicle records with the same redacted shape as the list sample. |
 | `devices.list({ fields: ["id", "imei", "status"], limit: 3 })` | `data` array with `id: number`, `imei: string`, `status: string` in the sampled record. |
+| `devices.sensors(deviceId, { limit: 2, page: 1 })` | Paginated sensor rows from `/devices/{deviceId}/sensors/history`. |
+| `devices.vendors()` | Array of vendors with supported model arrays. The live path requires `/devices/vendors/` with a trailing slash. |
+| `devices.installation({ deviceImei })` | Single installation object keyed by `device`, `deviceId`, `vehicle`, `vehicleId`, `installDate`, `uninstallDate`, `odometer`, and `files` when a match exists. Empty live responses are normalized to `null`. |
+| `sensors.list({ limit: 5, page: 1 })` | Paginated `data` array with sensor records, `page`, `limit`, `total`, and `aggregations`. |
+| `metadata.countries()` | Object map keyed by country code, not an array. |
+| `metadata.currentPlan()` | String array of permission or feature keys. |
+| `metadata.mapApiOptions()` / `metadata.providers()` | Single setting records with `id`, `name`, `value`, `role`, `team`, and `user` keys. |
 | `geofences.list({ limit: 3 })` | `data` array with `coordinates: array`, `createdAt: string`, `groups: array`, `id: number`, `name: string`, `polygon: string`, `readOnly: boolean`, `status: string`, `team: object`, `type: string`, `updatedAt: string` in the sampled record. |
 
 All sampled list responses returned normalized pagination metadata through
@@ -38,8 +57,13 @@ tenant inventory counts are operational data.
 ```bash
 pnpm build
 LINXIO_EMAIL="..." LINXIO_PASSWORD="..." pnpm live:smoke
+LINXIO_SDK_SCRATCH_EMAIL="..." LINXIO_SDK_SCRATCH_PASSWORD="..." pnpm live:contract
 ```
 
 Set `LINXIO_LIVE_FULL_PAGINATION=1` only when you deliberately want to exercise
 `vehicles.iterate()` against every vehicle page. The default smoke test avoids
 full-pagination traversal to keep production-tenant load low.
+
+Set `LINXIO_LIVE_MUTATIONS=1` or run `pnpm live:contract:mutations` only when
+you deliberately want to create and clean up scratch geofence objects. The
+default contract audit is read-only.

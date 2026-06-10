@@ -71,17 +71,15 @@ projection aggressively on list and iterate calls to keep large fleets fast.
   <CodeRail>
 
 ```ts title="List vehicles" lineNumbers
-const page = await linxio.vehicles.list({
-  fields: ["id", "regNo", "lastLoggedAt"],
-  limit: 100,
-  page: 1,
+// Paginated list with specific fields
+const { data: vehicles, error, meta } = await linxio.vehicles.list({
+  fields: ["id", "regNo", "status", "lastLoggedAt"],
+  limit: 50,
 });
 
-if (page.error) {
-  throw page.error;
-}
+if (error) throw error;
 
-console.log(page.meta.total, page.data);
+console.log(`${meta.total} total vehicles`);
 ```
 
   </CodeRail>
@@ -768,7 +766,12 @@ console.log(count.data.count ?? count.data.total ?? 0);
         {
           name: "data",
           type: "LinxioVehicleType[] | null",
-          description: "Vehicle type records, usually including id, name, and order.",
+          description: "Vehicle type records for the requested page, including id, name, color fields, status, and order.",
+        },
+        {
+          name: "meta",
+          type: "{ page: number; limit: number; total: number } | null",
+          description: "Pagination metadata returned by Linxio.",
         },
         {
           name: "error",
@@ -788,6 +791,7 @@ if (types.error) {
   throw types.error;
 }
 
+console.log(types.meta.total);
 const lightVehicle = types.data.find((type) => type.name === "Light Vehicle");
 ```
 

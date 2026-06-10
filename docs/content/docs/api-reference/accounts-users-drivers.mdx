@@ -7,6 +7,8 @@ The SDK exposes related account APIs through several services. Use `/users` for
 account-level user management, `/clients/{clientId}/users` for users inside a
 client account, and driver assignment endpoints for vehicle-driver links.
 
+<ImportantNote>Account and reseller endpoints are tenant-permission sensitive. In the live validation tenant, `/clients/{clientId}/users` was available for client-scoped users, while `/users`, `/clients/json`, and `/reseller` were unavailable or permission-gated for the supplied account.</ImportantNote>
+
 ## GET /users
 
 <ReferenceGrid>
