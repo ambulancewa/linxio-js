@@ -1,8 +1,8 @@
 {
     "name": "linxio-js",
-    "version": "1.37.3",
+    "version": "2.22.4",
     "packageManager": "pnpm@11.5.2",
-    "description": "A typed TypeScript client for the Linxio (https://linxio.com) Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!",
+    "description": "linxio-js is a secure, lightweight, high-performance Node.js SDK for interacting with the Linxio Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!",
     "type": "module",
     "main": "./dist/index.cjs",
     "module": "./dist/index.js",
