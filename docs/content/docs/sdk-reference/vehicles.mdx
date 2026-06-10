@@ -315,8 +315,8 @@ console.log(vehicle.data.regNo);
 
 ```ts title="Create a vehicle" lineNumbers
 const created = await linxio.vehicles.create({
-  regNo: "TEST-001",
-  defaultLabel: "Temporary SDK Test Vehicle",
+  regNo: "1ABC234",
+  defaultLabel: "NW201",
   typeId: vehicleTypeId,
 });
 
@@ -375,7 +375,7 @@ if (created.error) {
 
 ```ts title="Update a vehicle" lineNumbers
 const updated = await linxio.vehicles.update(vehicleId, {
-  defaultLabel: "Updated display label",
+  defaultLabel: "NW202",
 });
 
 if (updated.error) {

@@ -2438,13 +2438,7 @@ function buildReferenceExampleInternal(
             continue;
         }
 
-        const value = sampleValueForField(field, context);
-
-        if (value === undefined) {
-            continue;
-        }
-
-        setExampleValue(example, field.name, value);
+        setExampleFieldValue(example, field, context);
     }
 
     return Object.keys(example).length ? example : undefined;
@@ -2570,27 +2564,42 @@ function setExampleValue(
     rawName: string,
     value: unknown,
 ) {
-    for (const name of expandFieldName(rawName)) {
-        const path = name.split(".").map((part) => part.trim());
-        let cursor = target;
+    const path = rawName.split(".").map((part) => part.trim());
+    let cursor = target;
 
-        for (const [index, segment] of path.entries()) {
-            if (!segment || segment.startsWith("[") || segment === "none") {
-                return;
-            }
-
-            if (index === path.length - 1) {
-                cursor[segment] = value;
-                continue;
-            }
-
-            const current = cursor[segment];
-            if (!isPlainRecord(current)) {
-                cursor[segment] = {};
-            }
-
-            cursor = cursor[segment] as Record<string, unknown>;
+    for (const [index, segment] of path.entries()) {
+        if (!segment || segment.startsWith("[") || segment === "none") {
+            return;
         }
+
+        if (index === path.length - 1) {
+            cursor[segment] = value;
+            continue;
+        }
+
+        const current = cursor[segment];
+        if (!isPlainRecord(current)) {
+            cursor[segment] = {};
+        }
+
+        cursor = cursor[segment] as Record<string, unknown>;
+    }
+}
+
+function setExampleFieldValue(
+    target: Record<string, unknown>,
+    field: ReferenceShapeField,
+    context: ExampleBuildContext,
+) {
+    for (const name of expandFieldName(field.name)) {
+        const concreteField = { ...field, name };
+        const value = sampleValueForField(concreteField, context);
+
+        if (value === undefined) {
+            continue;
+        }
+
+        setExampleValue(target, name, value);
     }
 }
 
@@ -2616,6 +2625,22 @@ function sampleValueForField(
 ): unknown {
     if (field.name === "error") {
         return null;
+    }
+
+    const namedValue = sampleLinxioValueForField(field.name);
+    if (namedValue !== undefined) {
+        return namedValue;
+    }
+
+    const normalizedName = normalizeExampleFieldName(field.name);
+    const knownNumber = sampleNumberForName(normalizedName);
+    if (knownNumber !== undefined) {
+        return knownNumber;
+    }
+
+    const knownString = sampleStringForName(normalizedName);
+    if (knownString !== undefined) {
+        return knownString;
     }
 
     return sampleValueForType(field.type, field, context);
@@ -2669,7 +2694,7 @@ function sampleValueForType(
     }
 
     if (type.includes("LinxioId")) {
-        return 304;
+        return sampleId(field?.name);
     }
 
     if (type.includes("ISODateString")) {
@@ -2711,6 +2736,11 @@ function getArrayElementType(type: string): string | undefined {
 
 function sampleNumber(name = ""): number {
     const normalized = name.toLowerCase();
+
+    const knownNumber = sampleNumberForName(normalized);
+    if (knownNumber !== undefined) {
+        return knownNumber;
+    }
 
     if (normalized.includes("avg")) {
         return 62;
@@ -2758,6 +2788,11 @@ function sampleNumber(name = ""): number {
 function sampleString(name = ""): string {
     const normalized = name.toLowerCase();
 
+    const knownString = sampleStringForName(normalized);
+    if (knownString !== undefined) {
+        return knownString;
+    }
+
     if (normalized.includes("email")) {
         return "user@example.com";
     }
@@ -2783,11 +2818,11 @@ function sampleString(name = ""): string {
     }
 
     if (normalized.includes("regno")) {
-        return "AMB-304";
+        return "1ABC234";
     }
 
     if (normalized.includes("label")) {
-        return "Temporary SDK Test Vehicle";
+        return "Example Label";
     }
 
     if (normalized.includes("status")) {
@@ -2799,6 +2834,205 @@ function sampleString(name = ""): string {
     }
 
     return "string";
+}
+
+function sampleLinxioValueForField(name: string): unknown {
+    const normalized = normalizeExampleFieldName(name);
+
+    switch (normalized) {
+        case "areas":
+            return [
+                {
+                    id: "23535401",
+                    area: {
+                        id: 100037,
+                        name: "Nollamara District",
+                        status: "active",
+                        color: "#2bb100",
+                    },
+                    driverArrived: null,
+                    driverDeparted: null,
+                    arrived: "2026-05-31T05:46:13+00:00",
+                    departed: null,
+                },
+            ];
+        case "createdby":
+        case "updatedby":
+            return {
+                id: "36421",
+                fullName: "Example User",
+                email: "user@example.com.au",
+                teamType: "client",
+            };
+        case "depot":
+            return {
+                id: 1128,
+                name: "Westminster Depot",
+                status: 1,
+                createdAt: "2026-01-15T03:59:25+00:00",
+                color: "#0065d1",
+            };
+        case "driver":
+            return {
+                id: "36541",
+                email: "driver@example.com.au",
+                name: "Example",
+                surname: "Driver",
+                role: {
+                    id: 6,
+                    name: "admin",
+                    displayName: "Admin",
+                },
+                phone: "+61401000123",
+                status: "active",
+                lastLoggedAt: "2026-05-24T08:31:46+00:00",
+                driverSensorId: "F4CFB22527B2",
+                driverFOBId: "1",
+            };
+        case "groups":
+            return [
+                {
+                    id: 1391,
+                    name: "North Metropolitan",
+                    color: "#009221",
+                },
+            ];
+        case "lastcoordinates":
+            return {
+                lat: -31.9523,
+                lng: 115.8613,
+                ts: "2026-06-08T12:00:00+08:00",
+            };
+        case "picture":
+        case "regcertno":
+        case "unavailablemessage":
+            return null;
+        case "team":
+            return {
+                id: 5932,
+                type: "client",
+                clientId: 5598,
+                resellerId: null,
+                resellerName: null,
+                clientName: "EXAMPLE CLIENT",
+            };
+        case "todaydata":
+            return {
+                distance: 0,
+                duration: 0,
+                avgSpeed: 0,
+                idleDuration: 0,
+            };
+        default:
+            return undefined;
+    }
+}
+
+function sampleId(name = ""): number | string {
+    const normalized = normalizeExampleFieldName(name);
+
+    switch (normalized) {
+        case "areaid":
+            return 100037;
+        case "clientid":
+            return 5598;
+        case "deviceid":
+            return 124210;
+        case "driverid":
+            return "36541";
+        case "fueltype":
+            return 9;
+        case "groupid":
+            return 1391;
+        case "id":
+        case "vehicleid":
+            return 64553;
+        case "teamid":
+            return 5932;
+        case "typeid":
+            return 5;
+        default:
+            return 64553;
+    }
+}
+
+function sampleNumberForName(normalized: string): number | undefined {
+    switch (normalizeExampleFieldName(normalized)) {
+        case "averagedailymileage":
+            return 9047;
+        case "averagefuel":
+            return 0;
+        case "avgspeed":
+            return 0;
+        case "co2emissions":
+            return 229;
+        case "distance":
+            return 0;
+        case "duration":
+            return 0;
+        case "ecosinglespeed":
+        case "ecospeed":
+            return 85;
+        case "enginecapacity":
+            return 3198;
+        case "engineontime":
+            return 95330;
+        case "enginepower":
+            return 147;
+        case "excessiveidling":
+            return 120;
+        case "fueltankcapacity":
+            return 80;
+        case "grossweight":
+            return 3200;
+        case "idleduration":
+            return 0;
+        case "year":
+            return 2019;
+        default:
+            return undefined;
+    }
+}
+
+function sampleStringForName(normalized: string): string | undefined {
+    switch (normalizeExampleFieldName(normalized)) {
+        case "createdat":
+            return "2026-01-15T04:07:48+00:00";
+        case "defaultlabel":
+            return "NW201";
+        case "emissionclass":
+            return "5";
+        case "lastloggedat":
+            return "2026-06-08T12:00:00+00:00";
+        case "make":
+            return "Ford";
+        case "makemodel":
+            return "Ranger";
+        case "model":
+            return "Ford Ranger";
+        case "name":
+            return "Example";
+        case "regdate":
+            return "2019-01-02T00:00:00+00:00";
+        case "regno":
+            return "1ABC234";
+        case "status":
+            return "online";
+        case "type":
+            return "Truck";
+        case "typename":
+            return "Utility Vehicle";
+        case "updatedat":
+            return "2026-05-30T00:35:15+00:00";
+        case "vin":
+            return "MPBUMEF50KX208999";
+        default:
+            return undefined;
+    }
+}
+
+function normalizeExampleFieldName(name = ""): string {
+    return name.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {

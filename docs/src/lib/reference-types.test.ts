@@ -119,16 +119,24 @@ describe("reference type helpers", () => {
         expect(buildReferenceExample(fields)).toMatchObject({
             data: [
                 {
-                    id: 304,
+                    id: 64553,
+                    make: "Ford",
+                    makeModel: "Ranger",
+                    model: "Ford Ranger",
                     lastCoordinates: {
                         lat: -31.9523,
                         lng: 115.8613,
+                        ts: "2026-06-08T12:00:00+08:00",
                     },
-                    regNo: "AMB-304",
+                    regNo: "1ABC234",
+                    defaultLabel: "NW201",
+                    vin: "MPBUMEF50KX208999",
+                    fuelTankCapacity: 80,
                     todayData: {
-                        avgSpeed: 62,
-                        distance: 12750,
-                        duration: 5400,
+                        avgSpeed: 0,
+                        distance: 0,
+                        duration: 0,
+                        idleDuration: 0,
                     },
                 },
             ],
@@ -182,7 +190,7 @@ describe("reference type helpers", () => {
         ).toEqual({
             data: {
                 odometer: 123456,
-                vehicleId: 304,
+                vehicleId: 64553,
             },
         });
     });
