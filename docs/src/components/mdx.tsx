@@ -6,6 +6,8 @@ import {
     ForwardIcon,
     Link2Icon,
     type LucideIcon,
+    MinusIcon,
+    PlusIcon,
     ReplyIcon,
 } from "lucide-react";
 import type { MDXComponents } from "mdx/types";
@@ -587,10 +589,37 @@ function FieldRows({
             {hiddenFields.length ? (
                 <details
                     key={`${depth}-show-more-fields`}
-                    className={cn("bg-fd-muted/15", className)}
+                    className={cn(
+                        "bg-fd-muted/15 [&>summary>#summary-text-show]:hidden [&[open]>summary>#summary-text-hide]:hidden [&[open]>summary>#summary-text-hide]:hidden [&[open]>summary>#summary-text-show]:flex",
+                        className,
+                    )}
                 >
-                    <summary className="flex cursor-pointer list-none items-center justify-center px-3 py-3 font-semibold text-[12px] text-fd-muted-foreground transition-colors hover:bg-fd-muted/40 hover:text-fd-foreground [&::-webkit-details-marker]:hidden">
-                        Show {hiddenFields.length} more
+                    <summary className="flex cursor-pointer list-none flex-row items-center justify-center gap-1 border-fd-border bg-blue-300/20 px-3 py-1.5 font-semibold text-[12px] text-blue-600 transition-colors hover:bg-blue-300/30 hover:text-blue-800 dark:bg-blue-950/20 dark:hover:bg-blue-900/20 [&::-webkit-details-marker]:hidden">
+                        <span className="sr-only">
+                            Show/hide {hiddenFields.length} more
+                        </span>
+                        <span
+                            id="summary-text-hide"
+                            className="flex flex-row items-center justify-center gap-1"
+                            aria-hidden={true}
+                        >
+                            <PlusIcon
+                                className="size-3.5 opacity-50"
+                                strokeWidth={2.5}
+                            />{" "}
+                            Show {hiddenFields.length} more
+                        </span>
+                        <span
+                            id="summary-text-show"
+                            className="flex-row items-center justify-center gap-1"
+                            aria-hidden={true}
+                        >
+                            <MinusIcon
+                                className="size-3.5 opacity-50"
+                                strokeWidth={2.5}
+                            />{" "}
+                            Hide additional fields
+                        </span>
                     </summary>
                     <div className="divide-y divide-fd-border border-fd-border border-t">
                         <FieldRows
