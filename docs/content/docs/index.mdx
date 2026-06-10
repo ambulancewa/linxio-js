@@ -44,9 +44,3 @@ for (const vehicle of vehicles) {
   console.log(vehicle.id, vehicle.regNo, vehicle.lastLoggedAt);
 }
 ```
-
-## Evidence model
-
-The public API methods are based on Linxio's published API page. Additional service helpers were inferred from JavaScript bundles captured from the Linxio dashboard and are documented as dashboard-derived where appropriate.
-
-When a response schema is only partially known, exported types include the confirmed fields plus an open record shape so production scripts can keep working as Linxio adds fields.
