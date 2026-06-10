@@ -144,7 +144,7 @@ describe("LinxioClient", () => {
         });
         expect(linxioEndpoints.devices.vendors).toEqual({
             method: "GET",
-            path: "/devices/vendors",
+            path: "/devices/vendors/",
             source: "dashboard",
         });
         expect(linxioEndpoints.vehicles.count).toEqual({
@@ -466,6 +466,15 @@ describe("LinxioClient", () => {
                 return jsonResponse({ count: 14 });
             }
 
+            if (request.url.pathname === "/api/devices/installation/") {
+                return jsonResponse({
+                    deviceId: 545,
+                    id: 99,
+                    installDate: "2026-06-08T09:00:00+08:00",
+                    vehicleId: 304,
+                });
+            }
+
             return jsonResponse({ id: 1 });
         });
         const client = createTestClient(fetcher);
@@ -477,7 +486,8 @@ describe("LinxioClient", () => {
         await client.geofences.restoreGroup(7);
         await client.geofences.deleteGroup(7);
         await client.devices.vendors();
-        await client.devices.installations({ limit: 25 });
+        await client.devices.installation({ deviceImei: "123456789012345" });
+        await client.devices.installations({ vehicleRegNo: "TEST-001" });
         await client.devices.cameras(545);
         await client.vehicles.count({ status: "active" });
         await client.vehicles.types();
@@ -499,8 +509,19 @@ describe("LinxioClient", () => {
             ["PATCH", "/api/area-groups/7/archive", {}, {}],
             ["PATCH", "/api/area-groups/7/restore", {}, {}],
             ["DELETE", "/api/area-groups/7", {}, undefined],
-            ["GET", "/api/devices/vendors", {}, undefined],
-            ["GET", "/api/devices/installation", { limit: "25" }, undefined],
+            ["GET", "/api/devices/vendors/", {}, undefined],
+            [
+                "GET",
+                "/api/devices/installation/",
+                { deviceImei: "123456789012345" },
+                undefined,
+            ],
+            [
+                "GET",
+                "/api/devices/installation/",
+                { vehicleRegNo: "TEST-001" },
+                undefined,
+            ],
             ["GET", "/api/devices/545/cameras", {}, undefined],
             ["GET", "/api/vehicles/count", { status: "active" }, undefined],
             [
@@ -512,6 +533,139 @@ describe("LinxioClient", () => {
             ["POST", "/api/vehicles/304/restore", {}, {}],
             ["GET", "/api/scheduled-report/template", {}, undefined],
             ["PATCH", "/api/scheduled-report/91/restore", {}, {}],
+        ]);
+    });
+
+    it("normalizes live pageable reference endpoints that return data envelopes", async () => {
+        const fetcher = captureFetch((request) => {
+            if (request.url.pathname === "/api/vehicles/types") {
+                return jsonResponse({
+                    data: [
+                        {
+                            default: "#222222",
+                            driving: "#22c55e",
+                            id: 5,
+                            idling: "#f59e0b",
+                            name: "Utility Vehicle",
+                            order: 1,
+                            status: "active",
+                            stopped: "#64748b",
+                        },
+                    ],
+                    limit: 1000,
+                    page: 1,
+                    total: 1,
+                });
+            }
+
+            if (request.url.pathname === "/api/sensors") {
+                return jsonResponse({
+                    aggregations: null,
+                    data: [
+                        {
+                            id: 91,
+                            label: "Cooler Sensor",
+                            sensorId: "F4CFB22527B1",
+                            systemStatus: "online",
+                            type: "temp-and-humidity",
+                        },
+                    ],
+                    limit: 25,
+                    page: 2,
+                    total: 40,
+                });
+            }
+
+            return jsonResponse({ data: [], limit: 10, page: 1, total: 0 });
+        });
+        const client = createTestClient(fetcher);
+
+        const vehicleTypes = await client.vehicles.types();
+        const sensors = await client.sensors.list({ limit: 25, page: 2 });
+
+        expect(vehicleTypes.error).toBeNull();
+        expect(vehicleTypes.data).toEqual([
+            expect.objectContaining({
+                driving: "#22c55e",
+                id: 5,
+                name: "Utility Vehicle",
+            }),
+        ]);
+        expect(vehicleTypes.meta).toEqual({ limit: 1000, page: 1, total: 1 });
+        expect(sensors.error).toBeNull();
+        expect(sensors.data).toEqual([
+            expect.objectContaining({
+                id: 91,
+                label: "Cooler Sensor",
+                sensorId: "F4CFB22527B1",
+            }),
+        ]);
+        expect(sensors.meta).toEqual({ limit: 25, page: 2, total: 40 });
+    });
+
+    it("uses live-verified device auxiliary endpoints and query parameters", async () => {
+        const fetcher = captureFetch((request) => {
+            if (request.url.pathname === "/api/devices/545/coordinates") {
+                return jsonResponse([
+                    {
+                        lat: -31.9523,
+                        lng: 115.8613,
+                        ts: "2026-06-08T12:00:00+08:00",
+                    },
+                ]);
+            }
+
+            if (request.url.pathname === "/api/devices/545/sensors/history") {
+                return jsonResponse({
+                    data: [{ id: 7, label: "History Sensor" }],
+                    limit: 10,
+                    page: 1,
+                    total: 1,
+                });
+            }
+
+            return jsonResponse([]);
+        });
+        const client = createTestClient(fetcher);
+
+        const coordinates = await client.devices.coordinates(545, {
+            dateFrom: "2026-06-07T00:00:00+08:00",
+            dateTo: "2026-06-08T00:00:00+08:00",
+        });
+        const sensors = await client.devices.sensors(545, {
+            limit: 10,
+            page: 1,
+        });
+
+        expect(coordinates.data).toEqual([
+            {
+                lat: -31.9523,
+                lng: 115.8613,
+                ts: "2026-06-08T12:00:00+08:00",
+            },
+        ]);
+        expect(sensors.data).toEqual([{ id: 7, label: "History Sensor" }]);
+        expect(sensors.meta).toEqual({ limit: 10, page: 1, total: 1 });
+        expect(
+            fetcher.calls.map((request) => [
+                request.method,
+                request.url.pathname,
+                Object.fromEntries(request.url.searchParams),
+            ]),
+        ).toEqual([
+            [
+                "GET",
+                "/api/devices/545/coordinates",
+                {
+                    dateFrom: "2026-06-07T00:00:00+08:00",
+                    dateTo: "2026-06-08T00:00:00+08:00",
+                },
+            ],
+            [
+                "GET",
+                "/api/devices/545/sensors/history",
+                { limit: "10", page: "1" },
+            ],
         ]);
     });
 

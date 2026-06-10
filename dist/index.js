@@ -885,14 +885,14 @@ var DevicesService = class extends BaseService {
     );
   }
   /** Fetch recent coordinates for a device from the dashboard-derived endpoint. */
-  coordinates(deviceId) {
+  coordinates(deviceId, params = {}) {
     return this.result(
-      () => this.http.get(`/devices/${deviceId}/coordinates`)
+      () => this.http.get(`/devices/${deviceId}/coordinates`, { params })
     );
   }
-  /** List sensors paired with a device. */
-  sensors(deviceId) {
-    return this.result(() => this.http.get(`/devices/${deviceId}/sensors`));
+  /** List sensor history rows for a device. */
+  sensors(deviceId, params = {}) {
+    return this.getPage(`/devices/${deviceId}/sensors/history`, params);
   }
   /** Fetch device history entries from the dashboard-derived endpoint. */
   history(deviceId) {
@@ -900,17 +900,30 @@ var DevicesService = class extends BaseService {
   }
   /** List device vendors from the dashboard-derived endpoint. */
   vendors() {
-    return this.result(() => this.http.get("/devices/vendors"));
+    return this.result(() => this.http.get("/devices/vendors/"));
   }
-  /** List device installation rows from the dashboard-derived endpoint. */
+  /** Look up a device installation by device IMEI or vehicle registration. */
+  installation(params = {}) {
+    return this.result(async () => {
+      const installation = await this.http.get(
+        "/devices/installation/",
+        { params }
+      );
+      return isEmptyRecord(installation) ? null : installation;
+    });
+  }
+  /** Backwards-compatible alias for `installation()`. */
   installations(params = {}) {
-    return this.getPage("/devices/installation", params);
+    return this.installation(params);
   }
   /** List cameras attached to a device from the dashboard-derived endpoint. */
   cameras(deviceId) {
     return this.result(() => this.http.get(`/devices/${deviceId}/cameras`));
   }
 };
+function isEmptyRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 0;
+}
 
 // src/services/drivers.service.ts
 var DriversService = class extends BaseService {
@@ -1068,7 +1081,7 @@ var GeofencesService = class extends BaseService {
 
 // src/services/metadata.service.ts
 var MetadataService = class extends BaseService {
-  /** List country options used by Linxio address and tenant forms. */
+  /** Fetch country options as a map keyed by country code. */
   countries() {
     return this.result(() => this.http.get("/country/list"));
   }
@@ -1092,7 +1105,7 @@ var MetadataService = class extends BaseService {
   myTheme() {
     return this.result(() => this.http.get("/themes/my"));
   }
-  /** Fetch current-plan permission and feature information. */
+  /** Fetch current-plan permission keys. */
   currentPlan() {
     return this.result(() => this.http.get("/permissions/current-plan"));
   }
@@ -1104,7 +1117,7 @@ var MetadataService = class extends BaseService {
   languages() {
     return this.result(() => this.http.get("/settings/language/list"));
   }
-  /** List map API provider options available to the current tenant. */
+  /** Fetch the map API setting record for the current tenant. */
   mapApiOptions() {
     return this.result(() => this.http.get("/settings/mapApiOptions"));
   }
@@ -1211,8 +1224,16 @@ var RoutesService = class extends BaseService {
 // src/services/sensors.service.ts
 var SensorsService = class extends BaseService {
   /** List sensors from the dashboard-derived endpoint. */
-  list() {
-    return this.result(() => this.http.get("/sensors"));
+  list(params = {}) {
+    return this.getPage("/sensors", params);
+  }
+  /** Load every sensor page into a single result. */
+  iterate(params = {}) {
+    return collectPages((pageParams) => this.list(pageParams), params);
+  }
+  /** Stream sensors without loading the whole inventory at once. */
+  stream(params = {}) {
+    return streamPages((pageParams) => this.list(pageParams), params);
   }
   /** Fetch one sensor by internal Linxio sensor ID. */
   get(sensorId) {
@@ -1358,15 +1379,11 @@ var VehiclesService = class extends BaseService {
   }
   /** List vehicle types using the dashboard-derived vehicle type endpoint. */
   types(params = {}) {
-    return this.result(
-      () => this.http.get("/vehicles/types", {
-        params: {
-          limit: 1e3,
-          sort: "order",
-          ...params
-        }
-      })
-    );
+    return this.getPage("/vehicles/types", {
+      limit: 1e3,
+      sort: "order",
+      ...params
+    });
   }
 };
 
@@ -1705,13 +1722,13 @@ var linxioEndpoints = {
     },
     installations: {
       method: "GET",
-      path: "/devices/installation",
+      path: "/devices/installation/",
       source: "dashboard"
     },
     sensors: {
       list: {
         method: "GET",
-        path: "/devices/{deviceId}/sensors",
+        path: "/devices/{deviceId}/sensors/history",
         source: "dashboard"
       }
     },
@@ -1727,7 +1744,7 @@ var linxioEndpoints = {
     },
     vendors: {
       method: "GET",
-      path: "/devices/vendors",
+      path: "/devices/vendors/",
       source: "dashboard"
     }
   },
@@ -2025,7 +2042,7 @@ var linxioEndpoints = {
     },
     types: {
       method: "GET",
-      path: "/vehicles/types?limit=1000&sort=order",
+      path: "/vehicles/types",
       source: "dashboard"
     }
   }

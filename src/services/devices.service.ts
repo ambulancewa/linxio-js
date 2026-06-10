@@ -5,14 +5,16 @@ import type {
     LinxioDevice,
     LinxioDeviceCamera,
     LinxioDeviceCoordinate,
+    LinxioDeviceCoordinateParams,
     LinxioDeviceInstallation,
+    LinxioDeviceInstallationLookupParams,
     LinxioDeviceInstallationPayload,
     LinxioDeviceListParams,
     LinxioDevicePayload,
     LinxioDeviceUninstallPayload,
     LinxioDeviceVendor,
 } from "../types/devices";
-import type { LinxioSensor } from "../types/sensors";
+import type { LinxioSensor, LinxioSensorListParams } from "../types/sensors";
 import { BaseService } from "./base.service";
 
 /** Device inventory, install, uninstall, coordinate, and sensor endpoints. */
@@ -95,15 +97,19 @@ export class DevicesService extends BaseService {
     /** Fetch recent coordinates for a device from the dashboard-derived endpoint. */
     coordinates(
         deviceId: LinxioId,
+        params: LinxioDeviceCoordinateParams = {},
     ): Promise<LinxioResult<LinxioDeviceCoordinate[]>> {
         return this.result(() =>
-            this.http.get(`/devices/${deviceId}/coordinates`),
+            this.http.get(`/devices/${deviceId}/coordinates`, { params }),
         );
     }
 
-    /** List sensors paired with a device. */
-    sensors(deviceId: LinxioId): Promise<LinxioResult<LinxioSensor[]>> {
-        return this.result(() => this.http.get(`/devices/${deviceId}/sensors`));
+    /** List sensor history rows for a device. */
+    sensors(
+        deviceId: LinxioId,
+        params: LinxioSensorListParams = {},
+    ): Promise<LinxioPageResult<LinxioSensor>> {
+        return this.getPage(`/devices/${deviceId}/sensors/history`, params);
     }
 
     /** Fetch device history entries from the dashboard-derived endpoint. */
@@ -113,18 +119,41 @@ export class DevicesService extends BaseService {
 
     /** List device vendors from the dashboard-derived endpoint. */
     vendors(): Promise<LinxioResult<LinxioDeviceVendor[]>> {
-        return this.result(() => this.http.get("/devices/vendors"));
+        return this.result(() => this.http.get("/devices/vendors/"));
     }
 
-    /** List device installation rows from the dashboard-derived endpoint. */
+    /** Look up a device installation by device IMEI or vehicle registration. */
+    installation(
+        params: LinxioDeviceInstallationLookupParams = {},
+    ): Promise<LinxioResult<LinxioDeviceInstallation | null>> {
+        return this.result(async () => {
+            const installation = await this.http.get<LinxioDeviceInstallation>(
+                "/devices/installation/",
+                { params },
+            );
+
+            return isEmptyRecord(installation) ? null : installation;
+        });
+    }
+
+    /** Backwards-compatible alias for `installation()`. */
     installations(
-        params: LinxioDeviceListParams = {},
-    ): Promise<LinxioPageResult<LinxioDeviceInstallation>> {
-        return this.getPage("/devices/installation", params);
+        params: LinxioDeviceInstallationLookupParams = {},
+    ): Promise<LinxioResult<LinxioDeviceInstallation | null>> {
+        return this.installation(params);
     }
 
     /** List cameras attached to a device from the dashboard-derived endpoint. */
     cameras(deviceId: LinxioId): Promise<LinxioResult<LinxioDeviceCamera[]>> {
         return this.result(() => this.http.get(`/devices/${deviceId}/cameras`));
     }
+}
+
+function isEmptyRecord(value: unknown): boolean {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value) &&
+        Object.keys(value).length === 0
+    );
 }

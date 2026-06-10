@@ -1,6 +1,6 @@
 import type { LinxioResult } from "../result";
 import type {
-    LinxioCountry,
+    LinxioCountryMap,
     LinxioCurrentPlan,
     LinxioDigitalFormSettings,
     LinxioEcoSpeedSettings,
@@ -18,8 +18,8 @@ import { BaseService } from "./base.service";
 
 /** Read-only dashboard reference data and tenant settings. */
 export class MetadataService extends BaseService {
-    /** List country options used by Linxio address and tenant forms. */
-    countries(): Promise<LinxioResult<LinxioCountry[]>> {
+    /** Fetch country options as a map keyed by country code. */
+    countries(): Promise<LinxioResult<LinxioCountryMap>> {
         return this.result(() => this.http.get("/country/list"));
     }
 
@@ -48,7 +48,7 @@ export class MetadataService extends BaseService {
         return this.result(() => this.http.get("/themes/my"));
     }
 
-    /** Fetch current-plan permission and feature information. */
+    /** Fetch current-plan permission keys. */
     currentPlan(): Promise<LinxioResult<LinxioCurrentPlan>> {
         return this.result(() => this.http.get("/permissions/current-plan"));
     }
@@ -63,13 +63,13 @@ export class MetadataService extends BaseService {
         return this.result(() => this.http.get("/settings/language/list"));
     }
 
-    /** List map API provider options available to the current tenant. */
-    mapApiOptions(): Promise<LinxioResult<LinxioMapApiOption[]>> {
+    /** Fetch the map API setting record for the current tenant. */
+    mapApiOptions(): Promise<LinxioResult<LinxioMapApiOption>> {
         return this.result(() => this.http.get("/settings/mapApiOptions"));
     }
 
     /** Fetch dashboard provider settings visible to the current account. */
-    providers(): Promise<LinxioResult<LinxioProviderSetting[]>> {
+    providers(): Promise<LinxioResult<LinxioProviderSetting>> {
         return this.result(() => this.http.get("/settings/provider"));
     }
 

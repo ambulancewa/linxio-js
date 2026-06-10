@@ -3,6 +3,7 @@ import type { LinxioPageResult, LinxioResult } from "../result";
 import type { LinxioId } from "../types/common";
 import type {
     LinxioSensor,
+    LinxioSensorListParams,
     LinxioSensorReportParams,
     LinxioTemperatureHumidityReading,
 } from "../types/sensors";
@@ -11,8 +12,24 @@ import { BaseService } from "./base.service";
 /** Sensor inventory and temperature/humidity report endpoints. */
 export class SensorsService extends BaseService {
     /** List sensors from the dashboard-derived endpoint. */
-    list(): Promise<LinxioResult<LinxioSensor[]>> {
-        return this.result(() => this.http.get("/sensors"));
+    list(
+        params: LinxioSensorListParams = {},
+    ): Promise<LinxioPageResult<LinxioSensor>> {
+        return this.getPage("/sensors", params);
+    }
+
+    /** Load every sensor page into a single result. */
+    iterate(
+        params: LinxioSensorListParams = {},
+    ): Promise<LinxioResult<LinxioSensor[]>> {
+        return collectPages((pageParams) => this.list(pageParams), params);
+    }
+
+    /** Stream sensors without loading the whole inventory at once. */
+    stream(
+        params: LinxioSensorListParams = {},
+    ): AsyncGenerator<LinxioSensor, void, undefined> {
+        return streamPages((pageParams) => this.list(pageParams), params);
     }
 
     /** Fetch one sensor by internal Linxio sensor ID. */

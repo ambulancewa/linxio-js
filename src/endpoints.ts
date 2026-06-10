@@ -95,13 +95,13 @@ export const linxioEndpoints = {
         },
         installations: {
             method: "GET",
-            path: "/devices/installation",
+            path: "/devices/installation/",
             source: "dashboard",
         },
         sensors: {
             list: {
                 method: "GET",
-                path: "/devices/{deviceId}/sensors",
+                path: "/devices/{deviceId}/sensors/history",
                 source: "dashboard",
             },
         },
@@ -117,7 +117,7 @@ export const linxioEndpoints = {
         },
         vendors: {
             method: "GET",
-            path: "/devices/vendors",
+            path: "/devices/vendors/",
             source: "dashboard",
         },
     },
@@ -415,7 +415,7 @@ export const linxioEndpoints = {
         },
         types: {
             method: "GET",
-            path: "/vehicles/types?limit=1000&sort=order",
+            path: "/vehicles/types",
             source: "dashboard",
         },
     },

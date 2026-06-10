@@ -31,6 +31,8 @@
         "format:sdk": "biome check src scripts package.json tsconfig.json tsup.config.ts pnpm-workspace.yaml --write --config-path ./biome.json",
         "lint": "pnpm lint:sdk && pnpm --dir docs lint",
         "lint:sdk": "biome check src scripts package.json tsconfig.json tsup.config.ts pnpm-workspace.yaml --config-path ./biome.json",
+        "live:contract": "pnpm build && node scripts/live-contract.mjs",
+        "live:contract:mutations": "pnpm build && node scripts/live-contract.mjs --mutations",
         "live:smoke": "node scripts/live-smoke.mjs",
         "prepack": "pnpm build",
         "test": "vitest run",
