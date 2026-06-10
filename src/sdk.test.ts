@@ -104,6 +104,66 @@ describe("LinxioClient", () => {
         );
     });
 
+    it("unwraps endpoint-key result envelopes for pageable service data", async () => {
+        const fetcher = captureFetch(() =>
+            jsonResponse({
+                result: {
+                    limit: 5,
+                    page: 1,
+                    total: 1,
+                    vehicles: [
+                        {
+                            id: 64553,
+                            model: "Ford Ranger",
+                            regNo: "1ABC234",
+                        },
+                    ],
+                },
+            }),
+        );
+        const client = createTestClient(fetcher);
+
+        const result = await client.vehicles.list({ limit: 5, page: 1 });
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual([
+            {
+                id: 64553,
+                model: "Ford Ranger",
+                regNo: "1ABC234",
+            },
+        ]);
+        expect(result.meta).toEqual({ limit: 5, page: 1, total: 1 });
+    });
+
+    it("unwraps endpoint-key array envelopes for standard service data", async () => {
+        const fetcher = captureFetch(() =>
+            jsonResponse({
+                result: {
+                    forms: [
+                        {
+                            id: 1201,
+                            status: "active",
+                            title: "Vehicle Inspection",
+                        },
+                    ],
+                },
+            }),
+        );
+        const client = createTestClient(fetcher);
+
+        const result = await client.digitalForms.list();
+
+        expect(result.error).toBeNull();
+        expect(result.data).toEqual([
+            {
+                id: 1201,
+                status: "active",
+                title: "Vehicle Inspection",
+            },
+        ]);
+    });
+
     it("keeps generic collection access behind raw request", () => {
         const client = createTestClient(captureFetch(() => jsonResponse({})));
 

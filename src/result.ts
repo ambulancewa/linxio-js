@@ -1,4 +1,5 @@
 import { LinxioError } from "./errors";
+import { unwrapLinxioServiceData } from "./response";
 import type { LinxioPage, LinxioPaginationMeta } from "./types/common";
 
 /** Successful SDK operation result. */
@@ -72,7 +73,7 @@ export async function toResult<TData>(
     operation: () => Promise<TData>,
 ): Promise<LinxioResult<TData>> {
     try {
-        return ok(await operation());
+        return ok(unwrapLinxioServiceData<TData>(await operation()));
     } catch (error) {
         return fail(error);
     }

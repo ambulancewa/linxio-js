@@ -1,7 +1,8 @@
 {
     "name": "linxio-js",
-    "version": "2.23.0",
+    "version": "2.23.1",
     "packageManager": "pnpm@11.5.2",
+    "private": false,
     "description": "linxio-js is a secure, lightweight, high-performance Node.js SDK for interacting with the Linxio Fleet Management API. Query vehicles, drivers, and devices, stream live GPS positions, subscribe to real-time notifications, auto-paginate large fleets, export reports, manage geofences and routes, and more!",
     "type": "module",
     "main": "./dist/index.cjs",
@@ -34,10 +35,11 @@
         "live:contract": "pnpm build && node scripts/live-contract.mjs",
         "live:contract:mutations": "pnpm build && node scripts/live-contract.mjs --mutations",
         "live:smoke": "node scripts/live-smoke.mjs",
-        "prepack": "pnpm build",
+        "prepack": "pnpm format &&pnpm build",
         "test": "vitest run",
         "typecheck": "tsc --noEmit",
         "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm docs:check",
+        "pub": "pnpm prepack && npm publish --access public",
         "bump-deps": "npx npm-check-updates --deep -u -x @biomejs/biome"
     },
     "keywords": [
