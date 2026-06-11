@@ -2777,6 +2777,18 @@ function sampleValueForType(
         });
     }
 
+    const objectLiteralFields = parseObjectLiteralFields(type);
+    if (objectLiteralFields?.length) {
+        if (context.depth >= maxExampleDepth) {
+            return {};
+        }
+
+        return buildReferenceExampleInternal(objectLiteralFields, {
+            ...context,
+            depth: context.depth + 1,
+        });
+    }
+
     const shape = findReferenceShape(type);
     if (shape) {
         if (
@@ -2821,6 +2833,137 @@ function sampleValueForType(
     }
 
     return sampleString(field?.name);
+}
+
+function parseObjectLiteralFields(
+    type: string,
+): ReferenceShapeField[] | undefined {
+    const content = extractObjectLiteralContent(type);
+
+    if (!content) {
+        return undefined;
+    }
+
+    const fields = splitTopLevelMembers(content)
+        .map((member) => parseObjectLiteralMember(member))
+        .filter((field): field is ReferenceShapeField => Boolean(field));
+
+    return fields.length ? fields : undefined;
+}
+
+function extractObjectLiteralContent(type: string): string | undefined {
+    let depth = 0;
+    let start = -1;
+    let quote: string | undefined;
+
+    for (let index = 0; index < type.length; index += 1) {
+        const character = type[index];
+        const previous = type[index - 1];
+
+        if (quote) {
+            if (character === quote && previous !== "\\") {
+                quote = undefined;
+            }
+            continue;
+        }
+
+        if (character === '"' || character === "'") {
+            quote = character;
+            continue;
+        }
+
+        if (character === "{") {
+            if (depth === 0) {
+                start = index + 1;
+            }
+            depth += 1;
+            continue;
+        }
+
+        if (character === "}") {
+            depth -= 1;
+            if (depth === 0 && start >= 0) {
+                return type.slice(start, index);
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function splitTopLevelMembers(content: string): string[] {
+    const members: string[] = [];
+    let current = "";
+    let depth = 0;
+    let quote: string | undefined;
+
+    for (let index = 0; index < content.length; index += 1) {
+        const character = content[index];
+        const previous = content[index - 1];
+
+        if (quote) {
+            current += character;
+            if (character === quote && previous !== "\\") {
+                quote = undefined;
+            }
+            continue;
+        }
+
+        if (character === '"' || character === "'") {
+            quote = character;
+            current += character;
+            continue;
+        }
+
+        if ("{[(<".includes(character)) {
+            depth += 1;
+            current += character;
+            continue;
+        }
+
+        if ("}])>".includes(character)) {
+            depth = Math.max(0, depth - 1);
+            current += character;
+            continue;
+        }
+
+        if (depth === 0 && (character === ";" || character === ",")) {
+            const member = current.trim();
+            if (member) {
+                members.push(member);
+            }
+            current = "";
+            continue;
+        }
+
+        current += character;
+    }
+
+    const member = current.trim();
+    if (member) {
+        members.push(member);
+    }
+
+    return members;
+}
+
+function parseObjectLiteralMember(
+    member: string,
+): ReferenceShapeField | undefined {
+    const match = member.match(
+        /^(?:readonly\s+)?["']?([A-Za-z_$][A-Za-z0-9_$-]*)["']?(\?)?\s*:\s*(.+)$/,
+    );
+
+    if (!match?.[1] || !match[3]) {
+        return undefined;
+    }
+
+    return {
+        description: `${match[1]} field.`,
+        name: match[1],
+        required: !match[2],
+        type: match[3].trim(),
+    };
 }
 
 function getArrayElementType(type: string): string | undefined {

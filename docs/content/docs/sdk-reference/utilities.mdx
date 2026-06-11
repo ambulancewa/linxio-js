@@ -42,7 +42,7 @@ for scripts, tests, custom endpoint wrappers, and endpoint-discovery tooling.
   <CodeRail>
 
 ```ts title="Failure narrowing" lineNumbers
-import { isLinxioFailure } from "linxio-js";
+import { isLinxioFailure } from "@ambulancewa/linxio-js";
 
 const result = await linxio.vehicles.list({ limit: 100 });
 
@@ -96,7 +96,7 @@ if (isLinxioFailure(result)) {
   <CodeRail>
 
 ```ts title="Unwrap result" lineNumbers
-import { unwrapLinxioResult } from "linxio-js";
+import { unwrapLinxioResult } from "@ambulancewa/linxio-js";
 
 const vehicle = unwrapLinxioResult(await linxio.vehicles.get(vehicleId));
 console.log(vehicle.regNo);
@@ -145,7 +145,7 @@ console.log(vehicle.regNo);
   <CodeRail>
 
 ```ts title="Unwrap page" lineNumbers
-import { unwrapLinxioPageResult } from "linxio-js";
+import { unwrapLinxioPageResult } from "@ambulancewa/linxio-js";
 
 const page = unwrapLinxioPageResult(
   await linxio.vehicles.list({ limit: 100 }),
@@ -192,7 +192,7 @@ console.log(page.meta.total);
   <CodeRail>
 
 ```ts title="Normalize errors" lineNumbers
-import { toLinxioError } from "linxio-js";
+import { toLinxioError } from "@ambulancewa/linxio-js";
 
 try {
   await runCustomEndpoint();
@@ -243,7 +243,7 @@ try {
   <CodeRail>
 
 ```ts title="Custom result" lineNumbers
-import { fail, ok } from "linxio-js";
+import { fail, ok } from "@ambulancewa/linxio-js";
 
 async function readCustomThing() {
   try {
@@ -298,7 +298,7 @@ async function readCustomThing() {
   <CodeRail>
 
 ```ts title="Collect custom endpoint pages" lineNumbers
-import { collectPages } from "linxio-js";
+import { collectPages } from "@ambulancewa/linxio-js";
 
 const result = await collectPages(
   (params) => linxio.sensors.list(params),
@@ -359,7 +359,7 @@ if (result.error) {
   <CodeRail>
 
 ```ts title="Stream custom endpoint pages" lineNumbers
-import { streamPages } from "linxio-js";
+import { streamPages } from "@ambulancewa/linxio-js";
 
 for await (const sensor of streamPages(
   (params) => linxio.sensors.list(params),
@@ -406,7 +406,7 @@ for await (const sensor of streamPages(
   <CodeRail>
 
 ```ts title="Endpoint catalogue" lineNumbers
-import { linxioEndpoints } from "linxio-js";
+import { linxioEndpoints } from "@ambulancewa/linxio-js";
 
 console.log(linxioEndpoints.vehicles.list);
 // { method: "GET", path: "/vehicles/fields/json", source: "public-docs" }
@@ -451,7 +451,7 @@ console.log(linxioEndpoints.vehicles.list);
   <CodeRail>
 
 ```ts title="Flatten endpoints" lineNumbers
-import { flattenEndpointDefinitions, linxioEndpoints } from "linxio-js";
+import { flattenEndpointDefinitions, linxioEndpoints } from "@ambulancewa/linxio-js";
 
 const endpoints = flattenEndpointDefinitions(linxioEndpoints);
 console.table(endpoints.slice(0, 5));
@@ -496,7 +496,7 @@ console.table(endpoints.slice(0, 5));
   <CodeRail>
 
 ```ts title="Extract dashboard endpoint evidence" lineNumbers
-import { extractDashboardEndpoints } from "linxio-js";
+import { extractDashboardEndpoints } from "@ambulancewa/linxio-js";
 
 const endpoints = extractDashboardEndpoints([
   {
@@ -566,7 +566,7 @@ import {
   extractDashboardEndpoints,
   flattenEndpointDefinitions,
   linxioEndpoints,
-} from "linxio-js";
+} from "@ambulancewa/linxio-js";
 
 const coverage = compareDashboardEndpointCoverage({
   dashboardEndpoints: extractDashboardEndpoints(sources),

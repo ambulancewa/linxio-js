@@ -74,7 +74,7 @@ description: Login, session hydration, token refresh, OTP, and safe credential h
   <CodeRail>
 
 ```ts title="Login and read vehicles" lineNumbers
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 const linxio = createClient();
 
@@ -152,7 +152,7 @@ curl -X POST https://api.linxio.com/api/login \
   <CodeRail>
 
 ```ts title="Restore a persisted session" lineNumbers
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 const linxio = createClient({
   token: stored.token,

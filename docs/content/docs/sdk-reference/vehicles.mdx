@@ -56,7 +56,7 @@ projection aggressively on list and iterate calls to keep large fleets fast.
         },
         {
           name: "meta",
-          type: "{ page: number; limit: number; total: number } | null",
+          type: "LinxioPaginationMeta | null",
           description: "Pagination metadata.",
         },
         {
@@ -770,7 +770,7 @@ console.log(count.data.count ?? count.data.total ?? 0);
         },
         {
           name: "meta",
-          type: "{ page: number; limit: number; total: number } | null",
+          type: "LinxioPaginationMeta | null",
           description: "Pagination metadata returned by Linxio.",
         },
         {

@@ -35,4 +35,25 @@ describe("FieldTable", () => {
 
         expect(html).toContain("Show 5 more");
     });
+
+    it("renders inline pagination metadata examples as an object", () => {
+        const html = renderToStaticMarkup(
+            <FieldTable
+                title="Returns"
+                fields={[
+                    {
+                        name: "meta",
+                        type: "{ page: number; limit: number; total: number } | null",
+                        description: "Pagination metadata.",
+                    },
+                ]}
+            />,
+        );
+
+        expect(html).toContain("&quot;meta&quot;");
+        expect(html).toContain("&quot;page&quot;");
+        expect(html).toContain("&quot;limit&quot;");
+        expect(html).toContain("&quot;total&quot;");
+        expect(html).not.toContain("&quot;meta&quot;: 123");
+    });
 });

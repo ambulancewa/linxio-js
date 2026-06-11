@@ -31,7 +31,7 @@ description: Install linxio-js and make your first authenticated Linxio request.
   <CodeRail>
 
 ```ts title="Basic client setup"
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 const linxio = createClient();
 ```
@@ -51,7 +51,7 @@ const linxio = createClient();
   <CodeRail>
 
 ```ts title="Login"
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 // The client you created in the previous step
 const linxio = createClient();
@@ -89,13 +89,13 @@ import { linxio } from "path/where/you/created/the/client";
 // Retrieve the session from the Linxio client
 const session = linxio.session();
 
-// TODO: (Replace with your own, real callback) Save the session
-// to whatever storage medium you prefer - cookies, database, file, etc. 
+// Save the session to whatever storage medium you prefer:
+// cookies, database, file, etc.
 await mySaveSessionCallback(session);
 
 // On next startup/client restart, load the session from your storage into the client
 const linxio2 = createClient(
-    await myLoadSessionCallback() // TODO: Replace with your own, real callback
+    await myLoadSessionCallback()
 );
 ```
 
@@ -163,7 +163,7 @@ for await (const vehicle of linxio.vehicles.stream({ limit: 100 })) {
   <CodeRail>
 
 ```ts title="Full example"
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 // The client you created in the previous step
 const linxio = createClient();

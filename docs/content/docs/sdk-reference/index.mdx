@@ -115,7 +115,7 @@ description: TypeScript client options, result contracts, service pages, and sha
   <CodeRail>
 
 ```ts title="Client setup" lineNumbers
-import { createClient } from "linxio-js";
+import { createClient } from "@ambulancewa/linxio-js";
 
 const linxio = createClient({
   timeoutMs: 30_000,
@@ -170,7 +170,7 @@ response for diagnostics.
     },
     {
       name: "meta",
-      type: "{ page: number; limit: number; total: number } | null",
+      type: "LinxioPaginationMeta | null",
       description: "Normalized pagination metadata.",
     },
     {

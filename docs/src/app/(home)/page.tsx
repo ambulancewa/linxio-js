@@ -83,7 +83,7 @@ export default function HomePage() {
                     Quick install
                 </p>
                 <pre className="inline-block rounded-lg border border-fd-border bg-fd-muted/50 px-5 py-3 font-mono text-[13px] text-fd-foreground">
-                    pnpm add linxio-js
+                    pnpm add @ambulancewa/linxio-js
                 </pre>
             </div>
         </main>

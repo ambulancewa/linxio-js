@@ -105,7 +105,7 @@ unsubscribe();
 ## ❌ Errors
 
 ```ts
-import { LinxioApiError } from "linxio-js";
+import { LinxioApiError } from "@ambulancewa/linxio-js";
 
 const { error } = await linxio.vehicles.create({});
 

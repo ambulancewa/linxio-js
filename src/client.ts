@@ -52,7 +52,7 @@ export type LinxioClientOptions = {
  *
  * @example
  * ```ts
- * import { createClient } from "linxio-js";
+ * import { createClient } from "@ambulancewa/linxio-js";
  *
  * const linxio = createClient();
  * await linxio.auth.login({ email, password });
